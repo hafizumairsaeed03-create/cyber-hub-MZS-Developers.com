@@ -1,0 +1,32 @@
+body {
+    margin: 0;
+    padding: 0;
+    background-color: #000;
+    overflow: hidden;
+}
+
+/* Background video ko poori screen par set karne ke liye */
+.bg-video {
+    position: fixed;
+    right: 0;
+    bottom: 0;
+    min-width: 100%;
+    min-height: 100%;
+    z-index: -1;
+    object-fit: cover;
+}
+
+.radar {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 480px;
+    height: 480px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    border: 20px solid #f7f7f7;
+    border-radius: 50%;
+    box-shadow: 0 8px #c5c5c5, inset 0 0 100px rgba(0, 255, 0, 0.5);
+}

@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About Us - Cyber Academy</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-deep: #070b14;
+            --panel-bg: #0c1322;
+            --border-color: #1a2744;
+            --neon-cyan: #00f2fe;
+            --neon-green: #10b981;
+            --neon-blue: #2563eb;
+            --text-main: #f8fafc;
+            --text-dim: #94a3b8;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: var(--bg-deep); color: var(--text-main); min-height: 100vh; padding-bottom: 50px; }
+        
+        /* Navbar */
+        nav { display: flex; justify-content: space-between; align-items: center; padding: 20px 60px; border-bottom: 1px solid var(--border-color); background: var(--panel-bg); }
+        .logo { font-size: 1.3rem; font-weight: bold; color: #fff; display: flex; align-items: center; gap: 10px; }
+        .logo span { color: var(--neon-cyan); }
+        .nav-menu { display: flex; list-style: none; gap: 30px; align-items: center; }
+        .nav-menu a { text-decoration: none; color: var(--text-dim); font-size: 0.9rem; transition: 0.3s; }
+        .nav-menu a:hover { color: var(--neon-cyan); }
+        .back-btn { background: transparent; border: 1px solid var(--neon-cyan); color: var(--neon-cyan); padding: 8px 18px; border-radius: 6px; text-decoration: none; font-size: 0.85rem; transition: 0.3s; }
+        .back-btn:hover { background: rgba(0,242,254,0.1); }
+
+        /* Container */
+        .container { max-width: 1100px; margin: 50px auto; padding: 0 20px; }
+        
+        /* About Hero Section */
+        .about-hero { background-color: var(--panel-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 45px; display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 40px; align-items: center; margin-bottom: 40px; }
+        .about-text h1 { font-size: 2.2rem; color: #fff; margin-bottom: 15px; }
+        .about-text h1 span { color: var(--neon-cyan); }
+        .about-text p { font-size: 0.95rem; color: var(--text-dim); line-height: 1.7; margin-bottom: 20px; }
+        
+        .feature-bullets { display: flex; flex-direction: column; gap: 10px; }
+        .feature-item { display: flex; align-items: center; gap: 10px; font-size: 0.9rem; color: var(--text-main); }
+        .feature-item i { color: var(--neon-green); }
+
+        /* Stats Grid */
+        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+        .stat-card { background-color: var(--panel-bg); border: 1px solid var(--border-color); border-radius: 10px; padding: 30px; text-align: center; }
+        .stat-card h3 { font-size: 2rem; color: var(--neon-cyan); margin-bottom: 8px; }
+        .stat-card p { font-size: 0.85rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; }
+    </style>
+</head>
+
+<body>
+
+    <!-- Navbar -->
+    <nav>
+        <div class="logo"><i class="fa-solid fa-shield-halved"></i> Cyber <span>Academy</span></div>
+        <ul class="nav-menu">
+            <li><a href="home.html">Home</a></li>
+            <li><a href="services.html">Services</a></li>
+            <li><a href="about.html" style="color: var(--neon-cyan);">About</a></li>
+        </ul>
+        <a href="home.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i> Back to Home</a>
+    </nav>
+
+    <!-- Main Container -->
+    <div class="container">
+        
+        <!-- Hero Section -->
+        <div class="about-hero">
+            <div class="about-text">
+                <h1>Your Journey to <span>Cybersecurity Starts Here</span></h1>
+                <p>Cyber Academy is a modern learning platform designed to help you build in-demand cybersecurity skills. Whether you are a beginner or a professional, we provide the resources, tools, and guidance you need to succeed.</p>
+                <div class="feature-bullets">
+                    <div class="feature-item"><i class="fa-solid fa-circle-check"></i> Practical Learning & Hands-on Labs</div>
+                    <div class="feature-item"><i class="fa-solid fa-circle-check"></i> Modern Security Techniques & Pentesting</div>
+                    <div class="feature-item"><i class="fa-solid fa-circle-check"></i> Industry-Focused Skills & Expert Mentorship</div>
+                </div>
+            </div>
+            <div class="about-visual" style="text-align: center; background: rgba(0,242,254,0.03); border: 1px dashed var(--border-color); padding: 40px; border-radius: 10px;">
+                <i class="fa-solid fa-user-secret" style="font-size: 5rem; color: var(--neon-cyan); margin-bottom: 15px;"></i>
+                <h3 style="color: #fff; font-size: 1.2rem;">Mr. Zubair Khan</h3>
+                <p style="color: var(--text-dim); font-size: 0.85rem; margin-top: 5px;">Lead Security Instructor & Founder</p>
+            </div>
+        </div>
+
+        <!-- Stats Section -->
+       <!-- Clickable Stats Grid -->
+<div class="stats-grid">
+    <a href="modules.html" class="stat-card" style="text-decoration: none; color: inherit; display: block; transition: 0.3s;">
+        <h3>100+</h3>
+        <p>Security Modules</p>
+    </a>
+    <a href="students.html" class="stat-card" style="text-decoration: none; color: inherit; display: block; transition: 0.3s;">
+        <h3>5,000+</h3>
+        <p>Active Students</p>
+    </a>
+    <a href="labs.html" class="stat-card" style="text-decoration: none; color: inherit; display: block; transition: 0.3s;">
+        <h3>24/7</h3>
+        <p>Lab Access</p>
+    </a>
+</div>
+        </div>
+
+    </div>
+    <script>
+    // Stats counter animation or interactive click effect
+    const statCards = document.querySelectorAll('.stat-card');
+    
+    statCards.forEach(card => {
+        card.addEventListener('mouseenter', () => {
+            card.style.borderColor = 'var(--neon-cyan)';
+            card.style.transform = 'translateY(-5px)';
+            card.style.transition = '0.3s ease';
+        });
+        
+        card.addEventListener('mouseleave', () => {
+            card.style.borderColor = 'var(--border-color)';
+            card.style.transform = 'translateY(0)';
+        });
+    });
+</script>
+
+</body>
+</html>

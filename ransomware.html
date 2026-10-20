@@ -1,0 +1,932 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MZ Cyber Defense - AES-256 Client Secure File Viewer & Crystal Clear Audio</title>
+  <style>
+    :root {
+      --bg-color: #020617;
+      --card-bg: #050b18;
+      --border-color: #00f0ff;
+      --accent-color: #00f0ff;
+      --text-main: #ffffff;
+      --text-sub: #94a3b8;
+      --badge-bg: #0a2540;
+      --badge-text: #00f0ff;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      padding: 20px;
+      min-height: 100vh;
+      background-image: radial-gradient(circle at 50% 10%, #081b33 0%, #020617 70%);
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    #matrixCanvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
+      opacity: 0.15;
+    }
+
+    .container {
+      max-width: 1300px;
+      margin: 0 auto;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Master Audio Unlock Overlay */
+    #audioUnlockOverlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(2, 6, 23, 0.92);
+      backdrop-filter: blur(10px);
+      z-index: 99999;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .unlock-card {
+      background: #050b18;
+      border: 2px solid #00f0ff;
+      border-radius: 20px;
+      padding: 35px;
+      max-width: 500px;
+      width: 100%;
+      box-shadow: 0 0 50px rgba(0, 240, 255, 0.5);
+    }
+
+    .unlock-btn {
+      background: linear-gradient(135deg, #0088cc, #00f0ff);
+      color: #020617;
+      border: none;
+      padding: 16px 28px;
+      border-radius: 12px;
+      font-size: 16px;
+      font-weight: 900;
+      cursor: pointer;
+      margin-top: 20px;
+      width: 100%;
+      box-shadow: 0 0 20px rgba(0,240,255,0.6);
+      transition: all 0.3s;
+    }
+    .unlock-btn:hover {
+      transform: scale(1.03);
+      box-shadow: 0 0 30px rgba(0,240,255,0.9);
+    }
+
+    .top-banner {
+      background-color: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: 14px;
+      padding: 24px;
+      margin-bottom: 25px;
+      box-shadow: 0 0 35px rgba(0, 240, 255, 0.25);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+
+    .badge {
+      display: inline-block;
+      background-color: var(--badge-bg);
+      color: var(--badge-text);
+      padding: 5px 14px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 700;
+      margin-bottom: 8px;
+      border: 1px solid rgba(0, 240, 255, 0.4);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .banner-title {
+      font-size: 24px;
+      font-weight: 800;
+      color: #ffffff;
+      text-shadow: 0 0 10px rgba(0,240,255,0.4);
+    }
+
+    .banner-subtitle {
+      font-size: 13px;
+      color: var(--text-sub);
+      margin-top: 4px;
+    }
+
+    .mz-digital-logo {
+      width: 75px;
+      height: 75px;
+      background: linear-gradient(135deg, #020617, #0a2540);
+      color: #00f0ff;
+      font-weight: 900;
+      font-size: 28px;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 25px rgba(0, 240, 255, 0.6), inset 0 0 15px rgba(0, 240, 255, 0.4);
+      border: 2px solid #00f0ff;
+      letter-spacing: 2px;
+    }
+
+    .visual-flow-card {
+      background: rgba(5, 11, 24, 0.95);
+      border: 2px solid #00f0ff;
+      border-radius: 16px;
+      padding: 24px;
+      margin-bottom: 25px;
+      box-shadow: 0 0 30px rgba(0,240,255,0.25);
+    }
+
+    .visual-flow-title {
+      font-size: 16px;
+      font-weight: 900;
+      color: #00f0ff;
+      margin-bottom: 18px;
+      text-align: center;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .auto-indicator {
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      background-color: #10b981;
+      border-radius: 50%;
+      box-shadow: 0 0 10px #10b981;
+      animation: pulseBlink 1s infinite alternate;
+    }
+
+    @keyframes pulseBlink {
+      0% { opacity: 0.3; }
+      100% { opacity: 1; }
+    }
+
+    .flow-steps-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+
+    @media (max-width: 850px) {
+      .flow-steps-grid { grid-template-columns: 1fr; }
+    }
+
+    .flow-step-box {
+      background: #020617;
+      border: 1px solid #11223f;
+      border-radius: 12px;
+      padding: 18px;
+      transition: all 0.4s ease;
+      text-align: center;
+    }
+
+    .flow-step-box.active {
+      border-color: #00f0ff;
+      box-shadow: 0 0 25px rgba(0,240,255,0.7);
+      background: #081b33;
+      transform: translateY(-5px);
+    }
+
+    .flow-icon {
+      font-size: 36px;
+      margin-bottom: 10px;
+    }
+
+    .flow-step-name {
+      font-size: 14px;
+      font-weight: bold;
+      color: #fff;
+      margin-bottom: 6px;
+    }
+
+    .flow-step-desc {
+      font-size: 12px;
+      color: var(--text-sub);
+      line-height: 1.5;
+      margin-bottom: 12px;
+    }
+
+    .flow-live-preview {
+      background: #020617;
+      border: 1px dashed rgba(0, 240, 255, 0.4);
+      border-radius: 8px;
+      padding: 8px;
+      font-family: monospace;
+      font-size: 11px;
+      color: #00f0ff;
+      min-height: 38px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+
+    .global-voice-bar {
+      margin-bottom: 25px;
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .btn-global {
+      background: #0a2540;
+      border: 1px solid #00f0ff;
+      color: #00f0ff;
+      padding: 10px 18px;
+      border-radius: 8px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: bold;
+      transition: all 0.2s;
+    }
+    .btn-global:hover {
+      background: #00f0ff;
+      color: #020617;
+    }
+
+    .file-instance-box {
+      background: rgba(5, 11, 24, 0.85);
+      border: 1px solid rgba(0, 240, 255, 0.3);
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 40px;
+      box-shadow: 0 5px 25px rgba(0,0,0,0.6);
+      backdrop-filter: blur(5px);
+    }
+
+    .instance-header {
+      font-size: 16px;
+      font-weight: 800;
+      color: #00f0ff;
+      margin-bottom: 15px;
+      border-bottom: 1px solid #0a2540;
+      padding-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: 1fr 2fr;
+      gap: 20px;
+    }
+
+    @media (max-width: 900px) {
+      .dashboard-grid { grid-template-columns: 1fr; }
+    }
+
+    .card {
+      background: var(--card-bg);
+      border: 1px solid rgba(0, 240, 255, 0.2);
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 15px;
+    }
+
+    .card-title {
+      font-size: 14px;
+      font-weight: bold;
+      color: var(--accent-color);
+      margin-bottom: 12px;
+      border-bottom: 1px solid #0a2540;
+      padding-bottom: 6px;
+    }
+
+    .form-group {
+      margin-bottom: 12px;
+    }
+
+    label {
+      display: block;
+      font-size: 11px;
+      color: var(--text-sub);
+      margin-bottom: 4px;
+      font-weight: 600;
+    }
+
+    input[type="text"], input[type="password"], select {
+      width: 100%;
+      background: #020617;
+      border: 1px solid #11223f;
+      border-radius: 6px;
+      padding: 9px 12px;
+      color: #00f0ff;
+      font-family: monospace;
+      font-size: 12px;
+      outline: none;
+    }
+
+    .btn {
+      width: 100%;
+      background: linear-gradient(135deg, #0088cc, #00f0ff);
+      color: #020617;
+      border: none;
+      padding: 10px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 800;
+      transition: all 0.2s;
+    }
+    .btn:hover {
+      box-shadow: 0 0 15px rgba(0, 240, 255, 0.7);
+    }
+
+    .file-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 12px;
+      text-align: left;
+    }
+
+    .file-table th, .file-table td {
+      padding: 10px;
+      border-bottom: 1px solid #0a2540;
+    }
+
+    .file-table th {
+      color: var(--text-sub);
+      font-weight: 600;
+      font-size: 10px;
+      text-transform: uppercase;
+    }
+
+    .file-table td {
+      color: #fff;
+    }
+
+    .status-badge {
+      display: inline-block;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 9px;
+      font-weight: bold;
+      background: #0a2540;
+      color: #00f0ff;
+      border: 1px solid rgba(0,240,255,0.3);
+      margin-bottom: 3px;
+    }
+
+    .hash-text {
+      font-family: monospace;
+      color: #00f0ff;
+      font-size: 11px;
+    }
+
+    .action-btn {
+      background: #0a2540;
+      border: 1px solid #00f0ff;
+      color: #00f0ff;
+      padding: 4px 8px;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 10px;
+      font-weight: 600;
+      margin-right: 4px;
+    }
+    .action-btn:hover {
+      background: #00f0ff;
+      color: #020617;
+    }
+
+    /* Client File Viewer Modal */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(2, 6, 23, 0.85);
+      backdrop-filter: blur(8px);
+      z-index: 9999;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .modal-content {
+      background: #050b18;
+      border: 2px solid #00f0ff;
+      border-radius: 16px;
+      max-width: 650px;
+      width: 100%;
+      padding: 25px;
+      box-shadow: 0 0 50px rgba(0, 240, 255, 0.4);
+      animation: modalPopup 0.3s ease;
+    }
+
+    @keyframes modalPopup {
+      0% { transform: scale(0.9); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid #0a2540;
+      padding-bottom: 12px;
+      margin-bottom: 15px;
+    }
+
+    .modal-title {
+      font-size: 16px;
+      font-weight: 800;
+      color: #00f0ff;
+    }
+
+    .close-modal {
+      background: none;
+      border: none;
+      color: #ff4d4d;
+      font-size: 20px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .code-preview-box {
+      background: #020617;
+      border: 1px solid #11223f;
+      border-radius: 8px;
+      padding: 15px;
+      font-family: monospace;
+      font-size: 12px;
+      color: #10b981;
+      max-height: 250px;
+      overflow-y: auto;
+      margin-bottom: 15px;
+      white-space: pre-wrap;
+    }
+  </style>
+</head>
+<body>
+
+  <canvas id="matrixCanvas"></canvas>
+
+  <!-- Master Audio Unlock Overlay -->
+  <div id="audioUnlockOverlay">
+    <div class="unlock-card">
+      <div style="font-size: 40px; margin-bottom: 15px;">🛡️</div>
+      <h2 style="color: #00f0ff; font-size: 20px; margin-bottom: 10px;">MZ Cyber Security Client Portal</h2>
+      <p style="color: var(--text-sub); font-size: 13px; line-height: 1.5; margin-bottom: 15px;">Client presentation ke liye audio aur crystal clear English voice assistant ko active karne ke liye neechay diye gaye button par click karein:</p>
+      <button class="unlock-btn" onclick="unlockAudioAndStart()">🔊 Enable Audio & Start Presentation</button>
+    </div>
+  </div>
+
+  <!-- Client File Viewer Modal -->
+  <div class="modal-overlay" id="fileModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="modal-title" id="modalFileName">📂 Secure File Inspector</div>
+        <button class="close-modal" onclick="closeFileModal()">×</button>
+      </div>
+      <p style="font-size: 12px; color: var(--text-sub); margin-bottom: 10px;" id="modalFileDesc">Yeh file aapke system mein AES-256 military-grade encryption se mehfooz hai:</p>
+      <div class="code-preview-box" id="modalFileContent">Loading secure file buffer...</div>
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <span class="status-badge" id="modalFileStatus">STATUS: SECURED</span>
+        <button class="btn" style="width: auto; padding: 8px 16px;" onclick="closeFileModal()">Close Inspector</button>
+      </div>
+    </div>
+  </div>
+
+ <main class="w-full min-h-screen flex flex-col justify-start py-8 px-4 lg:px-8">
+    <div class="w-full max-w-[1450px] mx-auto cyber-glass-glow rounded-2xl p-5 md:p-8 relative overflow-hidden">
+        
+        <!-- Top Decorative Ambient Glows -->
+        <div class="absolute -top-20 -right-20 w-44 h-44 bg-cyan-500/20 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="absolute -bottom-20 -left-20 w-44 h-44 bg-blue-600/20 rounded-full blur-3xl pointer-events-none"></div>
+
+        <!-- Yahan se aapka asal container wala content shuru hoga -->
+        <div class="container" style="max-width: 100%; margin: 0; padding: 0; background: transparent; box-shadow: none;">
+            
+            <div class="top-banner">
+                <div>
+                    <span class="badge">MZ Cyber Defense Enterprise</span>
+                    <h1 class="banner-title">MZ AES-256 File Encryptor & Decryptor</h1>
+                    <p class="banner-subtitle">Client presentation workflow: automated security checks and live document inspection.</p>
+                </div>
+                <div class="mz-digital-logo">MZ</div>
+            </div>
+
+            <!-- Fully Automated Live Visual Workflow Steps -->
+            <div class="visual-flow-card">
+                <div class="visual-flow-title">
+                    <span class="auto-indicator"></span> 📊 Live Workflow: Step-by-Step Client Security Simulation
+                </div>
+                
+                <div class="flow-steps-grid">
+                    <!-- Step 1 -->
+                    <div class="flow-step-box" id="step1Box">
+                        <div class="flow-icon">📄</div>
+                        <div class="flow-step-name">Step 1: Original File</div>
+                        <div class="flow-step-desc">Aam saaf data ya file system mein load hoti hai.</div>
+                        <div class="flow-live-preview" id="previewStep1">Loading file...</div>
+                    </div>
+
+                    <!-- Step 2 -->
+                    <div class="flow-step-box" id="step2Box">
+                        <div class="flow-icon">🔒</div>
+                        <div class="flow-step-name">Step 2: AES-256 Encryptor</div>
+                        <div class="flow-step-desc">Master key ke zariye file ko secure lock karke unreadable hash code mein badalna.</div>
+                        <div class="flow-live-preview" id="previewStep2">Waiting for encryption...</div>
+                    </div>
+                </div>
+            </div>
+
+        </div> <!-- End of container wrapper -->
+
+    </div>
+</main>
+        <!-- Step 3 -->
+        <div class="flow-step-box" id="step3Box">
+          <div class="flow-icon">🔓</div>
+          <div class="flow-step-name">Step 3: Decryptor & Review</div>
+          <div class="flow-step-desc">Sahi security password lagane par file ka wapas unlock ho kar read hona.</div>
+          <div class="flow-live-preview" id="previewStep3">Waiting for decryption...</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="global-voice-bar">
+      <button class="btn-global" onclick="runFullAutoSimulation(1)">🔄 Re-run Client Simulation</button>
+      <button class="btn-global" onclick="speakClearAssistant()">🔊 Play Crystal Clear Voice</button>
+      <button class="btn-global" style="background:#059669; border-color:#10b981; color:#fff;" onclick="playChimeSound()">🔔 Test Chime</button>
+    </div>
+
+    <div id="tenInstancesContainer"></div>
+  </div>
+
+  <script>
+    const canvas = document.getElementById('matrixCanvas');
+    const ctx = canvas.getContext('2d');
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%&*<>';
+    const fontSize = 14;
+    let columns = canvas.width / fontSize;
+    const drops = [];
+    for (let x = 0; x < columns; x++) {
+      drops[x] = 1;
+    }
+
+    function drawMatrix() {
+      ctx.fillStyle = 'rgba(2, 6, 23, 0.1)';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      ctx.fillStyle = '#00f0ff';
+      ctx.font = fontSize + 'px monospace';
+
+      for (let i = 0; i < drops.length; i++) {
+        const text = letters.charAt(Math.floor(Math.random() * letters.length));
+        ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+
+        if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+          drops[i] = 0;
+        }
+        drops[i]++;
+      }
+    }
+    setInterval(drawMatrix, 35);
+
+    let sharedAudioCtx = null;
+
+    function getAudioContext() {
+      if (!sharedAudioCtx) {
+        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+        if (AudioContextClass) {
+          sharedAudioCtx = new AudioContextClass();
+        }
+      }
+      if (sharedAudioCtx && sharedAudioCtx.state === 'suspended') {
+        sharedAudioCtx.resume();
+      }
+      return sharedAudioCtx;
+    }
+
+    function playSound(freq = 700) {
+      try {
+        const ctx = getAudioContext();
+        if (!ctx) return;
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, ctx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(freq + 250, ctx.currentTime + 0.08);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        gain.gain.setValueAtTime(0.1, ctx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 0.09);
+        osc.start();
+        osc.stop(ctx.currentTime + 0.09);
+      } catch(e) {}
+    }
+
+    function playChimeSound() {
+      try {
+        const ctx = getAudioContext();
+        if (!ctx) return;
+        const notes = [523.25, 659.25, 783.99, 1046.50];
+        notes.forEach((note, index) => {
+          setTimeout(() => { playSound(note); }, index * 100);
+        });
+      } catch(e) {}
+    }
+
+    function speakClearAssistant() {
+      try {
+        getAudioContext();
+        if ('speechSynthesis' in window) {
+          window.speechSynthesis.cancel();
+          
+          // Crystal clear English professional presentation speech for high clarity
+          const text = "Welcome valued client. All your files are fully secure in our system. First, the file loads in original format, then it is encrypted securely using advanced AES-256 military protocol into unreadable hash code, and can only be unlocked back using the correct security key.";
+          
+          const utterance = new SpeechSynthesisUtterance(text);
+          const voices = window.speechSynthesis.getVoices();
+          
+          // Select best natural female English voice (Google US English or Microsoft Zira)
+          const clearVoice = voices.find(v => 
+            v.lang.includes('en') && (v.name.toLowerCase().includes('natural') || v.name.toLowerCase().includes('female') || v.name.toLowerCase().includes('zira') || v.name.toLowerCase().includes('google us english'))
+          ) || voices.find(v => v.lang.includes('en')) || voices[0];
+
+          if (clearVoice) {
+            utterance.voice = clearVoice;
+          }
+
+          utterance.lang = 'en-US';
+          utterance.rate = 1.0; // Normal readable speed for 100% clarity
+          utterance.pitch = 1.1;
+
+          window.speechSynthesis.speak(utterance);
+        }
+      } catch(e) {}
+    }
+
+    function unlockAudioAndStart() {
+      const overlay = document.getElementById('audioUnlockOverlay');
+      if (overlay) {
+        overlay.style.display = 'none';
+      }
+      getAudioContext();
+      playChimeSound();
+      setTimeout(() => {
+        runFullAutoSimulation(1);
+      }, 300);
+    }
+
+    const filesData = {};
+
+    function buildTenInstances() {
+      const container = document.getElementById('tenInstancesContainer');
+      let htmlContent = '';
+
+      for (let i = 1; i <= 10; i++) {
+        filesData[i] = [];
+        htmlContent += `
+          <div class="file-instance-box" id="box_${i}">
+            <div class="instance-header">
+              <span>🛡️ AES-256 File Security Instance #${i} (MZ Cyber Edition)</span>
+              <button class="btn" style="width:auto; padding: 5px 12px; font-size:11px;" onclick="runFullAutoSimulation(${i})">⚡ Re-run Simulation #${i}</button>
+            </div>
+
+            <div class="dashboard-grid">
+              <div>
+                <div class="card">
+                  <div class="card-title">File Configuration #${i}</div>
+                  <div class="form-group">
+                    <label>Encryption Protocol</label>
+                    <select id="protocol_${i}">
+                      <option value="AES-256-GCM">🔒 AES-256-GCM (Military Grade)</option>
+                      <option value="AES-256-CBC">🛡️ AES-256-CBC (Standard Block)</option>
+                      <option value="RSA-4096-HYBRID">⚡ RSA-4096 Hybrid Encryption</option>
+                    </select>
+                  </div>
+                  <div class="form-group">
+                    <label>Target File Name</label>
+                    <input type="text" id="filename_${i}" placeholder="e.g. database_backup.sql">
+                  </div>
+                  <div class="form-group">
+                    <label>File Description Detail</label>
+                    <input type="text" id="details_${i}" placeholder="e.g. Sensitive financial records...">
+                  </div>
+                  <div class="form-group">
+                    <label>Master Security Key</label>
+                    <input type="password" id="secret_${i}" placeholder="Enter secure passphrase...">
+                  </div>
+                  <button class="btn" onclick="encryptFileRecord(${i})">🔒 Execute Encryption #${i}</button>
+                </div>
+              </div>
+
+              <div>
+                <div class="card" style="margin-bottom:0; height: 100%;">
+                  <div class="card-title" style="display:flex; justify-content:space-between;">
+                    <span>Secured Files Database & Client Viewer</span>
+                    <span style="font-size: 11px; color: #00f0ff;" id="count_${i}">0 files secured</span>
+                  </div>
+                  <div style="overflow-x: auto;">
+                    <table class="file-table">
+                      <thead>
+                        <tr>
+                          <th>File & Protocol</th>
+                          <th>Detailed Description</th>
+                          <th>Hash Signature</th>
+                          <th>Client Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody id="tbody_${i}">
+                        <tr>
+                          <td colspan="4" style="text-align: center; color: #94a3b8; padding: 20px;">Initializing security simulation...</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        `;
+      }
+      container.innerHTML = htmlContent;
+    }
+
+    async function updateWorkflowStep(stepNum, previewText) {
+      document.getElementById('step1Box').classList.remove('active');
+      document.getElementById('step2Box').classList.remove('active');
+      document.getElementById('step3Box').classList.remove('active');
+
+      if (stepNum > 0) {
+        document.getElementById(`step${stepNum}Box`).classList.add('active');
+        document.getElementById(`previewStep${stepNum}`).innerText = previewText;
+      }
+    }
+
+    async function encryptFileRecord(id) {
+      const protocol = document.getElementById(`protocol_${id}`).value;
+      const filename = document.getElementById(`filename_${id}`).value.trim() || `backup_${Date.now()}.sql`;
+      const details = document.getElementById(`details_${id}`).value.trim() || `Encrypted database backup records.`;
+      const secret = document.getElementById(`secret_${id}`).value.trim() || `Pass#2026!Secure`;
+
+      playSound(950);
+      updateWorkflowStep(2, `[LOCKED]: ${filename} secured with AES-256`);
+      
+      const hashSig = 'sha256_' + btoa(filename + secret).substring(0, 24) + '...[SECURE]';
+      const fileContentDump = `-- MZ CYBER DEFENCE SECURE FILE INSPECTOR\n-- File: ${filename}\n-- Protocol: ${protocol}\n-- Status: 100% SECURED & ENCRYPTED\n\n[ENCRYPTED HASH BYTES]:\n${btoa(filename + details).repeat(2)}`;
+
+      filesData[id].push({ protocol, filename, details, hashSig, fileContentDump, decrypted: false });
+
+      document.getElementById(`filename_${id}`).value = '';
+      document.getElementById(`details_${id}`).value = '';
+      document.getElementById(`secret_${id}`).value = '';
+
+      renderFilesTable(id);
+    }
+
+    async function typeTextInstance(id, fieldType, text) {
+      const el = document.getElementById(`${fieldType}_${id}`);
+      if (!el) return;
+      el.value = "";
+      for (let i = 0; i < text.length; i++) {
+        el.value += text[i];
+        playSound(550 + (i * 10));
+        await new Promise(resolve => setTimeout(resolve, 25));
+      }
+    }
+
+    async function runFullAutoSimulation(id) {
+      filesData[id] = [];
+      renderFilesTable(id);
+
+      const demoFiles = [
+        { protocol: "AES-256-GCM", filename: `financial_ledger_${id}.sql`, details: `Confidential client transactions & records.` },
+        { protocol: "AES-256-CBC", filename: `source_code_${id}.zip`, details: `Protected core system source code.` }
+      ];
+
+      for (let file of demoFiles) {
+        updateWorkflowStep(1, `[OPENED]: ${file.filename} loaded in plain text.`);
+        document.getElementById(`protocol_${id}`).value = file.protocol;
+        
+        await typeTextInstance(id, 'filename', file.filename);
+        await new Promise(r => setTimeout(r, 50));
+        await typeTextInstance(id, 'details', file.details);
+        await new Promise(r => setTimeout(r, 50));
+        await typeTextInstance(id, 'secret', `ClientKey#${id}_2026`);
+        await new Promise(r => setTimeout(r, 80));
+
+        encryptFileRecord(id);
+        await new Promise(r => setTimeout(r, 200));
+      }
+
+      updateWorkflowStep(3, `[READY]: All records successfully encrypted & ready for client inspection.`);
+      speakClearAssistant();
+    }
+
+    function openFileModal(id, index) {
+      playSound(800);
+      const file = filesData[id][index];
+      document.getElementById('modalFileName').innerText = `📂 File Viewer: ${file.filename}`;
+      document.getElementById('modalFileDesc').innerText = `Protocol: ${file.protocol} | Detailed Info: ${file.details}`;
+      document.getElementById('modalFileContent').innerText = file.decrypted 
+        ? `[DECRYPTED VIEW - READABLE MODE]:\nFile Name: ${file.filename}\nDescription: ${file.details}\nHash Signature: ${file.hashSig}\nStatus: Unlocked & Verified by Client.` 
+        : file.fileContentDump;
+      document.getElementById('modalFileStatus').innerText = file.decrypted ? "STATUS: UNLOCKED & READABLE" : "STATUS: ENCRYPTED & SECURED";
+      document.getElementById('fileModal').style.display = 'flex';
+    }
+
+    function closeFileModal() {
+      document.getElementById('fileModal').style.display = 'none';
+    }
+
+    async function toggleFileStatus(id, index) {
+      playSound(850);
+      filesData[id][index].decrypted = !filesData[id][index].decrypted;
+      const file = filesData[id][index];
+      
+      if(file.decrypted) {
+        updateWorkflowStep(3, `[UNLOCKED]: ${file.filename} decrypted for client review.`);
+      } else {
+        updateWorkflowStep(2, `[LOCKED]: ${file.filename} encrypted back safely.`);
+      }
+
+      renderFilesTable(id);
+      openFileModal(id, index);
+    }
+
+    function renderFilesTable(id) {
+      const tbody = document.getElementById(`tbody_${id}`);
+      const countEl = document.getElementById(`count_${id}`);
+      if(countEl) countEl.innerText = `${filesData[id].length} files secured`;
+
+      if(!tbody) return;
+      if(filesData[id].length === 0) {
+        tbody.innerHTML = `<tr><td colspan="4" style="text-align: center; color: #94a3b8; padding: 20px;">No files secured yet.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = '';
+      filesData[id].forEach((item, index) => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>
+            <span class="status-badge">${item.protocol}</span><br>
+            <b>${item.filename}</b>
+          </td>
+          <td><span style="color: ${item.decrypted ? '#10b981' : '#fff'}">${item.details}</span></td>
+          <td><span class="hash-text">${item.hashSig}</span></td>
+          <td>
+            <button class="action-btn" onclick="openFileModal(${id}, ${index})">🔍 Open File</button>
+            <button class="action-btn" onclick="toggleFileStatus(${id}, ${index})">${item.decrypted ? 'Lock' : 'Decrypt'}</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    window.onload = function() {
+      buildTenInstances();
+    };
+  </script>
+</body>
+</html>

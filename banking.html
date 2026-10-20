@@ -1,0 +1,1041 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MZ Digital Banking & Wallet System</title>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            bankDark: '#030a16',
+            bankCard: '#050e1f',
+            bankCardHover: '#0a1733',
+            neonCyan: '#00f2fe',
+            neonBlue: '#0088cc',
+            neonGreen: '#10b981',
+            neonPink: '#ff007f'
+          },
+          animation: {
+            'pulse-fast': 'pulse 1s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+            'glow-pulse': 'glowPulse 2s infinite ease-in-out',
+            'scan-line': 'scanLine 2.5s linear infinite',
+            'float': 'float 4s ease-in-out infinite',
+          },
+          keyframes: {
+            glowPulse: {
+              '0%, 100%': { boxShadow: '0 0 15px rgba(0, 136, 204, 0.4), inset 0 0 10px rgba(0, 242, 254, 0.2)' },
+              '50%': { boxShadow: '0 0 30px rgba(0, 242, 254, 0.8), inset 0 0 20px rgba(0, 242, 254, 0.4)' },
+            },
+            scanLine: {
+              '0%': { top: '0%' },
+              '100%': { top: '100%' }
+            },
+            float: {
+              '0%, 100%': { transform: 'translateY(0px)' },
+              '50%': { transform: 'translateY(-6px)' }
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Google Fonts & FontAwesome -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800;900&family=Rajdhani:wght@500;600;700&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    body {
+      font-family: 'Rajdhani', sans-serif;
+      background-color: #030a16;
+      color: #f8fafc;
+      overflow-x: hidden;
+    }
+
+    .font-orbitron { font-family: 'Orbitron', sans-serif; }
+    .font-mono-code { font-family: 'Space Mono', monospace; }
+
+    /* Custom Scrollbars */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #030a16;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #0088cc;
+      border-radius: 3px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #00f2fe;
+    }
+
+    /* Glassmorphic Cyber Effect */
+    .cyber-glass {
+      background: rgba(5, 14, 31, 0.85);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(0, 136, 204, 0.35);
+      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5), inset 0 0 12px rgba(0, 242, 254, 0.05);
+    }
+
+    .cyber-glass-glow {
+      background: rgba(5, 14, 31, 0.9);
+      backdrop-filter: blur(16px);
+      border: 1px solid #0088cc;
+      box-shadow: 0 0 20px rgba(0, 136, 204, 0.3), inset 0 0 15px rgba(0, 242, 254, 0.1);
+    }
+
+    /* Glow Text */
+    .glow-text-cyan {
+      text-shadow: 0 0 10px rgba(0, 242, 254, 0.7), 0 0 20px rgba(0, 242, 254, 0.4);
+    }
+    .glow-text-blue {
+      text-shadow: 0 0 10px rgba(0, 136, 204, 0.8);
+    }
+
+    /* Tech grid overlay background */
+    .bg-grid-pattern {
+      background-image: linear-gradient(to right, rgba(0, 136, 204, 0.05) 1px, transparent 1px),
+                        linear-gradient(to bottom, rgba(0, 136, 204, 0.05) 1px, transparent 1px);
+      background-size: 30px 30px;
+    }
+
+    /* Scanline effect */
+    .scanlines {
+      position: relative;
+      overflow: hidden;
+    }
+    .scanlines::before {
+      content: " ";
+      display: block;
+      position: absolute;
+      top: 0; left: 0; bottom: 0; right: 0;
+      background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%);
+      background-size: 100% 4px;
+      z-index: 10;
+      pointer-events: none;
+      opacity: 0.6;
+    }
+
+    /* Laser beam laser sweep overlay */
+    .laser-beam {
+      position: absolute;
+      left: 0;
+      width: 100%;
+      height: 3px;
+      background: linear-gradient(90deg, transparent, #00f2fe, #ffffff, #00f2fe, transparent);
+      box-shadow: 0 0 15px #00f2fe, 0 0 30px #00f2fe;
+      z-index: 20;
+      pointer-events: none;
+      opacity: 0;
+    }
+
+    .laser-active {
+      animation: laserSweep 2s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+      opacity: 1;
+    }
+
+    @keyframes laserSweep {
+      0% { top: 0%; }
+      50% { top: 100%; }
+      100% { top: 0%; }
+    }
+  </style>
+</head>
+
+<body class="min-h-screen bg-bankDark text-slate-100 bg-grid-pattern flex flex-col justify-between selection:bg-neonCyan selection:text-black">
+
+  <!-- Top Global Cyber Navbar -->
+  <header class="w-full border-b border-cyan-900/40 bg-bankDark/90 backdrop-blur-md sticky top-0 z-50 px-4 lg:px-8 py-3">
+    <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-4">
+      
+      <!-- Network Branding & Status -->
+      <div class="flex items-center space-x-3">
+        <div class="w-3 h-3 rounded-full bg-emerald-500 animate-ping"></div>
+        <span class="font-orbitron font-extrabold text-lg text-transparent bg-clip-text bg-gradient-to-r from-neonCyan to-blue-500 tracking-wider">
+          MZ NETWORK PORTAL
+        </span>
+        <span class="hidden sm:inline-block px-2.5 py-0.5 text-xs font-mono-code rounded border border-cyan-500/30 text-cyan-400 bg-cyan-950/40">
+          v4.0.9-ENCRYPTED
+        </span>
+      </div>
+
+      <!-- Realtime Telemetry Stats -->
+      <div class="hidden md:flex items-center space-x-6 text-xs font-mono-code text-slate-400">
+        <div class="flex items-center space-x-2">
+          <i class="fa-solid fa-server text-cyan-400"></i>
+          <span>NODE: <strong class="text-slate-200">MZ-PK-782</strong></span>
+        </div>
+        <div class="flex items-center space-x-2">
+          <i class="fa-solid fa-shield-halved text-emerald-400"></i>
+          <span>SECURITY: <strong class="text-emerald-400">AES-256 LIVE</strong></span>
+        </div>
+        <div class="flex items-center space-x-2">
+          <i class="fa-solid fa-bolt text-amber-400"></i>
+          <span>LATENCY: <strong id="latencyDisplay" class="text-amber-400">12ms</strong></span>
+        </div>
+      </div>
+
+      <!-- Sound Toggle & Audio Control -->
+      <div class="flex items-center space-x-3">
+        <button id="soundToggleBtn" onclick="toggleAudio()" class="flex items-center space-x-2 px-3 py-1.5 rounded-lg border border-cyan-500/40 bg-cyan-950/30 hover:bg-cyan-900/50 hover:border-neonCyan transition text-xs font-semibold text-cyan-300 shadow-md">
+          <i id="soundIcon" class="fa-solid fa-volume-xmark text-slate-400"></i>
+          <span id="soundStatusText">AUDIO: OFF</span>
+          <!-- Audio visualizer bars small -->
+          <div id="miniAudioBars" class="flex items-end space-x-0.5 h-3 ml-1 opacity-40">
+            <span class="w-0.5 bg-neonCyan h-1 rounded-full animate-bounce" style="animation-delay: 0.1s"></span>
+            <span class="w-0.5 bg-neonCyan h-3 rounded-full animate-bounce" style="animation-delay: 0.3s"></span>
+            <span class="w-0.5 bg-neonCyan h-2 rounded-full animate-bounce" style="animation-delay: 0.2s"></span>
+          </div>
+        </button>
+
+        <button onclick="openTransferModal()" class="px-4 py-1.5 rounded-lg bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-semibold text-xs tracking-wider uppercase transition shadow-lg shadow-cyan-900/50 flex items-center space-x-1.5">
+          <i class="fa-solid fa-paper-plane"></i>
+          <span>New Transfer</span>
+        </button>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- Main Interactive Dashboard Container -->
+  <main class="max-w-7xl mx-auto px-4 lg:px-8 py-8 w-full flex-grow flex flex-col justify-center items-center">
+    
+    <!-- Hero Main Card Layout (Matching Image Context with Interactive Boost) -->
+    <div class="w-full max-w-4xl cyber-glass-glow rounded-2xl p-5 md:p-8 relative overflow-hidden transition-all duration-300">
+      
+      <!-- Top Decorative Corner Glows -->
+      <div class="absolute -top-16 -right-16 w-32 h-32 bg-cyan-500/20 rounded-full blur-3xl pointer-events-none"></div>
+      <div class="absolute -bottom-16 -left-16 w-32 h-32 bg-blue-600/20 rounded-full blur-3xl pointer-events-none"></div>
+
+      <!-- Card Header: Tag FinTech & Glowing MZ Logo -->
+      <div class="flex items-center justify-between mb-4 border-b border-slate-800/80 pb-4">
+        <!-- FinTech Tag Badge -->
+        <div class="flex items-center space-x-2">
+          <span class="px-3 py-1 bg-cyan-950/80 border border-cyan-600/50 text-cyan-400 font-bold text-xs rounded-md tracking-wider uppercase shadow-inner">
+            FinTech
+          </span>
+          <span class="px-2 py-0.5 bg-emerald-950/60 border border-emerald-500/40 text-emerald-400 text-[10px] font-mono-code rounded flex items-center space-x-1">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span>
+            <span>SYSTEM ONLINE</span>
+          </span>
+        </div>
+
+        <!-- Prominent Glowing "MZ" Logo -->
+        <div class="group relative cursor-pointer" onclick="triggerMzPulse()">
+          <div class="absolute -inset-1 bg-gradient-to-r from-neonCyan to-blue-600 rounded-xl blur opacity-75 group-hover:opacity-100 transition duration-300 group-hover:scale-105"></div>
+          <div class="relative w-12 h-12 md:w-14 md:h-14 bg-gradient-to-br from-cyan-600 via-blue-700 to-indigo-900 rounded-xl flex items-center justify-center font-orbitron font-black text-xl md:text-2xl text-white tracking-tighter shadow-2xl border border-cyan-300/40 select-none transform transition active:scale-95">
+            MZ
+          </div>
+        </div>
+      </div>
+
+      <!-- Card Title & Subtitle -->
+      <div class="mb-6">
+        <h1 class="text-2xl md:text-3xl lg:text-4xl font-extrabold font-orbitron text-white tracking-wide glow-text-cyan flex items-center gap-3">
+          <span>Digital Banking & Wallet System</span>
+        </h1>
+        <p class="text-slate-400 text-sm md:text-base font-medium mt-1 flex items-center gap-2">
+          <i class="fa-solid fa-lock text-cyan-400 text-xs"></i>
+          <span>Encrypted money transfer portal with multi-layer security</span>
+        </p>
+      </div>
+
+      <!-- Live Visualizer Screen Container (Digital Live Pic / Audio Canvas) -->
+      <div class="relative w-full rounded-xl overflow-hidden border border-cyan-500/40 bg-slate-950/90 shadow-2xl scanlines group mb-6">
+        
+        <!-- Laser Scan Animation Overlay -->
+        <div id="laserBeam" class="laser-beam"></div>
+
+        <!-- Top Status Bar Overlay on Visualizer -->
+        <div class="absolute top-3 left-3 right-3 z-30 flex items-center justify-between pointer-events-none">
+          
+          <div class="flex items-center space-x-2 bg-slate-900/80 backdrop-blur-md px-3 py-1 rounded-full border border-cyan-800/50">
+            <i class="fa-solid fa-chart-line text-cyan-400 text-xs"></i>
+            <span class="text-[11px] font-mono-code text-cyan-300 uppercase tracking-wider">LIVE DATA STREAM</span>
+          </div>
+
+          <!-- Pulsing RED / GREEN LIVE Badge -->
+          <div class="flex items-center space-x-2 bg-red-950/90 backdrop-blur-md px-3 py-1 rounded-full border border-red-500/60 shadow-lg shadow-red-950">
+            <span class="w-2 h-2 rounded-full bg-red-500 animate-ping"></span>
+            <span class="text-xs font-black font-mono-code text-red-200 tracking-widest">LIVE</span>
+          </div>
+        </div>
+
+        <!-- Bottom Canvas Controls & Indicators -->
+        <div class="absolute bottom-3 left-3 right-3 z-30 flex items-center justify-between pointer-events-none">
+          <div class="text-[11px] font-mono-code text-slate-400 bg-slate-900/80 backdrop-blur-md px-2.5 py-1 rounded border border-slate-800">
+            FREQ: <span id="freqDisplay" class="text-cyan-400">142.85 MHz</span>
+          </div>
+          <div class="text-[11px] font-mono-code text-slate-400 bg-slate-900/80 backdrop-blur-md px-2.5 py-1 rounded border border-slate-800">
+            FPS: <span id="fpsDisplay" class="text-emerald-400">60</span>
+          </div>
+        </div>
+
+        <!-- HTML5 Interactive Canvas Visualizer -->
+        <canvas id="digitalCanvas" class="w-full h-56 md:h-72 block cursor-crosshair"></canvas>
+      </div>
+
+      <!-- Real-Time Metrics & Balance Bar -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        
+        <!-- Live Wallet Balance -->
+        <div class="p-4 rounded-xl bg-slate-900/80 border border-cyan-900/50 hover:border-cyan-500/50 transition">
+          <div class="flex items-center justify-between text-xs text-slate-400 font-mono-code mb-1">
+            <span>TOTAL LIQUID BALANCE</span>
+            <i class="fa-solid fa-wallet text-cyan-400"></i>
+          </div>
+          <div class="text-2xl md:text-3xl font-extrabold font-orbitron text-white tracking-tight glow-text-blue">
+            $<span id="walletBalance">1,428,950.42</span>
+          </div>
+          <div class="text-[11px] text-emerald-400 font-mono-code mt-1 flex items-center space-x-1">
+            <i class="fa-solid fa-caret-up"></i>
+            <span>+ 4.82% yield (24h)</span>
+          </div>
+        </div>
+
+        <!-- Encrypted Security Score -->
+        <div class="p-4 rounded-xl bg-slate-900/80 border border-cyan-900/50 hover:border-cyan-500/50 transition">
+          <div class="flex items-center justify-between text-xs text-slate-400 font-mono-code mb-1">
+            <span>QUANTUM ENCRYPTION</span>
+            <i class="fa-solid fa-shield-virus text-emerald-400"></i>
+          </div>
+          <div id="securityScore" class="text-2xl md:text-3xl font-extrabold font-orbitron text-emerald-400 tracking-tight">
+            100% SECURE
+          </div>
+          <!-- Progress Bar -->
+          <div class="w-full bg-slate-800 h-1.5 rounded-full mt-2 overflow-hidden">
+            <div id="securityProgressBar" class="bg-gradient-to-r from-emerald-500 to-cyan-400 h-full w-full transition-all duration-500"></div>
+          </div>
+        </div>
+
+        <!-- Network Hashrate / Transfers -->
+        <div class="p-4 rounded-xl bg-slate-900/80 border border-cyan-900/50 hover:border-cyan-500/50 transition">
+          <div class="flex items-center justify-between text-xs text-slate-400 font-mono-code mb-1">
+            <span>LIVE TX SPEED</span>
+            <i class="fa-solid fa-gauge-high text-amber-400"></i>
+          </div>
+          <div class="text-2xl md:text-3xl font-extrabold font-orbitron text-amber-300 tracking-tight">
+            <span id="txRate">98,420</span> <span class="text-xs font-normal text-slate-400">TPS</span>
+          </div>
+          <div class="text-[11px] text-slate-400 font-mono-code mt-1">
+            Block Height: <span id="blockHeight" class="text-cyan-400">#8,941,204</span>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Interactive Action Buttons Row -->
+      <div class="flex flex-wrap gap-3 mb-6">
+        
+        <!-- Simulate Live Transfer -->
+        <button onclick="simulateTransfer()" class="flex-1 min-w-[180px] py-3 px-4 rounded-xl bg-gradient-to-r from-cyan-600 via-blue-600 to-indigo-700 hover:from-cyan-500 hover:to-indigo-600 text-white font-bold text-sm tracking-wider uppercase transition transform active:scale-95 shadow-lg shadow-cyan-900/40 flex items-center justify-center space-x-2 border border-cyan-300/30">
+          <i class="fa-solid fa-bolt text-amber-300 animate-pulse"></i>
+          <span>Simulate Live Transfer</span>
+        </button>
+
+        <!-- Deep Security Scan -->
+        <button onclick="runSecurityScan()" class="flex-1 min-w-[180px] py-3 px-4 rounded-xl bg-slate-900 border border-emerald-500/50 hover:bg-emerald-950/40 text-emerald-400 font-bold text-sm tracking-wider uppercase transition transform active:scale-95 shadow-lg flex items-center justify-center space-x-2">
+          <i class="fa-solid fa-radar text-emerald-400"></i>
+          <span>Security Scan</span>
+        </button>
+
+        <!-- Toggle Visual Wave Mode -->
+        <button onclick="cycleVisualMode()" class="py-3 px-4 rounded-xl bg-slate-900 border border-cyan-800/60 hover:bg-slate-800 text-cyan-300 font-semibold text-sm transition flex items-center space-x-2">
+          <i class="fa-solid fa-wave-square"></i>
+          <span class="hidden sm:inline">Mode:</span>
+          <span id="modeLabel" class="font-mono-code text-xs text-cyan-400">CYBER WAVE</span>
+        </button>
+
+      </div>
+
+      <!-- Encrypted Live Transaction Feed -->
+      <div class="rounded-xl bg-slate-950/80 border border-cyan-900/40 p-4">
+        <div class="flex items-center justify-between mb-3 border-b border-slate-800 pb-2">
+          <div class="flex items-center space-x-2">
+            <i class="fa-solid fa-list-check text-cyan-400 text-xs"></i>
+            <h3 class="text-xs font-mono-code font-bold uppercase text-slate-300">Live Transaction Ticker Log</h3>
+          </div>
+          <span class="text-[10px] font-mono-code text-cyan-400 animate-pulse">● AUTO-SYNCED</span>
+        </div>
+
+        <div id="transactionFeed" class="space-y-2 max-h-36 overflow-y-auto pr-1 text-xs font-mono-code">
+          <!-- Dynamically populated transaction rows -->
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Transfer Modal Dialog -->
+  <div id="transferModal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden opacity-0 transition-opacity duration-300">
+    <div class="cyber-glass-glow w-full max-w-md rounded-2xl p-6 border border-cyan-500/50 relative shadow-2xl transform scale-95 transition-transform duration-300" id="transferModalCard">
+      
+      <!-- Close Button -->
+      <button onclick="closeTransferModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-lg">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+
+      <div class="flex items-center space-x-3 mb-4">
+        <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center text-white text-lg font-bold">
+          <i class="fa-solid fa-paper-plane"></i>
+        </div>
+        <div>
+          <h3 class="font-orbitron font-bold text-lg text-white">Execute Instant Transfer</h3>
+          <p class="text-xs text-slate-400">MZ Quantum Secured Direct Portal</p>
+        </div>
+      </div>
+
+      <form onsubmit="handleManualTransfer(event)" class="space-y-4">
+        <div>
+          <label class="block text-xs font-mono-code text-cyan-400 mb-1">RECIPIENT WALLET / NODE ADDRESS</label>
+          <input type="text" id="recipientInput" required value="MZ-0x9F4a...8C1B" class="w-full bg-slate-900 border border-cyan-800/80 rounded-lg px-3 py-2 text-white text-sm font-mono-code focus:outline-none focus:border-neonCyan">
+        </div>
+
+        <div>
+          <label class="block text-xs font-mono-code text-cyan-400 mb-1">TRANSFER AMOUNT (USD)</label>
+          <div class="relative">
+            <span class="absolute left-3 top-2.5 text-slate-400 font-mono-code">$</span>
+            <input type="number" id="amountInput" required value="25000" min="1" step="any" class="w-full bg-slate-900 border border-cyan-800/80 rounded-lg pl-8 pr-3 py-2 text-white text-sm font-mono-code focus:outline-none focus:border-neonCyan">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-mono-code text-cyan-400 mb-1">ENCRYPTION SCHEME</label>
+          <select class="w-full bg-slate-900 border border-cyan-800/80 rounded-lg px-3 py-2 text-white text-sm font-mono-code focus:outline-none focus:border-neonCyan">
+            <option>AES-256-GCM (Quantum Resilient)</option>
+            <option>RSA-4096 Multi-Key</option>
+            <option>Zero-Knowledge Proof zk-SNARKs</option>
+          </select>
+        </div>
+
+        <button type="submit" class="w-full py-3 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-bold text-sm tracking-wider uppercase transition shadow-lg shadow-cyan-950">
+          Confirm & Dispatch Funds
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="w-full border-t border-cyan-900/30 py-4 px-4 text-center text-xs font-mono-code text-slate-500">
+    <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
+      <div>© 2026 MZ DIGITAL BANKING SYSTEM. ALL RIGHTS RESERVED.</div>
+      <div class="flex items-center space-x-4">
+        <span class="hover:text-cyan-400 cursor-pointer">ENCRYPTION DOCS</span>
+        <span class="hover:text-cyan-400 cursor-pointer">NODE STATUS</span>
+        <span class="hover:text-cyan-400 cursor-pointer">PRIVACY PORTAL</span>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    /* ===================================================================
+       GLOBAL STATE & CANVAS SETUP
+       =================================================================== */
+    let canvas, ctx;
+    let animFrameId;
+    let modeIndex = 0; // 0: Cyber Wave, 1: Particle Matrix, 2: Audio Frequency Spectrum
+    const modes = ['CYBER WAVE', 'PARTICLE MATRIX', 'AUDIO SPECTRUM'];
+
+    // Balance and metrics state
+    let balance = 1428950.42;
+    let blockHeight = 8941204;
+    let isScanning = false;
+
+    // Web Audio API State
+    let audioCtx = null;
+    let isMuted = true;
+    let ambientOsc1 = null, ambientOsc2 = null, ambientGain = null;
+    let analyserNode = null;
+    let audioDataArray = null;
+
+    /* ===================================================================
+       INITIALIZATION
+       =================================================================== */
+    window.addEventListener('DOMContentLoaded', () => {
+      setupCanvas();
+      seedInitialTransactions();
+      startTelemetrySimulation();
+      requestAnimationFrame(renderCanvasLoop);
+    });
+
+    window.addEventListener('resize', () => {
+      setupCanvas();
+    });
+
+    function setupCanvas() {
+      canvas = document.getElementById('digitalCanvas');
+      if (!canvas) return;
+      ctx = canvas.getContext('2d');
+      
+      const rect = canvas.getBoundingClientRect();
+      canvas.width = rect.width * window.devicePixelRatio || rect.width;
+      canvas.height = rect.height * window.devicePixelRatio || rect.height;
+      ctx.scale(window.devicePixelRatio || 1, window.devicePixelRatio || 1);
+    }
+
+    /* ===================================================================
+       WEB AUDIO API SYNTHESIZER (NO EXTERNAL AUDIO FILES)
+       =================================================================== */
+    function initAudioContext() {
+      if (!audioCtx) {
+        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+        audioCtx = new AudioContextClass();
+
+        // Create Analyser Node for canvas reactive visualization
+        analyserNode = audioCtx.createAnalyser();
+        analyserNode.fftSize = 64;
+        audioDataArray = new Uint8Array(analyserNode.frequencyBinCount);
+      }
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+    }
+
+    function toggleAudio() {
+      initAudioContext();
+      isMuted = !isMuted;
+
+      const icon = document.getElementById('soundIcon');
+      const text = document.getElementById('soundStatusText');
+      const miniBars = document.getElementById('miniAudioBars');
+
+      if (!isMuted) {
+        icon.className = 'fa-solid fa-volume-high text-neonCyan';
+        text.innerText = 'AUDIO: LIVE';
+        text.className = 'text-neonCyan font-bold';
+        miniBars.classList.remove('opacity-40');
+        startAmbientDrone();
+        playBeepSound(880, 0.1, 'sine');
+      } else {
+        icon.className = 'fa-solid fa-volume-xmark text-slate-400';
+        text.innerText = 'AUDIO: OFF';
+        text.className = '';
+        miniBars.classList.add('opacity-40');
+        stopAmbientDrone();
+      }
+    }
+
+    // Continuous Sci-Fi Ambient Tone
+    function startAmbientDrone() {
+      if (!audioCtx || ambientOsc1) return;
+
+      try {
+        ambientOsc1 = audioCtx.createOscillator();
+        ambientOsc2 = audioCtx.createOscillator();
+        ambientGain = audioCtx.createGain();
+
+        // Lowpass filter for warm cyber drone
+        const filter = audioCtx.createBiquadFilter();
+        filter.type = 'lowpass';
+        filter.frequency.setValueAtTime(280, audioCtx.currentTime);
+
+        ambientOsc1.type = 'sine';
+        ambientOsc1.frequency.setValueAtTime(110, audioCtx.currentTime); // A2 note
+
+        ambientOsc2.type = 'triangle';
+        ambientOsc2.frequency.setValueAtTime(110.5, audioCtx.currentTime); // Slight detune for chorus
+
+        ambientGain.gain.setValueAtTime(0.04, audioCtx.currentTime); // Soft background volume
+
+        ambientOsc1.connect(filter);
+        ambientOsc2.connect(filter);
+        filter.connect(ambientGain);
+
+        if (analyserNode) {
+          ambientGain.connect(analyserNode);
+          analyserNode.connect(audioCtx.destination);
+        } else {
+          ambientGain.connect(audioCtx.destination);
+        }
+
+        ambientOsc1.start();
+        ambientOsc2.start();
+      } catch (e) {
+        console.error("Audio synth error:", e);
+      }
+    }
+
+    function stopAmbientDrone() {
+      if (ambientGain && audioCtx) {
+        ambientGain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.5);
+        setTimeout(() => {
+          if (ambientOsc1) { ambientOsc1.stop(); ambientOsc1.disconnect(); ambientOsc1 = null; }
+          if (ambientOsc2) { ambientOsc2.stop(); ambientOsc2.disconnect(); ambientOsc2 = null; }
+        }, 500);
+      }
+    }
+
+    // Custom Interactive Sound Effects
+    function playBeepSound(freq = 600, duration = 0.08, type = 'sine') {
+      if (isMuted || !audioCtx) return;
+      try {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+
+        gain.gain.setValueAtTime(0.15, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+
+        osc.connect(gain);
+        if (analyserNode) {
+          gain.connect(analyserNode);
+        } else {
+          gain.connect(audioCtx.destination);
+        }
+
+        osc.start();
+        osc.stop(audioCtx.currentTime + duration);
+      } catch(e) {}
+    }
+
+    function playTransferSound() {
+      if (isMuted || !audioCtx) return;
+      try {
+        const now = audioCtx.currentTime;
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(300, now);
+        osc.frequency.exponentialRampToValueAtTime(1200, now + 0.35);
+
+        gain.gain.setValueAtTime(0.12, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
+
+        osc.connect(gain);
+        if (analyserNode) gain.connect(analyserNode);
+        else gain.connect(audioCtx.destination);
+
+        osc.start();
+        osc.stop(now + 0.4);
+      } catch(e) {}
+    }
+
+    function playScanSound() {
+      if (isMuted || !audioCtx) return;
+      try {
+        const now = audioCtx.currentTime;
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(1200, now);
+        osc.frequency.linearRampToValueAtTime(400, now + 0.8);
+
+        gain.gain.setValueAtTime(0.1, now);
+        gain.gain.linearRampToValueAtTime(0.001, now + 0.8);
+
+        osc.connect(gain);
+        if (analyserNode) gain.connect(analyserNode);
+        else gain.connect(audioCtx.destination);
+
+        osc.start();
+        osc.stop(now + 0.8);
+      } catch(e) {}
+    }
+
+    /* ===================================================================
+       CANVAS GRAPHICS & ANIMATION ENGINE
+       =================================================================== */
+    let waveOffset = 0;
+    const particleList = Array.from({ length: 45 }, () => ({
+      x: Math.random() * 800,
+      y: Math.random() * 300,
+      radius: Math.random() * 2 + 1,
+      speedX: (Math.random() - 0.5) * 1.5,
+      speedY: (Math.random() - 0.5) * 1.5,
+      alpha: Math.random() * 0.7 + 0.3
+    }));
+
+    function renderCanvasLoop() {
+      if (!canvas || !ctx) return;
+
+      const w = canvas.getBoundingClientRect().width;
+      const h = canvas.getBoundingClientRect().height;
+
+      // Clear with subtle trail
+      ctx.fillStyle = 'rgba(3, 10, 22, 0.25)';
+      ctx.fillRect(0, 0, w, h);
+
+      // Draw Grid Background
+      drawTechGrid(w, h);
+
+      // Fetch Audio Frequency Data if active
+      if (analyserNode && !isMuted) {
+        analyserNode.getByteFrequencyData(audioDataArray);
+      }
+
+      // Render Selected Mode
+      if (modeIndex === 0) {
+        drawCyberWave(w, h);
+      } else if (modeIndex === 1) {
+        drawParticleMatrix(w, h);
+      } else if (modeIndex === 2) {
+        drawAudioSpectrum(w, h);
+      }
+
+      // Draw Overlay Floating Nodes
+      drawConnectedNodes(w, h);
+
+      waveOffset += 0.04;
+      animFrameId = requestAnimationFrame(renderCanvasLoop);
+    }
+
+    function drawTechGrid(w, h) {
+      ctx.save();
+      ctx.strokeStyle = 'rgba(0, 136, 204, 0.08)';
+      ctx.lineWidth = 1;
+
+      const gridSize = 30;
+      for (let x = 0; x < w; x += gridSize) {
+        ctx.beginPath();
+        ctx.moveTo(x, 0);
+        ctx.lineTo(x, h);
+        ctx.stroke();
+      }
+      for (let y = 0; y < h; y += gridSize) {
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(w, y);
+        ctx.stroke();
+      }
+      ctx.restore();
+    }
+
+    function drawCyberWave(w, h) {
+      ctx.save();
+      const centerY = h / 2;
+
+      // Outer Cyan Wave
+      ctx.beginPath();
+      ctx.lineWidth = 3;
+      ctx.strokeStyle = '#00f2fe';
+      ctx.shadowColor = '#00f2fe';
+      ctx.shadowBlur = 12;
+
+      for (let x = 0; x <= w; x += 5) {
+        const audioBoost = (audioDataArray && audioDataArray[Math.floor(x / w * 16)]) ? audioDataArray[Math.floor(x / w * 16)] * 0.2 : 0;
+        const y = centerY + Math.sin(x * 0.015 + waveOffset) * (25 + audioBoost) + Math.cos(x * 0.03 - waveOffset) * 10;
+        if (x === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+
+      // Secondary Blue Wave
+      ctx.beginPath();
+      ctx.lineWidth = 2;
+      ctx.strokeStyle = 'rgba(0, 136, 204, 0.7)';
+      ctx.shadowColor = '#0088cc';
+      ctx.shadowBlur = 8;
+
+      for (let x = 0; x <= w; x += 5) {
+        const y = centerY + Math.cos(x * 0.02 - waveOffset * 1.3) * 30 + Math.sin(x * 0.01 + waveOffset) * 12;
+        if (x === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+
+      // Gradient Fill under main wave
+      ctx.lineTo(w, h);
+      ctx.lineTo(0, h);
+      ctx.closePath();
+      const grad = ctx.createLinearGradient(0, centerY, 0, h);
+      grad.addColorStop(0, 'rgba(0, 242, 254, 0.15)');
+      grad.addColorStop(1, 'rgba(3, 10, 22, 0)');
+      ctx.fillStyle = grad;
+      ctx.fill();
+
+      ctx.restore();
+    }
+
+    function drawParticleMatrix(w, h) {
+      ctx.save();
+      particleList.forEach((p, idx) => {
+        p.x += p.speedX;
+        p.y += p.speedY;
+
+        if (p.x < 0) p.x = w;
+        if (p.x > w) p.x = 0;
+        if (p.y < 0) p.y = h;
+        if (p.y > h) p.y = 0;
+
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+        ctx.fillStyle = idx % 2 === 0 ? '#00f2fe' : '#10b981';
+        ctx.shadowColor = ctx.fillStyle;
+        ctx.shadowBlur = 8;
+        ctx.fill();
+      });
+      ctx.restore();
+    }
+
+    function drawAudioSpectrum(w, h) {
+      ctx.save();
+      const barCount = 32;
+      const barWidth = (w / barCount) - 4;
+
+      for (let i = 0; i < barCount; i++) {
+        let val = 20 + Math.sin(i * 0.5 + waveOffset * 2) * 15 + Math.random() * 15;
+        if (audioDataArray && audioDataArray[i]) {
+          val = (audioDataArray[i] / 255) * (h * 0.7);
+        }
+
+        const x = i * (barWidth + 4) + 2;
+        const y = h - val;
+
+        const grad = ctx.createLinearGradient(0, h, 0, y);
+        grad.addColorStop(0, '#0088cc');
+        grad.addColorStop(0.5, '#00f2fe');
+        grad.addColorStop(1, '#ff007f');
+
+        ctx.fillStyle = grad;
+        ctx.shadowColor = '#00f2fe';
+        ctx.shadowBlur = 6;
+        ctx.fillRect(x, y, barWidth, val);
+      }
+      ctx.restore();
+    }
+
+    function drawConnectedNodes(w, h) {
+      // Draw 3 dynamic telemetry data points on canvas
+      const points = [
+        { x: w * 0.2, y: h * 0.3 + Math.sin(waveOffset) * 15, label: 'NODE-A [PRIMARY]' },
+        { x: w * 0.5, y: h * 0.6 + Math.cos(waveOffset * 0.8) * 20, label: 'MZ-ROUTER [SECURE]' },
+        { x: w * 0.8, y: h * 0.4 + Math.sin(waveOffset * 1.2) * 10, label: 'VAULT-7 [ACTIVE]' }
+      ];
+
+      ctx.save();
+      ctx.font = '10px Space Mono, monospace';
+      ctx.fillStyle = '#00f2fe';
+
+      points.forEach((pt) => {
+        ctx.beginPath();
+        ctx.arc(pt.x, pt.y, 4, 0, Math.PI * 2);
+        ctx.fillStyle = '#00f2fe';
+        ctx.shadowColor = '#00f2fe';
+        ctx.shadowBlur = 10;
+        ctx.fill();
+
+        ctx.fillStyle = 'rgba(248, 250, 252, 0.8)';
+        ctx.fillText(pt.label, pt.x + 8, pt.y + 3);
+      });
+
+      // Connect points with subtle cyan line
+      ctx.beginPath();
+      ctx.moveTo(points[0].x, points[0].y);
+      ctx.lineTo(points[1].x, points[1].y);
+      ctx.lineTo(points[2].x, points[2].y);
+      ctx.strokeStyle = 'rgba(0, 242, 254, 0.25)';
+      ctx.lineWidth = 1;
+      ctx.setLineDash([4, 4]);
+      ctx.stroke();
+
+      ctx.restore();
+    }
+
+    /* ===================================================================
+       INTERACTIVE ACTIONS & SIMULATIONS
+       =================================================================== */
+    function cycleVisualMode() {
+      playBeepSound(750, 0.05, 'triangle');
+      modeIndex = (modeIndex + 1) % modes.length;
+      document.getElementById('modeLabel').innerText = modes[modeIndex];
+    }
+
+    function triggerMzPulse() {
+      playBeepSound(1100, 0.12, 'sine');
+      // Briefly boost canvas wave offset or trigger visual effect
+      waveOffset += 2.0;
+      addTransactionLogRow('SYSTEM', 'MZ Quantum Key Rotation Initiated', 'VERIFIED', '#00f2fe');
+    }
+
+    function simulateTransfer() {
+      playTransferSound();
+      
+      const sendAmount = Math.floor(Math.random() * 45000) + 5000;
+      balance += sendAmount;
+
+      // Animate Balance Text
+      animateBalanceChange(sendAmount);
+
+      // Trigger Laser Beam Effect
+      const laser = document.getElementById('laserBeam');
+      laser.classList.add('laser-active');
+      setTimeout(() => laser.classList.remove('laser-active'), 2000);
+
+      // Add to Log
+      const randomNodes = ['MZ-NODE-99', 'TX-GLOBAL-01', 'SWIFT-CYBER-88', 'MZ-WALLET-VIP'];
+      const target = randomNodes[Math.floor(Math.random() * randomNodes.length)];
+      addTransactionLogRow('TRANSFER', `+$${sendAmount.toLocaleString()} USD from ${target}`, 'COMPLETED', '#10b981');
+    }
+
+    function runSecurityScan() {
+      if (isScanning) return;
+      isScanning = true;
+
+      playScanSound();
+
+      const scoreEl = document.getElementById('securityScore');
+      const barEl = document.getElementById('securityProgressBar');
+      const laser = document.getElementById('laserBeam');
+
+      scoreEl.innerText = 'SCANNING...';
+      scoreEl.className = 'text-2xl md:text-3xl font-extrabold font-orbitron text-amber-400 tracking-tight animate-pulse';
+      barEl.style.width = '30%';
+
+      laser.classList.add('laser-active');
+
+      setTimeout(() => {
+        barEl.style.width = '70%';
+        playBeepSound(900, 0.1, 'sine');
+      }, 900);
+
+      setTimeout(() => {
+        barEl.style.width = '100%';
+        scoreEl.innerText = '100% SECURE';
+        scoreEl.className = 'text-2xl md:text-3xl font-extrabold font-orbitron text-emerald-400 tracking-tight';
+        laser.classList.remove('laser-active');
+        isScanning = false;
+
+        playBeepSound(1200, 0.15, 'sine');
+        addTransactionLogRow('SECURITY', 'Full Quantum Vulnerability Audit Passed', 'CLEARED', '#10b981');
+      }, 1800);
+    }
+
+    function animateBalanceChange(addedValue) {
+      const balanceEl = document.getElementById('walletBalance');
+      let currentVal = balance - addedValue;
+      const steps = 15;
+      const increment = addedValue / steps;
+      let count = 0;
+
+      const timer = setInterval(() => {
+        currentVal += increment;
+        count++;
+        balanceEl.innerText = currentVal.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        if (count >= steps) {
+          balanceEl.innerText = balance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+          clearInterval(timer);
+        }
+      }, 30);
+    }
+
+    function seedInitialTransactions() {
+      addTransactionLogRow('TRANSFER', '+$120,000.00 USD from MZ-SWIFT-NODE', 'VERIFIED', '#10b981');
+      addTransactionLogRow('SECURITY', 'AES-256 Multi-layer Handshake Completed', 'SUCCESS', '#00f2fe');
+      addTransactionLogRow('TRANSFER', '-$3,450.00 USD to Encrypted Vault-09', 'EXECUTED', '#ff007f');
+    }
+
+    function addTransactionLogRow(type, desc, status, colorHex) {
+      const feed = document.getElementById('transactionFeed');
+      if (!feed) return;
+
+      const timeStr = new Date().toLocaleTimeString('en-US', { hour12: false });
+      const hashStr = '0x' + Math.random().toString(16).substr(2, 6).toUpperCase();
+
+      const row = document.createElement('div');
+      row.className = 'p-2 rounded bg-slate-900/90 border border-slate-800 flex items-center justify-between hover:border-cyan-700/50 transition transform slide-in';
+
+      row.innerHTML = `
+        <div class="flex items-center space-x-2 overflow-hidden">
+          <span class="text-slate-500 text-[10px]">${timeStr}</span>
+          <span class="px-1.5 py-0.5 rounded text-[10px] font-bold" style="background: rgba(0, 136, 204, 0.2); color: ${colorHex}">
+            [${type}]
+          </span>
+          <span class="text-slate-200 truncate max-w-[200px] sm:max-w-[320px]">${desc}</span>
+        </div>
+        <div class="flex items-center space-x-2">
+          <span class="text-[10px] text-slate-500 hidden sm:inline">${hashStr}</span>
+          <span class="px-2 py-0.5 rounded text-[10px] font-bold" style="border: 1px solid ${colorHex}; color: ${colorHex}">
+            ${status}
+          </span>
+        </div>
+      `;
+
+      feed.insertBefore(row, feed.firstChild);
+
+      // Keep only top 10 items
+      while (feed.children.length > 10) {
+        feed.removeChild(feed.lastChild);
+      }
+    }
+
+    /* ===================================================================
+       MODAL CONTROLS & FORM
+       =================================================================== */
+    function openTransferModal() {
+      playBeepSound(700, 0.08, 'sine');
+      const modal = document.getElementById('transferModal');
+      const card = document.getElementById('transferModalCard');
+      modal.classList.remove('hidden');
+      setTimeout(() => {
+        modal.classList.remove('opacity-0');
+        card.classList.remove('scale-95');
+      }, 10);
+    }
+
+    function closeTransferModal() {
+      playBeepSound(400, 0.05, 'sine');
+      const modal = document.getElementById('transferModal');
+      const card = document.getElementById('transferModalCard');
+      modal.classList.add('opacity-0');
+      card.classList.add('scale-95');
+      setTimeout(() => {
+        modal.classList.add('hidden');
+      }, 300);
+    }
+
+    function handleManualTransfer(e) {
+      e.preventDefault();
+      const recipient = document.getElementById('recipientInput').value;
+      const amount = parseFloat(document.getElementById('amountInput').value) || 0;
+
+      balance += amount;
+      animateBalanceChange(amount);
+      playTransferSound();
+
+      addTransactionLogRow('DIRECT TX', `+$${amount.toLocaleString()} USD dispatched to ${recipient}`, 'SUCCESS', '#10b981');
+      closeTransferModal();
+    }
+
+    /* ===================================================================
+       TELEMETRY UPDATES
+       =================================================================== */
+    function startTelemetrySimulation() {
+      setInterval(() => {
+        // Random latency variation
+        const lat = Math.floor(Math.random() * 8) + 9;
+        const latencyEl = document.getElementById('latencyDisplay');
+        if (latencyEl) latencyEl.innerText = lat + 'ms';
+
+        // Frequency variation display
+        const freqEl = document.getElementById('freqDisplay');
+        if (freqEl) freqEl.innerText = (142.80 + Math.random() * 0.2).toFixed(2) + ' MHz';
+
+        // Block height ticker
+        blockHeight += Math.floor(Math.random() * 2);
+        const bhEl = document.getElementById('blockHeight');
+        if (bhEl) bhEl.innerText = '#' + blockHeight.toLocaleString();
+
+        // Transaction TPS ticker
+        const tps = 98000 + Math.floor(Math.random() * 1200);
+        const txEl = document.getElementById('txRate');
+        if (txEl) txEl.innerText = tps.toLocaleString();
+
+      }, 2500);
+    }
+  </script>
+</body>
+</html>

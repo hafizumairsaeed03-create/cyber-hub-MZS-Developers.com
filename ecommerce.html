@@ -1,0 +1,1800 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MZ Digital Tech E-Commerce Store</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            cyberDark: '#030712',
+            cyberCard: '#070f1e',
+            cyberCardHover: '#0d1b32',
+            neonCyan: '#00f2fe',
+            neonBlue: '#0088cc',
+            neonPurple: '#a855f7',
+            neonGreen: '#10b981',
+            neonAmber: '#f59e0b'
+          },
+          animation: {
+            'glow-pulse': 'glowPulse 2.5s infinite ease-in-out',
+            'laser-scan': 'laserScan 2s linear infinite',
+            'float-subtle': 'floatSubtle 4s ease-in-out infinite',
+            'radar-spin': 'radarSpin 4s linear infinite',
+          },
+          keyframes: {
+            glowPulse: {
+              '0%, 100%': { boxShadow: '0 0 15px rgba(0, 242, 254, 0.3), inset 0 0 10px rgba(0, 136, 204, 0.2)' },
+              '50%': { boxShadow: '0 0 35px rgba(0, 242, 254, 0.7), inset 0 0 20px rgba(0, 242, 254, 0.4)' },
+            },
+            laserScan: {
+              '0%': { top: '0%' },
+              '50%': { top: '100%' },
+              '100%': { top: '0%' }
+            },
+            floatSubtle: {
+              '0%, 100%': { transform: 'translateY(0px)' },
+              '50%': { transform: 'translateY(-6px)' }
+            },
+            radarSpin: {
+              '0%': { transform: 'rotate(0deg)' },
+              '100%': { transform: 'rotate(360deg)' }
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Google Fonts & FontAwesome -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800;900&family=Rajdhani:wght@500;600;700&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    body {
+      font-family: 'Rajdhani', sans-serif;
+      background-color: #030712;
+      color: #f8fafc;
+      overflow-x: hidden;
+    }
+
+    .font-orbitron { font-family: 'Orbitron', sans-serif; }
+    .font-mono-code { font-family: 'Space Mono', monospace; }
+
+    /* Custom Cyber Scrollbars */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #030712;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #0088cc;
+      border-radius: 3px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #00f2fe;
+    }
+
+    /* Glassmorphic Cyber Border Style */
+    .cyber-glass-card {
+      background: rgba(7, 15, 30, 0.88);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(0, 242, 254, 0.25);
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.7), inset 0 0 15px rgba(0, 242, 254, 0.05);
+    }
+
+    .cyber-glass-glow {
+      background: rgba(7, 15, 30, 0.94);
+      backdrop-filter: blur(20px);
+      border: 1px solid #00f2fe;
+      box-shadow: 0 0 25px rgba(0, 242, 254, 0.25), inset 0 0 20px rgba(0, 136, 204, 0.12);
+    }
+
+    /* Glowing Text Effects */
+    .glow-text-cyan {
+      text-shadow: 0 0 10px rgba(0, 242, 254, 0.8), 0 0 20px rgba(0, 242, 254, 0.4);
+    }
+
+    /* Grid pattern background overlay */
+    .bg-grid-cyber {
+      background-image: linear-gradient(to right, rgba(0, 242, 254, 0.04) 1px, transparent 1px),
+                        linear-gradient(to bottom, rgba(0, 242, 254, 0.04) 1px, transparent 1px);
+      background-size: 32px 32px;
+    }
+
+    /* Holographic scanline effect */
+    .scanlines {
+      position: relative;
+      overflow: hidden;
+    }
+    .scanlines::before {
+      content: " ";
+      display: block;
+      position: absolute;
+      top: 0; left: 0; bottom: 0; right: 0;
+      background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%);
+      background-size: 100% 4px;
+      z-index: 10;
+      pointer-events: none;
+      opacity: 0.5;
+    }
+
+    /* Laser Line for Scan Simulation */
+    .laser-beam {
+      position: absolute;
+      left: 0;
+      width: 100%;
+      height: 3px;
+      background: linear-gradient(90deg, transparent, #00f2fe, #ffffff, #00f2fe, transparent);
+      box-shadow: 0 0 15px #00f2fe, 0 0 30px #00f2fe;
+      z-index: 25;
+      pointer-events: none;
+    }
+
+    .tab-btn {
+      transition: all 0.25s ease;
+    }
+    .tab-btn.active {
+      background: linear-gradient(90deg, rgba(0, 242, 254, 0.25), rgba(0, 136, 204, 0.35));
+      border-color: #00f2fe;
+      color: #00f2fe;
+      box-shadow: 0 0 15px rgba(0, 242, 254, 0.25);
+    }
+  </style>
+</head>
+
+<body class="min-h-screen bg-cyberDark text-slate-100 bg-grid-cyber flex flex-col justify-between selection:bg-neonCyan selection:text-black">
+
+  <header class="w-full border-b border-cyan-900/40 bg-cyberDark/90 backdrop-blur-md sticky top-0 z-40 px-4 lg:px-8 py-3">
+    <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-4">
+      
+      <!-- Network Branding & Status Badge -->
+      <div class="flex items-center space-x-3">
+        <div class="w-3 h-3 rounded-full bg-emerald-400 animate-ping"></div>
+        <span class="font-orbitron font-black text-lg sm:text-xl text-transparent bg-clip-text bg-gradient-to-r from-neonCyan via-blue-400 to-purple-500 tracking-wider">
+          MZ TECH STORE
+        </span>
+        <span class="hidden md:inline-block px-2.5 py-0.5 text-xs font-mono-code rounded border border-cyan-500/30 text-cyan-400 bg-cyan-950/40">
+          MZ-SHOP-v6.0-ONLINE
+        </span>
+      </div>
+
+      <!-- Realtime Audio & Speech Controls -->
+      <div class="flex items-center space-x-3">
+        
+        <!-- Sound FX Toggle -->
+        <button id="soundToggleBtn" onclick="toggleAudioSystem()" class="flex items-center space-x-2 px-3 py-1.5 rounded-lg border border-cyan-500/40 bg-cyan-950/40 hover:bg-cyan-900/60 transition text-xs font-semibold text-cyan-300">
+          <i id="soundIcon" class="fa-solid fa-volume-high text-neonCyan"></i>
+          <span id="soundStatusText">AUDIO: ON</span>
+        </button>
+
+        <!-- Voice Announcement Engine Toggle -->
+        <button id="voiceToggleBtn" onclick="toggleVoiceAnnouncements()" class="flex items-center space-x-2 px-3 py-1.5 rounded-lg border border-purple-500/40 bg-purple-950/40 hover:bg-purple-900/60 transition text-xs font-semibold text-purple-300">
+          <i id="voiceIcon" class="fa-solid fa-comment-dots text-purple-400"></i>
+          <span id="voiceStatusText">VOICE: ON</span>
+        </button>
+
+        <!-- Slide-out Cart Button with Badge -->
+        <button onclick="toggleCartDrawer(true)" class="relative px-3.5 py-1.5 rounded-lg bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-semibold text-xs tracking-wider uppercase transition shadow-lg shadow-cyan-950/60 flex items-center space-x-2">
+          <i class="fa-solid fa-cart-shopping"></i>
+          <span class="hidden sm:inline">Cart</span>
+          <span id="cartCountBadge" class="w-5 h-5 rounded-full bg-neonCyan text-black font-mono-code font-bold text-[11px] flex items-center justify-center">0</span>
+        </button>
+
+      </div>
+
+    </div>
+  </header>
+<main class="w-full px-6 lg:px-12 py-6 flex-grow flex flex-col"></main>
+ 
+    <!-- Hero Main Card Header Banner -->
+    <div class="w-full cyber-glass-glow rounded-2xl p-5 md:p-8 relative overflow-hidden transition-all duration-300 mb-8">
+      
+      <!-- Top Decorative Ambient Glows -->
+      <div class="absolute -top-20 -right-20 w-48 h-48 bg-cyan-500/20 rounded-full blur-3xl pointer-events-none"></div>
+      <div class="absolute -bottom-20 -left-20 w-48 h-48 bg-blue-600/20 rounded-full blur-3xl pointer-events-none"></div>
+
+      <!-- Card Top Bar: E-Commerce Badge & Glowing MZ Digital Logo -->
+      <div class="flex items-center justify-between mb-4 border-b border-slate-800/80 pb-4">
+        
+        <!-- Futuristic Neon Blue "E-Commerce" Tag Badge -->
+        <div class="flex items-center space-x-2">
+          <span class="px-3.5 py-1 bg-cyan-950/80 border border-cyan-500/60 text-neonCyan font-black text-xs rounded-md tracking-widest uppercase shadow-inner shadow-cyan-900/50 flex items-center space-x-1.5">
+            <i class="fa-solid fa-store text-cyan-400"></i>
+            <span>E-Commerce</span>
+          </span>
+          <span class="px-2.5 py-0.5 bg-emerald-950/60 border border-emerald-500/40 text-emerald-400 text-[10px] font-mono-code rounded hidden sm:flex items-center space-x-1">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-ping"></span>
+            <span>80 MZ ITEMS LIVE</span>
+          </span>
+        </div>
+
+        <!-- Prominent Glowing "MZ" Digital Logo -->
+        <div class="group relative cursor-pointer" onclick="triggerMzLogoEffect()" title="Click for Quantum Audio Sync Pulse">
+          <div class="absolute -inset-1.5 bg-gradient-to-r from-neonCyan via-blue-500 to-purple-600 rounded-2xl blur opacity-75 group-hover:opacity-100 transition duration-300 group-hover:scale-110"></div>
+          <div class="relative w-12 h-12 md:w-14 md:h-14 bg-gradient-to-br from-cyan-600 via-blue-800 to-indigo-950 rounded-xl flex items-center justify-center font-orbitron font-black text-xl md:text-2xl text-white tracking-tighter shadow-2xl border border-cyan-300/50 select-none transform transition active:scale-90">
+            MZ
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Card Title & Subtitle -->
+      <div class="mb-6">
+        <h1 class="text-2xl md:text-3xl lg:text-4xl font-black font-orbitron text-white tracking-wide glow-text-cyan flex items-center gap-3">
+          <span>Digital Tech E-Commerce Store - MZ Edition</span>
+        </h1>
+        <p class="text-slate-300 text-sm md:text-base font-medium mt-1.5 flex items-center gap-2">
+          <i class="fa-solid fa-microchip text-cyan-400 text-xs"></i>
+          <span>Quantum-grade laptops, mobile devices, spatial audio, wearables, and cyber accessories with live voice announcements.</span>
+        </p>
+      </div>
+
+      <!-- Live Search & Sort Toolbar Bar -->
+      <div class="grid grid-cols-1 md:grid-cols-12 gap-3 items-center pt-2 border-t border-cyan-900/40">
+        
+        <!-- Live Real-Time Search Bar -->
+        <div class="md:col-span-8 relative">
+          <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-cyan-400 text-sm"></i>
+          <input type="text" id="searchInput" oninput="handleSearchAndFilter()" placeholder="Search 80 MZ products by title, spec, or category..." class="w-full bg-slate-950/90 border border-cyan-800/80 rounded-xl pl-10 pr-10 py-2.5 text-xs md:text-sm font-mono-code text-white focus:outline-none focus:border-neonCyan focus:ring-1 focus:ring-neonCyan">
+          <button onclick="clearSearchInput()" id="clearSearchBtn" class="hidden absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white text-xs">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+
+        <!-- Sort Select Dropdown -->
+        <div class="md:col-span-4 flex items-center space-x-2">
+          <span class="text-xs font-mono-code text-slate-400 whitespace-nowrap">Sort:</span>
+          <select id="sortSelect" onchange="handleSearchAndFilter()" class="w-full bg-slate-950 border border-cyan-800 rounded-xl px-3 py-2.5 text-xs font-mono-code text-cyan-300 focus:outline-none focus:border-neonCyan">
+            <option value="featured">Featured (MZ Curated)</option>
+            <option value="price-asc">Price: Low to High</option>
+            <option value="price-desc">Price: High to Low</option>
+            <option value="rating">Highest Rated</option>
+            <option value="name">Product Name (A-Z)</option>
+          </select>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- Category Filter Tabs Bar -->
+    <div class="w-full flex flex-wrap gap-2 mb-6 border-b border-cyan-900/40 pb-4 items-center justify-between">
+      
+      <div class="flex flex-wrap gap-2">
+        <button onclick="filterByCategory('all')" id="cat-all" class="tab-btn active px-4 py-2 rounded-xl border border-cyan-900/60 bg-slate-900/60 text-xs sm:text-sm font-bold font-mono-code flex items-center space-x-2">
+          <i class="fa-solid fa-layer-group text-cyan-400"></i>
+          <span>All Items (<span id="count-all">80</span>)</span>
+        </button>
+
+        <button onclick="filterByCategory('laptops')" id="cat-laptops" class="tab-btn px-4 py-2 rounded-xl border border-cyan-900/60 bg-slate-900/60 text-xs sm:text-sm font-bold font-mono-code flex items-center space-x-2">
+          <i class="fa-solid fa-laptop text-blue-400"></i>
+          <span>Laptops (16)</span>
+        </button>
+
+        <button onclick="filterByCategory('mobiles')" id="cat-mobiles" class="tab-btn px-4 py-2 rounded-xl border border-cyan-900/60 bg-slate-900/60 text-xs sm:text-sm font-bold font-mono-code flex items-center space-x-2">
+          <i class="fa-solid fa-mobile-screen-button text-purple-400"></i>
+          <span>Mobiles & Tablets (16)</span>
+        </button>
+
+        <button onclick="filterByCategory('audio')" id="cat-audio" class="tab-btn px-4 py-2 rounded-xl border border-cyan-900/60 bg-slate-900/60 text-xs sm:text-sm font-bold font-mono-code flex items-center space-x-2">
+          <i class="fa-solid fa-headphones text-emerald-400"></i>
+          <span>AirBuds & Audio (16)</span>
+        </button>
+
+        <button onclick="filterByCategory('wearables')" id="cat-wearables" class="tab-btn px-4 py-2 rounded-xl border border-cyan-900/60 bg-slate-900/60 text-xs sm:text-sm font-bold font-mono-code flex items-center space-x-2">
+          <i class="fa-solid fa-stopwatch text-amber-400"></i>
+          <span>Wearables (16)</span>
+        </button>
+
+        <button onclick="filterByCategory('electronics')" id="cat-electronics" class="tab-btn px-4 py-2 rounded-xl border border-cyan-900/60 bg-slate-900/60 text-xs sm:text-sm font-bold font-mono-code flex items-center space-x-2">
+          <i class="fa-solid fa-plug text-pink-400"></i>
+          <span>Electronics (16)</span>
+        </button>
+      </div>
+
+      <div class="text-xs font-mono-code text-slate-400 mt-2 sm:mt-0">
+        Showing <span id="filteredCountText" class="text-neonCyan font-bold">80</span> products
+      </div>
+
+    </div>
+
+    <!-- 80 Products Grid Display -->
+    <div id="productsGrid" class="w-full grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 min-h-[800px]">
+      <!-- Dynamically populated via JavaScript -->
+    </div>
+
+    <!-- Empty Results State -->
+    <div id="noResultsState" class="hidden w-full py-16 text-center space-y-3">
+      <div class="text-4xl text-cyan-500"><i class="fa-solid fa-ghost"></i></div>
+      <h3 class="font-orbitron font-bold text-lg text-white">No MZ Tech Matches Found</h3>
+      <p class="text-xs font-mono-code text-slate-400">Try clearing your search query or switching categories.</p>
+      <button onclick="resetFilters()" class="px-4 py-2 rounded-xl bg-cyan-950 border border-cyan-500 text-cyan-300 font-mono-code text-xs font-bold hover:bg-cyan-900 transition">
+        Reset Search Filters
+      </button>
+    </div>
+
+  </main>
+
+  <!-- Slide-out Shopping Cart Drawer Backdrop -->
+  <div id="cartBackdrop" onclick="toggleCartDrawer(false)" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden opacity-0 transition-opacity duration-300"></div>
+
+  <!-- Slide-out Shopping Cart Drawer Panel -->
+  <div id="cartDrawer" class="fixed top-0 right-0 h-full w-full max-w-md bg-cyberDark/95 border-l border-cyan-500/40 z-50 transform translate-x-full transition-transform duration-300 ease-in-out flex flex-col justify-between shadow-2xl">
+    
+    <!-- Drawer Header -->
+    <div class="p-4 border-b border-slate-800 flex items-center justify-between bg-slate-950/80">
+      <div class="flex items-center space-x-2">
+        <i class="fa-solid fa-cart-shopping text-neonCyan text-lg"></i>
+        <h3 class="font-orbitron font-bold text-white text-base">MZ Cyber Shopping Cart</h3>
+      </div>
+      <button onclick="toggleCartDrawer(false)" class="text-slate-400 hover:text-white p-1 text-lg">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    </div>
+
+    <!-- Drawer Cart Items Scroll Area -->
+    <div id="cartItemsList" class="flex-grow p-4 overflow-y-auto space-y-3">
+      <!-- Dynamically rendered cart items -->
+    </div>
+
+    <!-- Drawer Footer & Totals -->
+    <div class="p-4 border-t border-slate-800 bg-slate-950/90 space-y-3">
+      <div class="space-y-1.5 text-xs font-mono-code">
+        <div class="flex justify-between text-slate-400">
+          <span>Subtotal</span>
+          <span id="cartSubtotal" class="text-slate-200">$0.00</span>
+        </div>
+        <div class="flex justify-between text-slate-400">
+          <span>Quantum Express Shipping</span>
+          <span class="text-emerald-400">FREE</span>
+        </div>
+        <div class="flex justify-between text-slate-400">
+          <span>Cyber Tax (5%)</span>
+          <span id="cartTax" class="text-slate-200">$0.00</span>
+        </div>
+        <div class="flex justify-between text-base font-orbitron font-bold text-white pt-2 border-t border-slate-800">
+          <span>Grand Total</span>
+          <span id="cartGrandTotal" class="text-neonCyan glow-text-cyan">$0.00</span>
+        </div>
+      </div>
+
+      <button id="checkoutBtn" onclick="openCheckoutModal()" disabled class="w-full py-3 rounded-xl bg-gradient-to-r from-cyan-600 via-blue-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500 disabled:opacity-50 text-white font-bold font-orbitron text-xs tracking-wider uppercase transition shadow-lg shadow-cyan-950 flex items-center justify-center space-x-2 border border-cyan-300/30">
+        <i class="fa-solid fa-credit-card text-amber-300"></i>
+        <span>Proceed to Cyber Checkout</span>
+      </button>
+    </div>
+
+  </div>
+
+  <!-- Stripe / Cyber Payment Checkout Modal -->
+  <div id="checkoutModal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden opacity-0 transition-opacity duration-300">
+    <div id="checkoutModalCard" class="cyber-glass-glow w-full max-w-lg rounded-2xl p-6 border border-cyan-400/60 relative shadow-2xl transform scale-95 transition-transform duration-300 overflow-hidden">
+      
+      <button onclick="closeCheckoutModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-lg">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+
+      <!-- Step 1: Payment Form View -->
+      <div id="paymentFormView" class="space-y-4">
+        
+        <div class="flex items-center space-x-3 border-b border-slate-800 pb-3">
+          <div class="w-10 h-10 rounded-xl bg-cyan-950 border border-cyan-500/50 flex items-center justify-center text-neonCyan font-bold text-lg">
+            <i class="fa-brands fa-stripe"></i>
+          </div>
+          <div>
+            <h3 class="font-orbitron font-bold text-white text-base">Stripe Secure Cyber Gateway</h3>
+            <p class="text-xs text-slate-400">Encrypted 256-bit tokenized transaction processing</p>
+          </div>
+        </div>
+
+        <!-- Simulated Cyber Credit Card Preview -->
+        <div class="w-full h-44 rounded-2xl bg-gradient-to-tr from-cyan-950 via-slate-900 to-purple-950 p-4 border border-cyan-500/50 relative shadow-xl flex flex-col justify-between font-mono-code text-xs overflow-hidden">
+          <div class="flex justify-between items-start">
+            <span class="text-cyan-400 font-bold tracking-widest font-orbitron">MZ QUANTUM CARD</span>
+            <i class="fa-solid fa-wifi text-cyan-300 text-sm"></i>
+          </div>
+
+          <div class="space-y-1">
+            <div class="w-10 h-8 rounded bg-amber-500/30 border border-amber-400/60 mb-2"></div>
+            <div id="cardDisplayNumber" class="text-lg md:text-xl font-bold tracking-widest text-white">•••• •••• •••• 4242</div>
+          </div>
+
+          <div class="flex justify-between items-end text-[11px]">
+            <div>
+              <span class="text-slate-400 block text-[9px]">CARD HOLDER</span>
+              <span id="cardDisplayName" class="text-slate-200 uppercase font-bold">ALEX V. MERCER</span>
+            </div>
+            <div>
+              <span class="text-slate-400 block text-[9px]">EXPIRES</span>
+              <span id="cardDisplayExp" class="text-slate-200 font-bold">12/28</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Payment Inputs -->
+        <form onsubmit="handlePaymentSubmit(event)" class="space-y-3">
+          <div>
+            <label class="block text-xs font-mono-code text-cyan-400 mb-1">CARDHOLDER NAME</label>
+            <input type="text" id="payName" required value="Alex V. Mercer" oninput="updateCardPreview()" class="w-full bg-slate-950 border border-cyan-800 rounded-lg px-3 py-2 text-xs font-mono-code text-white focus:outline-none focus:border-neonCyan">
+          </div>
+
+          <div>
+            <label class="block text-xs font-mono-code text-cyan-400 mb-1">CARD NUMBER</label>
+            <input type="text" id="payNumber" required maxlength="19" value="4242 4242 4242 4242" oninput="formatCardNumber(this)" class="w-full bg-slate-950 border border-cyan-800 rounded-lg px-3 py-2 text-xs font-mono-code text-white focus:outline-none focus:border-neonCyan">
+          </div>
+
+          <div class="grid grid-cols-2 gap-3">
+            <div>
+              <label class="block text-xs font-mono-code text-cyan-400 mb-1">EXPIRY DATE</label>
+              <input type="text" id="payExp" required placeholder="MM/YY" maxlength="5" value="12/28" oninput="updateCardPreview()" class="w-full bg-slate-950 border border-cyan-800 rounded-lg px-3 py-2 text-xs font-mono-code text-white focus:outline-none focus:border-neonCyan">
+            </div>
+            <div>
+              <label class="block text-xs font-mono-code text-cyan-400 mb-1">CVC CODE</label>
+              <input type="password" id="payCvc" required maxlength="4" value="888" class="w-full bg-slate-950 border border-cyan-800 rounded-lg px-3 py-2 text-xs font-mono-code text-white focus:outline-none focus:border-neonCyan">
+            </div>
+          </div>
+
+          <button type="submit" class="w-full py-3 rounded-xl bg-gradient-to-r from-emerald-600 via-teal-600 to-cyan-600 hover:from-emerald-500 hover:to-cyan-500 text-white font-bold font-orbitron text-xs tracking-wider uppercase transition shadow-lg shadow-emerald-950 flex items-center justify-center space-x-2 border border-emerald-400/40 mt-2">
+            <i class="fa-solid fa-lock text-emerald-300"></i>
+            <span>Pay <span id="payAmountButton">$0.00</span> Now</span>
+          </button>
+        </form>
+
+      </div>
+
+      <!-- Step 2: Processing Laser View -->
+      <div id="paymentProcessingView" class="hidden py-12 text-center space-y-4">
+        <div class="relative w-20 h-20 mx-auto">
+          <div class="w-full h-full rounded-full border-4 border-cyan-500/30 border-t-neonCyan animate-spin"></div>
+          <i class="fa-solid fa-microchip absolute inset-0 m-auto text-2xl text-cyan-400 flex items-center justify-center"></i>
+        </div>
+        <h3 class="font-orbitron font-bold text-lg text-white">Processing Quantum Token...</h3>
+        <p class="text-xs font-mono-code text-cyan-400 animate-pulse">Contacting Stripe Encrypted Mesh Network</p>
+      </div>
+
+      <!-- Step 3: Success View -->
+      <div id="paymentSuccessView" class="hidden py-8 text-center space-y-4">
+        <div class="w-16 h-16 rounded-full bg-emerald-950 border-2 border-emerald-400 text-emerald-400 text-3xl mx-auto flex items-center justify-center shadow-lg shadow-emerald-900/60 animate-bounce">
+          <i class="fa-solid fa-check"></i>
+        </div>
+        <div>
+          <h3 class="font-orbitron font-bold text-xl text-white">Payment Confirmed!</h3>
+          <p class="text-xs font-mono-code text-slate-300 mt-1">Transaction ID: <span id="successTxId" class="text-cyan-400">#MZ-88902-X</span></p>
+        </div>
+        <p class="text-xs text-slate-400 max-w-xs mx-auto">Your MZ Tech order has been verified and dispatched to Quantum Express Logistics.</p>
+        <button onclick="closeCheckoutModal()" class="px-6 py-2.5 rounded-xl bg-cyan-950 border border-cyan-500 text-cyan-300 font-mono-code text-xs font-bold hover:bg-cyan-900 transition">
+          Continue Tech Shopping
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <footer class="w-full border-t border-cyan-900/30 py-4 px-4 text-center text-xs font-mono-code text-slate-500">
+    <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
+      <div>© 2026 MZ DIGITAL TECH STORE. ALL RIGHTS RESERVED.</div>
+      <div class="flex items-center space-x-4">
+        <span class="hover:text-cyan-400 cursor-pointer">PRIVACY POLICY</span>
+        <span class="hover:text-cyan-400 cursor-pointer">TERMS OF SERVICE</span>
+        <span class="hover:text-cyan-400 cursor-pointer">QUANTUM RETURN GUARANTEE</span>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    /* ===================================================================
+       PRODUCTS DATASET (80 UNIQUE ITEMS ACROSS 5 CATEGORIES)
+       =================================================================== */
+    const productsData = [
+      // ----------------- LAPTOPS & PCS (1-16) -----------------
+      {
+        id: 1,
+        name: "MZ CyberBook Pro X16",
+        category: "laptops",
+        price: 2499,
+        rating: 4.9,
+        specs: "M3 Max / 64GB RAM / 2TB SSD / 120Hz Liquid Retina",
+        desc: "The pinnacle of mobile cybernetics with quantum architecture and ultra-fast rendering capabilities.",
+        image: "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?w=500&q=80"
+      },
+      {
+        id: 2,
+        name: "MZ Blade Stealth Ultra",
+        category: "laptops",
+        price: 3199,
+        rating: 5.0,
+        specs: "OLED 240Hz / RTX 4090 / Intel i9-14900HX",
+        desc: "Precision CNC aluminum chassis engineered for high-throughput cyber simulation and zero-lag gaming.",
+        image: "https://images.unsplash.com/photo-1603302576837-37561b2e2302?w=500&q=80"
+      },
+      {
+        id: 3,
+        name: "MZ QuantumBook AI-14",
+        category: "laptops",
+        price: 1899,
+        rating: 4.8,
+        specs: "Intel Core Ultra 9 / 32GB RAM / Neural NPU",
+        desc: "Built-in hardware neural processing unit for localized AI inference and code execution.",
+        image: "https://images.unsplash.com/photo-1531297484001-80022131f5a1?w=500&q=80"
+      },
+      {
+        id: 4,
+        name: "MZ Titan CyberStation",
+        category: "laptops",
+        price: 3499,
+        rating: 4.9,
+        specs: "Dual Screen / 128GB RAM / RTX 5000 Ada",
+        desc: "Heavy-duty dual-display workstation designed for quantum encryption analysis and CAD modeling.",
+        image: "https://images.unsplash.com/photo-1588872657578-7efd1f1555ed?w=500&q=80"
+      },
+      {
+        id: 5,
+        name: "MZ AeroBook Air 13",
+        category: "laptops",
+        price: 1299,
+        rating: 4.7,
+        specs: "Magnesium Alloy / 2.1 lbs / 22Hr Battery",
+        desc: "Featherweight portable ultrabook with all-day battery endurance and whisper-quiet liquid cooling.",
+        image: "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=500&q=80"
+      },
+      {
+        id: 6,
+        name: "MZ NovaBook Touch Convertible",
+        category: "laptops",
+        price: 1499,
+        rating: 4.6,
+        specs: "360 Hinge / 4K Stylus Display / 1TB SSD",
+        desc: "Versatile 2-in-1 cyber laptop with pen precision support for digital designers.",
+        image: "https://images.unsplash.com/photo-1541807084-5c52b6b3adef?w=500&q=80"
+      },
+      {
+        id: 7,
+        name: "MZ Phantom OLED Gaming Rig",
+        category: "laptops",
+        price: 2799,
+        rating: 4.9,
+        specs: "175Hz Mini-LED / RTX 4080 / Liquid Metal",
+        desc: "Aggressive thermal design featuring vapor chamber cooling and customizable RGB aura backlighting.",
+        image: "https://images.unsplash.com/photo-1525547719571-a2d4ac8945e2?w=500&q=80"
+      },
+      {
+        id: 8,
+        name: "MZ Apex Studio Book 16",
+        category: "laptops",
+        price: 2299,
+        rating: 4.8,
+        specs: "100% DCI-P3 Color / Calibrated 4K Screen",
+        desc: "Color-accurate workstation built for 8K video rendering and holographic graphics development.",
+        image: "https://images.unsplash.com/photo-1515378791036-0648a3ef77b2?w=500&q=80"
+      },
+      {
+        id: 9,
+        name: "MZ PulseBook Carbon 15",
+        category: "laptops",
+        price: 1699,
+        rating: 4.7,
+        specs: "Ryzen 9 8945HS / Carbon Fiber Casing",
+        desc: "Ultra-durable carbon fiber weave shell protecting extreme multi-threaded processing power.",
+        image: "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=500&q=80"
+      },
+      {
+        id: 10,
+        name: "MZ CyberPad Pro Modular Laptop",
+        category: "laptops",
+        price: 1999,
+        rating: 4.9,
+        specs: "Swappable Ports / Upgradable Mainboard",
+        desc: "Future-proof modular design allowing user-swappable I/O ports and processor modules.",
+        image: "https://images.unsplash.com/photo-1588702547923-7093a6c3ba33?w=500&q=80"
+      },
+      {
+        id: 11,
+        name: "MZ Helix Fold Dual-OLED",
+        category: "laptops",
+        price: 2899,
+        rating: 4.8,
+        specs: "17.3\" Foldable Screen / Magnetic Keyboard",
+        desc: "Seamless folding display technology transforming from a compact laptop into a massive tablet.",
+        image: "https://images.unsplash.com/photo-1537498425277-c283d32ef9db?w=500&q=80"
+      },
+      {
+        id: 12,
+        name: "MZ StealthBook Nano 12",
+        category: "laptops",
+        price: 1199,
+        rating: 4.6,
+        specs: "Fanless / Ultra Quiet / ARM-64 Chipset",
+        desc: "Zero-fan silent laptop engineered for coding on the go with instant waking capability.",
+        image: "https://images.unsplash.com/photo-1504707748692-419802cf939d?w=500&q=80"
+      },
+      {
+        id: 13,
+        name: "MZ Vector 17 Gaming Monster",
+        category: "laptops",
+        price: 2599,
+        rating: 4.9,
+        specs: "240Hz QHD+ / Mechanical Keyboard",
+        desc: "Tactile mechanical keys with Per-Key RGB switches and high-frame-rate display panel.",
+        image: "https://images.unsplash.com/photo-1618424181497-157f25b6ddd5?w=500&q=80"
+      },
+      {
+        id: 14,
+        name: "MZ Enterprise Security Book",
+        category: "laptops",
+        price: 1799,
+        rating: 4.7,
+        specs: "Self-Healing BIOS / Biometric Enclave",
+        desc: "Military-grade encryption laptop with automated hardware hardware privacy shutter.",
+        image: "https://images.unsplash.com/photo-1522199755839-a2bacb67c546?w=500&q=80"
+      },
+      {
+        id: 15,
+        name: "MZ VisionBook Creator 3D",
+        category: "laptops",
+        price: 2199,
+        rating: 4.8,
+        specs: "Glasses-Free 3D OLED / Pen Stylus",
+        desc: "Autostereoscopic 3D display panel rendering volumetric objects without 3D glasses.",
+        image: "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=500&q=80"
+      },
+      {
+        id: 16,
+        name: "MZ ZeroBook Arm Ultra",
+        category: "laptops",
+        price: 1399,
+        rating: 4.7,
+        specs: "30-Hour Battery / 5G Global Sub-6",
+        desc: "Always-connected mobile satellite communications and revolutionary power efficiency.",
+        image: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=500&q=80"
+      },
+
+      // ----------------- MOBILES & TABLETS (17-32) -----------------
+      {
+        id: 17,
+        name: "MZ CyberPhone Pro Max 5G",
+        category: "mobiles",
+        price: 1399,
+        rating: 4.9,
+        specs: "1TB Storage / 200MP Quad Camera / Titanium",
+        desc: "Flagship cyber smartphone featuring satellite SOS connectivity and periscope optics.",
+        image: "https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?w=500&q=80"
+      },
+      {
+        id: 18,
+        name: "MZ Fold X Quantum Phone",
+        category: "mobiles",
+        price: 1799,
+        rating: 4.8,
+        specs: "7.8\" Inner OLED Screen / Armor Hinge",
+        desc: "Revolutionary dual-folding display phone with split-screen multi-tasking workspace.",
+        image: "https://images.unsplash.com/photo-1592899677977-9c10ca588bbd?w=500&q=80"
+      },
+      {
+        id: 19,
+        name: "MZ CyberPad Ultra 13\" Tablet",
+        category: "mobiles",
+        price: 999,
+        rating: 4.9,
+        specs: "OLED 144Hz / M-Stylus Pro / 16GB RAM",
+        desc: "High-performance digital drawing canvas with paper-like matte anti-reflective coating.",
+        image: "https://images.unsplash.com/photo-1544244015-0df4b3ffc6b0?w=500&q=80"
+      },
+      {
+        id: 20,
+        name: "MZ Phone Apex 15",
+        category: "mobiles",
+        price: 1199,
+        rating: 4.7,
+        specs: "160W Fast Charge / Graphene Thermal",
+        desc: "Fully charges from 0 to 100% in under 9 minutes with advanced graphene cooling.",
+        image: "https://images.unsplash.com/photo-1565849904461-04a58ad377e0?w=500&q=80"
+      },
+      {
+        id: 21,
+        name: "MZ Mini CyberPhone Pocket",
+        category: "mobiles",
+        price: 799,
+        rating: 4.6,
+        specs: "5.4\" Compact OLED / Lightweight 130g",
+        desc: "Ultra-compact ergonomic smartphone packing full flagship processing performance.",
+        image: "https://images.unsplash.com/photo-1580910051074-3eb694886505?w=500&q=80"
+      },
+      {
+        id: 22,
+        name: "MZ CyberTab Air 11\" Paper",
+        category: "mobiles",
+        price: 599,
+        rating: 4.7,
+        specs: "E-Ink Color Hybrid / Eye Care Tech",
+        desc: "Zero eye strain paper-display tablet ideal for reading documentation and code reviewing.",
+        image: "https://images.unsplash.com/photo-1561154464-82e9adf32764?w=500&q=80"
+      },
+      {
+        id: 23,
+        name: "MZ Gaming Phone RedBlade 9",
+        category: "mobiles",
+        price: 999,
+        rating: 4.9,
+        specs: "Built-in Cooling Fan / Shoulder Triggers",
+        desc: "Dedicated eSports mobile smartphone with touch-responsive physical trigger buttons.",
+        image: "https://images.unsplash.com/photo-1574944985070-8f3ebc6b79d2?w=500&q=80"
+      },
+      {
+        id: 24,
+        name: "MZ ArmorPhone Heavy Duty",
+        category: "mobiles",
+        price: 1099,
+        rating: 4.8,
+        specs: "IP69K Waterproof / FLIR Thermal Cam",
+        desc: "Indestructible rugged phone equipped with integrated infrared thermal imaging camera.",
+        image: "https://images.unsplash.com/photo-1533228876829-65c94e7b5025?w=500&q=80"
+      },
+      {
+        id: 25,
+        name: "MZ CyberPad Creator Stylus Pro",
+        category: "mobiles",
+        price: 899,
+        rating: 4.7,
+        specs: "4096 Pressure Levels / magnetic Keyboard",
+        desc: "Includes active Bluetooth magnetic stylus with zero tilt latency for digital artists.",
+        image: "https://images.unsplash.com/photo-1542751371-adc38448a05e?w=500&q=80"
+      },
+      {
+        id: 26,
+        name: "MZ CyberPhone Neo Lite",
+        category: "mobiles",
+        price: 499,
+        rating: 4.5,
+        specs: "5G Speed / 50MP Sony Sensor / 120Hz",
+        desc: "Accessible cyber smartphone delivering high refresh rates and crisp night photography.",
+        image: "https://images.unsplash.com/photo-1573148195900-7845dcb9b127?w=500&q=80"
+      },
+      {
+        id: 27,
+        name: "MZ Flip Quantum Pocket",
+        category: "mobiles",
+        price: 1299,
+        rating: 4.8,
+        specs: "3.4\" Outer Screen / Flex Mode Camera",
+        desc: "Clamshell folding design that sits comfortably in any pocket with quick notification widget screen.",
+        image: "https://images.unsplash.com/photo-1598327105666-5b89351aff97?w=500&q=80"
+      },
+      {
+        id: 28,
+        name: "MZ CyberPad Mini 8.4\" eSports",
+        category: "mobiles",
+        price: 449,
+        rating: 4.6,
+        specs: "A17 Chip / Dual Haptic Motors",
+        desc: "Pocket tablet optimized for high-FPS mobile gaming and low-latency wireless streaming.",
+        image: "https://images.unsplash.com/photo-1510557880182-3d4d3cba35a5?w=500&q=80"
+      },
+      {
+        id: 29,
+        name: "MZ Phone Vision Pro AR-Linked",
+        category: "mobiles",
+        price: 1499,
+        rating: 4.9,
+        specs: "LiDAR 3D Scanner / AR Spatial Projection",
+        desc: "Designed to pair directly with AR smart glasses for spatial computing interface rendering.",
+        image: "https://images.unsplash.com/photo-1523206489230-c012c64b2b48?w=500&q=80"
+      },
+      {
+        id: 30,
+        name: "MZ CyberTab Workstation Pro",
+        category: "mobiles",
+        price: 1149,
+        rating: 4.8,
+        specs: "14.6\" Massive OLED / Desktop OS Mode",
+        desc: "Huge screen slate that switches instantly into multi-window desktop operating system mode.",
+        image: "https://images.unsplash.com/photo-1527698266440-12104e498b76?w=500&q=80"
+      },
+      {
+        id: 31,
+        name: "MZ Phone Carbon Stealth",
+        category: "mobiles",
+        price: 1049,
+        rating: 4.7,
+        specs: "Matte Black Carbon / Encrypted Vault",
+        desc: "Stealth privacy mobile phone with hardware kill switches for camera and microphone.",
+        image: "https://images.unsplash.com/photo-1567581935884-3349723552ca?w=500&q=80"
+      },
+      {
+        id: 32,
+        name: "MZ CyberTab Kids Security",
+        category: "mobiles",
+        price: 299,
+        rating: 4.5,
+        specs: "Drop-proof Bumper / Eye Protect Mode",
+        desc: "Reinforced protective tablet with parental control network dashboard and outdoor visibility screen.",
+        image: "https://images.unsplash.com/photo-1585060544812-6b45742d762f?w=500&q=80"
+      },
+
+      // ----------------- AIRBUDS & AUDIO (33-48) -----------------
+      {
+        id: 33,
+        name: "MZ SonicPro ANC CyberBuds",
+        category: "audio",
+        price: 249,
+        rating: 4.9,
+        specs: "50dB Adaptive ANC / LDAC Hi-Res Audio",
+        desc: "Flagship wireless earbuds with custom planar drivers and real-time noise cancellation.",
+        image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500&q=80"
+      },
+      {
+        id: 34,
+        name: "MZ Quantum Studio Over-Ear",
+        category: "audio",
+        price: 499,
+        rating: 5.0,
+        specs: "Magnesium Acoustic Drivers / Spatial 3D",
+        desc: "Reference-grade studio wireless headphones with head-tracking spatial audio calibration.",
+        image: "https://images.unsplash.com/photo-1546435770-a3e426bf472b?w=500&q=80"
+      },
+      {
+        id: 35,
+        name: "MZ PulseBuds True Sports",
+        category: "audio",
+        price: 179,
+        rating: 4.7,
+        specs: "IPX8 Waterproof / Secure Ear Hooks",
+        desc: "Workout proof earbuds with sweat resistant nano-coating and ambient transparency pass-through.",
+        image: "https://images.unsplash.com/photo-1590658268037-6bf12165a8df?w=500&q=80"
+      },
+      {
+        id: 36,
+        name: "MZ Spatial Audio Soundbar 7.1.4",
+        category: "audio",
+        price: 899,
+        rating: 4.9,
+        specs: "Dolby Atmos / Wireless Subwoofer 800W",
+        desc: "Immersive home theatre soundbar featuring up-firing drivers for room-filling cyber acoustics.",
+        image: "https://images.unsplash.com/photo-1545454675-3531b543be5d?w=500&q=80"
+      },
+      {
+        id: 37,
+        name: "MZ BoneConduction Pro Headset",
+        category: "audio",
+        price: 199,
+        rating: 4.6,
+        specs: "Open-Ear Design / Boom Noise-Cancel Mic",
+        desc: "Open-ear bone conduction headphones delivering audio through jawbone vibrations safely.",
+        image: "https://images.unsplash.com/photo-1484704849700-f032a568e944?w=500&q=80"
+      },
+      {
+        id: 38,
+        name: "MZ AudioSphere Desktop Monitors",
+        category: "audio",
+        price: 349,
+        rating: 4.8,
+        specs: "Kevlar Woofers / RGB Illumination Ring",
+        desc: "Active desktop reference speakers engineered for crisp audio mix evaluation and gaming.",
+        image: "https://images.unsplash.com/photo-1545454675-3531b543be5d?w=500&q=80"
+      },
+      {
+        id: 39,
+        name: "MZ RGB CyberSurround Headset",
+        category: "audio",
+        price: 229,
+        rating: 4.8,
+        specs: "7.1 Virtual Surround / Detachable Mic",
+        desc: "Competitive gaming headset equipped with ultra-clear cardioid broadcast microphone.",
+        image: "https://images.unsplash.com/photo-1618366712010-f4ae9c647dcb?w=500&q=80"
+      },
+      {
+        id: 40,
+        name: "MZ CyberBuds Nano Invisible",
+        category: "audio",
+        price: 159,
+        rating: 4.5,
+        specs: "Micro-Sized Fit / Sleep Mode Sound Masking",
+        desc: "Ultra-discreet tiny earbuds tailored for sleep comfort and white noise masking.",
+        image: "https://images.unsplash.com/photo-1572536147248-ac59a8abfa4d?w=500&q=80"
+      },
+      {
+        id: 41,
+        name: "MZ StudioMaster Open-Back",
+        category: "audio",
+        price: 599,
+        rating: 4.9,
+        specs: "Planar Magnetic / Velvet Ear Cushion",
+        desc: "Audiophile open-back headphones providing an expansive natural soundstage.",
+        image: "https://images.unsplash.com/photo-1583394838336-acd977736f90?w=500&q=80"
+      },
+      {
+        id: 42,
+        name: "MZ CyberBeat Bluetooth Tower",
+        category: "audio",
+        price: 399,
+        rating: 4.7,
+        specs: "120W Peak / Bass Boost / Dynamic Light Show",
+        desc: "Portable loud outdoor speaker featuring beat-synced cyber visual light matrix.",
+        image: "https://images.unsplash.com/photo-1608043152269-423dbba4e7e1?w=500&q=80"
+      },
+      {
+        id: 43,
+        name: "MZ AudioDAC Hi-Res Amplifier",
+        category: "audio",
+        price: 299,
+        rating: 4.8,
+        specs: "ESS Sabre Chipset / 32-bit 384kHz PCM",
+        desc: "External digital-to-analog converter amplifying high impedance headphones.",
+        image: "https://images.unsplash.com/photo-1558089687-f282ffcbc126?w=500&q=80"
+      },
+      {
+        id: 44,
+        name: "MZ SonicClip Magnetic Earbuds",
+        category: "audio",
+        price: 129,
+        rating: 4.6,
+        specs: "Magnetic Neckband / 30Hr Battery",
+        desc: "Tangle-free magnetic wireless earbuds designed for daily active commuting.",
+        image: "https://images.unsplash.com/photo-1590658268037-6bf12165a8df?w=500&q=80"
+      },
+      {
+        id: 45,
+        name: "MZ QuadDriver Reference IEMs",
+        category: "audio",
+        price: 379,
+        rating: 4.9,
+        specs: "Silver-Plated Cable / 4 Armature Drivers",
+        desc: "In-ear monitors tuned specifically for audio engineers and touring musicians.",
+        image: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500&q=80"
+      },
+      {
+        id: 46,
+        name: "MZ AcousticPod Smart Home",
+        category: "audio",
+        price: 249,
+        rating: 4.7,
+        specs: "Voice Assistant AI / Room Calibration",
+        desc: "360-degree high-fidelity home speaker that tunes audio based on room geometry.",
+        image: "https://images.unsplash.com/photo-1589003077984-894e133dabab?w=500&q=80"
+      },
+      {
+        id: 47,
+        name: "MZ CyberMic Studio Condenser",
+        category: "audio",
+        price: 199,
+        rating: 4.8,
+        specs: "XLR & USB-C Dual / Shock Mount Included",
+        desc: "Broadcast grade cardioid condenser microphone tailored for podcasts and live streams.",
+        image: "https://images.unsplash.com/photo-1590602847861-f357a9332bbc?w=500&q=80"
+      },
+      {
+        id: 48,
+        name: "MZ Wireless Stage Monitor System",
+        category: "audio",
+        price: 649,
+        rating: 4.8,
+        specs: "Zero Latency 2.4GHz / Dual Channel Transmitter",
+        desc: "Pro-audio wireless transmitter system for zero-delay stage performance monitoring.",
+        image: "https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=500&q=80"
+      },
+
+      // ----------------- WEARABLES (49-64) -----------------
+      {
+        id: 49,
+        name: "MZ CyberWatch Ultra Titanium",
+        category: "wearables",
+        price: 799,
+        rating: 5.0,
+        specs: "Sapphire Glass / ECG Sensor / 100m Water",
+        desc: "Extreme outdoor smartwatch crafted from aerospace grade titanium with dual-frequency GPS.",
+        image: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500&q=80"
+      },
+      {
+        id: 50,
+        name: "MZ Quantum Ring Health v3",
+        category: "wearables",
+        price: 299,
+        rating: 4.8,
+        specs: "Sleep Analytics / Body Temp / Titanium",
+        desc: "Sleek smart ring analyzing blood oxygen, stress levels, and circadian sleep cycles.",
+        image: "https://images.unsplash.com/photo-1605100804763-247f67b3557e?w=500&q=80"
+      },
+      {
+        id: 51,
+        name: "MZ Vision AR Smart Glasses 2.0",
+        category: "wearables",
+        price: 999,
+        rating: 4.9,
+        specs: "Micro-LED Heads Up Display / Dual Speakers",
+        desc: "Lightweight augment reality glasses displaying navigation, notifications, and translation overlay.",
+        image: "https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=500&q=80"
+      },
+      {
+        id: 52,
+        name: "MZ Apex Sport Tactical Watch",
+        category: "wearables",
+        price: 549,
+        rating: 4.7,
+        specs: "Solar Charging / Topo Maps / Flashlight",
+        desc: "Tactical endurance watch with built-in LED flashlight and offline topographical mapping.",
+        image: "https://images.unsplash.com/photo-1508685096489-7aacd43bd3b1?w=500&q=80"
+      },
+      {
+        id: 53,
+        name: "MZ CyberWatch Horizon OLED",
+        category: "wearables",
+        price: 399,
+        rating: 4.8,
+        specs: "Curved Screen / 60FPS UI / Leather & Metal",
+        desc: "Stylish daily smartwatch featuring customizable holographic cyber watchfaces.",
+        image: "https://images.unsplash.com/photo-1510017803434-a899398421b3?w=500&q=80"
+      },
+      {
+        id: 54,
+        name: "MZ BioBand Fitness Tracker Pro",
+        category: "wearables",
+        price: 149,
+        rating: 4.6,
+        specs: "14-Day Battery / Heart Rate & SpO2",
+        desc: "Slim band providing continuous bio-metric tracking and AI recovery advice.",
+        image: "https://images.unsplash.com/photo-1575311373937-040b8e1fd5b6?w=500&q=80"
+      },
+      {
+        id: 55,
+        name: "MZ CyberGlass HUD Biker Edition",
+        category: "wearables",
+        price: 699,
+        rating: 4.8,
+        specs: "Helmet Mount / Rear Radar Blindspot Alert",
+        desc: "HUD eyewear warning cyclists and motorcyclists of incoming vehicles.",
+        image: "https://images.unsplash.com/photo-1511499767150-a48a237f0083?w=500&q=80"
+      },
+      {
+        id: 56,
+        name: "MZ Kids Safety CyberWatch",
+        category: "wearables",
+        price: 129,
+        rating: 4.5,
+        specs: "4G Video Call / GPS Geo-fencing",
+        desc: "Child security watch with immediate SOS emergency calling and safe perimeter alerts.",
+        image: "https://images.unsplash.com/photo-1544117519-31a4b719223d?w=500&q=80"
+      },
+      {
+        id: 57,
+        name: "MZ Haptic Gaming Vest & Band",
+        category: "wearables",
+        price: 499,
+        rating: 4.9,
+        specs: "16 Haptic Feedback Zones / Low Latency",
+        desc: "Tactile haptic feedback wearable letting you feel recoil and explosions in VR/PC games.",
+        image: "https://images.unsplash.com/photo-1593508512255-86ab42a8e620?w=500&q=80"
+      },
+      {
+        id: 58,
+        name: "MZ Smart Glove VR Motion Controller",
+        category: "wearables",
+        price: 349,
+        rating: 4.7,
+        specs: "Sub-Millimeter Finger Tracking / Flex Sensors",
+        desc: "Precision tracking gloves for realistic hand interaction inside virtual environments.",
+        image: "https://images.unsplash.com/photo-1622979135225-d2ba269bc1bd?w=500&q=80"
+      },
+      {
+        id: 59,
+        name: "MZ Watch Ceramic Luxury Edition",
+        category: "wearables",
+        price: 1199,
+        rating: 4.9,
+        specs: "White Zirconia Ceramic / Gold Accents",
+        desc: "Exquisite ceramic body handcrafted for executive luxury and advanced connectivity.",
+        image: "https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=500&q=80"
+      },
+      {
+        id: 60,
+        name: "MZ SleepPatch Neuro Monitor",
+        category: "wearables",
+        price: 219,
+        rating: 4.6,
+        specs: "EEG Brainwave Sensor / Soft Silicone",
+        desc: "Neuro-feedback patch optimizing Deep and REM sleep stages through subtle acoustic pulses.",
+        image: "https://images.unsplash.com/photo-1508685096489-7aacd43bd3b1?w=500&q=80"
+      },
+      {
+        id: 61,
+        name: "MZ SolarWatch Survival Tactical",
+        category: "wearables",
+        price: 449,
+        rating: 4.8,
+        specs: "Infinite Solar Charge / Altimeter & Barometer",
+        desc: "Rugged wilderness smartwatch powered perpetually by ambient ambient sunlight.",
+        image: "https://images.unsplash.com/photo-1524805444758-089113d48a6d?w=500&q=80"
+      },
+      {
+        id: 62,
+        name: "MZ OrthoPulse Posture Band",
+        category: "wearables",
+        price: 119,
+        rating: 4.5,
+        specs: "Vibration Correction / Ergonomic Tracking",
+        desc: "Wearable spine alignment sensor providing silent haptic alerts when slouching.",
+        image: "https://images.unsplash.com/photo-1510017803434-a899398421b3?w=500&q=80"
+      },
+      {
+        id: 63,
+        name: "MZ Audio Frames Sun AR",
+        category: "wearables",
+        price: 249,
+        rating: 4.7,
+        specs: "Polarized Lenses / Open-Ear Audio",
+        desc: "Classic UV sunglasses with integrated directional micro-speakers for music calls.",
+        image: "https://images.unsplash.com/photo-1511499767150-a48a237f0083?w=500&q=80"
+      },
+      {
+        id: 64,
+        name: "MZ Watch Active 4G LTE",
+        category: "wearables",
+        price: 429,
+        rating: 4.8,
+        specs: "eSIM Standalone / Music Streaming",
+        desc: "Run phone-free with direct cellular network connectivity and contactless payments.",
+        image: "https://images.unsplash.com/photo-1508685096489-7aacd43bd3b1?w=500&q=80"
+      },
+
+      // ----------------- ELECTRONICS & ACCESSORIES (65-80) -----------------
+      {
+        id: 65,
+        name: "MZ CyberDesk RGB Electric Desk",
+        category: "electronics",
+        price: 799,
+        rating: 4.9,
+        specs: "Memory Heights / Integrated Power Outlets / Carbon",
+        desc: "Motorized sit-stand desk equipped with dynamic ambient lighting and built-in cable management.",
+        image: "https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=500&q=80"
+      },
+      {
+        id: 66,
+        name: "MZ MechKey Pro Wireless Magnetic",
+        category: "electronics",
+        price: 189,
+        rating: 4.9,
+        specs: "Hall Effect Magnetic Switches / Rapid Trigger",
+        desc: "Custom mechanical keyboard with adjustable actuation distance down to 0.1mm.",
+        image: "https://images.unsplash.com/photo-1587829741301-dc798b83add3?w=500&q=80"
+      },
+      {
+        id: 67,
+        name: "MZ CyberTrack 26K DPI Mouse",
+        category: "electronics",
+        price: 119,
+        rating: 4.8,
+        specs: "49g Ultra Light / Optical Switches / 8K Polling",
+        desc: "Ultra-lightweight gaming mouse engineered for pixel-perfect competitive aiming.",
+        image: "https://images.unsplash.com/photo-1615663245857-ac93bb7c39e7?w=500&q=80"
+      },
+      {
+        id: 68,
+        name: "MZ GaN Charger 240W CyberHub",
+        category: "electronics",
+        price: 129,
+        rating: 4.9,
+        specs: "4x USB-C PD 3.1 / Power Display Screen",
+        desc: "Compact Gallium Nitride multi-device charger capable of powering two laptops simultaneously.",
+        image: "https://images.unsplash.com/photo-1583863788434-e58a36330cf0?w=500&q=80"
+      },
+      {
+        id: 69,
+        name: "MZ CyberDock Thunderbolt 4",
+        category: "electronics",
+        price: 279,
+        rating: 4.8,
+        specs: "Dual 4K@120Hz Output / 96W Pass-Through",
+        desc: "Expand a single cable into 14 ports including SD card, 2.5G Ethernet, and audio.",
+        image: "https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?w=500&q=80"
+      },
+      {
+        id: 70,
+        name: "MZ Holographic Display Cube",
+        category: "electronics",
+        price: 499,
+        rating: 4.7,
+        specs: "3D Volumetric Pixels / Wi-Fi Sync",
+        desc: "Desktop holographic display rendering animated 3D cyber avatars and crypto meters.",
+        image: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=500&q=80"
+      },
+      {
+        id: 71,
+        name: "MZ Quantum Router Wi-Fi 7 Mesh",
+        category: "electronics",
+        price: 449,
+        rating: 4.9,
+        specs: "19 Gbps Speed / 10G WAN Port / Cyber Security Shield",
+        desc: "Next-gen tri-band router providing ultra-low latency wireless coverage across 6,000 sq ft.",
+        image: "https://images.unsplash.com/photo-1544197150-b99a580bb7a8?w=500&q=80"
+      },
+      {
+        id: 72,
+        name: "MZ CyberCooler Liquid PC Kit",
+        category: "electronics",
+        price: 229,
+        rating: 4.8,
+        specs: "360mm Radiator / Customizable LCD Screen",
+        desc: "All-in-one liquid processor cooler displaying system temperatures or custom GIFs.",
+        image: "https://images.unsplash.com/photo-1587202372775-e229f172b9d7?w=500&q=80"
+      },
+      {
+        id: 73,
+        name: "MZ High-Speed NVMe Gen5 SSD 4TB",
+        category: "electronics",
+        price: 399,
+        rating: 5.0,
+        specs: "14,000 MB/s Read Speed / Active Heatsink",
+        desc: "Blazing fast PCI-Express 5.0 storage drive eliminating game load times entirely.",
+        image: "https://images.unsplash.com/photo-1597872200969-2b65d56bd16b?w=500&q=80"
+      },
+      {
+        id: 74,
+        name: "MZ CyberStream 4K60 Capture Card",
+        category: "electronics",
+        price: 199,
+        rating: 4.7,
+        specs: "4K60 HDR Pass-Through / Zero Latency USB-C",
+        desc: "Pro streaming capture device recording console gameplay seamlessly into OBS Studio.",
+        image: "https://images.unsplash.com/photo-1587202372634-32705e3bf49c?w=500&q=80"
+      },
+      {
+        id: 75,
+        name: "MZ Smart RGB Ambient Towers",
+        category: "electronics",
+        price: 149,
+        rating: 4.6,
+        specs: "Screen Color Sync / Music Reactive",
+        desc: "Dual LED light bars mirroring the colors on your desktop monitor in real-time.",
+        image: "https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=500&q=80"
+      },
+      {
+        id: 76,
+        name: "MZ CyberBackpack Anti-Theft Solar",
+        category: "electronics",
+        price: 169,
+        rating: 4.8,
+        specs: "Waterproof TSA Lock / Solar Panel Charging",
+        desc: "Tech travel backpack built with cut-resistant fabric and integrated solar battery charger.",
+        image: "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=500&q=80"
+      },
+      {
+        id: 77,
+        name: "MZ Magnetic PowerBank 20k",
+        category: "electronics",
+        price: 89,
+        rating: 4.7,
+        specs: "15W Wireless / 65W USB-C PD Fast Charge",
+        desc: "High-capacity power bank snapping magnetically to smartphones or laptops.",
+        image: "https://images.unsplash.com/photo-1609592807688-8aaf4d3701a5?w=500&q=80"
+      },
+      {
+        id: 78,
+        name: "MZ CyberCam 4K AI WebCam 60FPS",
+        category: "electronics",
+        price: 179,
+        rating: 4.8,
+        specs: "AI Auto-Framing / Dual Noise-Cancel Mics",
+        desc: "Ultra HD webcam tracking your movement automatically and keeping focus sharp.",
+        image: "https://images.unsplash.com/photo-1587826080692-f439cd0b70da?w=500&q=80"
+      },
+      {
+        id: 79,
+        name: "MZ CyberMic Boom Arm Pro",
+        category: "electronics",
+        price: 139,
+        rating: 4.7,
+        specs: "Internal Springs / Cable Channel / Metal Construction",
+        desc: "Quiet heavy-duty microphone boom arm keeping desktop space free from clutter.",
+        image: "https://images.unsplash.com/photo-1590602847861-f357a9332bbc?w=500&q=80"
+      },
+      {
+        id: 80,
+        name: "MZ Quantum VR Motion Base",
+        category: "electronics",
+        price: 1299,
+        rating: 4.9,
+        specs: "360-Degree Treadmill Pad / Harness Included",
+        desc: "Omnidirectional virtual reality floor pad enabling natural physical walking in games.",
+        image: "https://images.unsplash.com/photo-1592478411213-6153e4ebc07d?w=500&q=80"
+      }
+    ];
+
+    /* ===================================================================
+       APPLICATION STATE
+       =================================================================== */
+    let currentCategory = 'all';
+    let searchQuery = '';
+    let currentSort = 'featured';
+    let cart = [];
+
+    let isAudioEnabled = true;
+    let isVoiceEnabled = true;
+    let audioCtx = null;
+
+    /* ===================================================================
+       INITIALIZATION
+       =================================================================== */
+    window.addEventListener('DOMContentLoaded', () => {
+      renderProducts();
+      updateCartUI();
+    });
+
+    /* ===================================================================
+       WEB AUDIO SYNTHESIZER ENGINE (NO EXTERNAL AUDIO FILES)
+       =================================================================== */
+    function initAudioContext() {
+      if (!audioCtx) {
+        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+        audioCtx = new AudioContextClass();
+      }
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+    }
+
+    function toggleAudioSystem() {
+      isAudioEnabled = !isAudioEnabled;
+      const icon = document.getElementById('soundIcon');
+      const text = document.getElementById('soundStatusText');
+
+      if (isAudioEnabled) {
+        icon.className = 'fa-solid fa-volume-high text-neonCyan';
+        text.innerText = 'AUDIO: ON';
+        playBeep(800, 0.08, 'sine');
+      } else {
+        icon.className = 'fa-solid fa-volume-xmark text-slate-400';
+        text.innerText = 'AUDIO: OFF';
+      }
+    }
+
+    function playBeep(freq = 600, duration = 0.08, type = 'sine') {
+      if (!isAudioEnabled) return;
+      initAudioContext();
+      try {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+
+        gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        osc.start();
+        osc.stop(audioCtx.currentTime + duration);
+      } catch (e) {}
+    }
+
+    function playCartChime() {
+      if (!isAudioEnabled) return;
+      initAudioContext();
+      try {
+        const now = audioCtx.currentTime;
+        const osc1 = audioCtx.createOscillator();
+        const osc2 = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+
+        osc1.type = 'sine';
+        osc1.frequency.setValueAtTime(523.25, now); // C5
+        osc2.type = 'sine';
+        osc2.frequency.setValueAtTime(659.25, now + 0.08); // E5
+
+        gain.gain.setValueAtTime(0.12, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+
+        osc1.connect(gain);
+        osc2.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        osc1.start(now);
+        osc1.stop(now + 0.15);
+        osc2.start(now + 0.08);
+        osc2.stop(now + 0.35);
+      } catch (e) {}
+    }
+
+    function playSuccessFanfare() {
+      if (!isAudioEnabled) return;
+      initAudioContext();
+      try {
+        const now = audioCtx.currentTime;
+        const notes = [523.25, 659.25, 783.99, 1046.50]; // C5, E5, G5, C6
+        notes.forEach((freq, idx) => {
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(freq, now + idx * 0.09);
+
+          gain.gain.setValueAtTime(0.12, now + idx * 0.09);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.09 + 0.3);
+
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+
+          osc.start(now + idx * 0.09);
+          osc.stop(now + idx * 0.09 + 0.3);
+        });
+      } catch (e) {}
+    }
+
+    /* ===================================================================
+       WEB SPEECH API ANNOUNCEMENT ENGINE
+       =================================================================== */
+    function toggleVoiceAnnouncements() {
+      isVoiceEnabled = !isVoiceEnabled;
+      const icon = document.getElementById('voiceIcon');
+      const text = document.getElementById('voiceStatusText');
+
+      if (isVoiceEnabled) {
+        icon.className = 'fa-solid fa-comment-dots text-purple-400';
+        text.innerText = 'VOICE: ON';
+        speakText("Voice announcements enabled.");
+      } else {
+        icon.className = 'fa-solid fa-comment-slash text-slate-400';
+        text.innerText = 'VOICE: OFF';
+        if (window.speechSynthesis) window.speechSynthesis.cancel();
+      }
+    }
+
+    function speakText(text) {
+      if (!isVoiceEnabled || !('speechSynthesis' in window)) return;
+      try {
+        window.speechSynthesis.cancel(); // Stop ongoing speech
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.rate = 1.05;
+        utterance.pitch = 1.0;
+        window.speechSynthesis.speak(utterance);
+      } catch (e) {}
+    }
+
+    function announceProduct(id) {
+      const p = productsData.find(item => item.id === id);
+      if (!p) return;
+      playBeep(700, 0.06, 'triangle');
+      speakText(`${p.name}. Price: ${p.price} dollars. Specs: ${p.specs}`);
+    }
+
+    /* ===================================================================
+       SEARCH, FILTER, & SORT CONTROLLER
+       =================================================================== */
+    function filterByCategory(cat) {
+      playBeep(650, 0.05, 'sine');
+      currentCategory = cat;
+
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+      const activeBtn = document.getElementById(`cat-${cat}`);
+      if (activeBtn) activeBtn.classList.add('active');
+
+      renderProducts();
+    }
+
+    function handleSearchAndFilter() {
+      searchQuery = document.getElementById('searchInput').value.trim().toLowerCase();
+      currentSort = document.getElementById('sortSelect').value;
+
+      const clearBtn = document.getElementById('clearSearchBtn');
+      if (searchQuery.length > 0) {
+        clearBtn.classList.remove('hidden');
+      } else {
+        clearBtn.classList.add('hidden');
+      }
+
+      renderProducts();
+    }
+
+    function clearSearchInput() {
+      playBeep(500, 0.05, 'sine');
+      document.getElementById('searchInput').value = '';
+      handleSearchAndFilter();
+    }
+
+    function resetFilters() {
+      playBeep(600, 0.06, 'sine');
+      document.getElementById('searchInput').value = '';
+      currentCategory = 'all';
+      filterByCategory('all');
+    }
+
+    function getFilteredProducts() {
+      return productsData.filter(p => {
+        const matchesCategory = (currentCategory === 'all') || (p.category === currentCategory);
+        const matchesSearch = p.name.toLowerCase().includes(searchQuery) || 
+                              p.specs.toLowerCase().includes(searchQuery) || 
+                              p.desc.toLowerCase().includes(searchQuery);
+        return matchesCategory && matchesSearch;
+      }).sort((a, b) => {
+        if (currentSort === 'price-asc') return a.price - b.price;
+        if (currentSort === 'price-desc') return b.price - a.price;
+        if (currentSort === 'rating') return b.rating - a.rating;
+        if (currentSort === 'name') return a.name.localeCompare(b.name);
+        return a.id - b.id; // Default featured
+      });
+    }
+
+    function renderProducts() {
+      const grid = document.getElementById('productsGrid');
+      const noResults = document.getElementById('noResultsState');
+      const filtered = getFilteredProducts();
+
+      document.getElementById('filteredCountText').innerText = filtered.length;
+
+      if (filtered.length === 0) {
+        grid.innerHTML = '';
+        noResults.classList.remove('hidden');
+        return;
+      }
+
+      noResults.classList.add('hidden');
+
+      grid.innerHTML = filtered.map(p => `
+        <div class="cyber-glass-card rounded-2xl p-4 flex flex-col justify-between group hover:border-cyan-400 transition-all duration-300 relative overflow-hidden shadow-lg">
+          
+          <!-- Category Tag & Image -->
+          <div>
+            <div class="relative w-full h-72 rounded-xl overflow-hidden bg-slate-950 border border-slate-800 mb-3 group-hover:border-cyan-500/50 transition">
+              <img src="${p.image}" alt="${p.name}" onerror="this.src='https://placehold.co/400x300/0b172a/00f2fe?text=MZ+Tech'" class="w-full h-full object-cover group-hover:scale-110 transition duration-500">
+              
+              <span class="absolute top-2 left-2 px-2 py-0.5 rounded text-[9px] font-mono-code bg-slate-950/80 text-cyan-300 border border-cyan-800 uppercase backdrop-blur-md">
+                ${p.category}
+              </span>
+
+              <span class="absolute top-2 right-2 px-2 py-0.5 rounded text-[10px] font-mono-code bg-slate-950/80 text-amber-400 border border-amber-800/60 backdrop-blur-md flex items-center space-x-1">
+                <i class="fa-solid fa-star text-[9px]"></i>
+                <span>${p.rating}</span>
+              </span>
+            </div>
+
+            <!-- Product Title -->
+            <h3 class="font-orbitron font-bold text-white text-sm group-hover:text-neonCyan transition leading-snug line-clamp-1">
+              ${p.name}
+            </h3>
+
+            <!-- Specs Tag -->
+            <p class="text-[11px] font-mono-code text-cyan-400/90 mt-1 line-clamp-1">
+              <i class="fa-solid fa-sliders text-[9px] mr-1"></i>${p.specs}
+            </p>
+
+            <!-- Description -->
+            <p class="text-xs text-slate-400 mt-1.5 line-clamp-2 leading-relaxed">
+              ${p.desc}
+            </p>
+          </div>
+
+          <!-- Price & Action Buttons -->
+          <div class="pt-3 mt-3 border-t border-slate-800/80 space-y-2">
+            <div class="flex items-center justify-between">
+              <div class="text-lg font-black font-orbitron text-white">
+                $${p.price.toLocaleString()}
+              </div>
+              
+              <!-- Voice Announce Button -->
+              <button onclick="announceProduct(${p.id})" title="🔊 Voice Announce Details" class="px-2 py-1 rounded-lg bg-purple-950/80 border border-purple-500/40 text-purple-300 hover:bg-purple-900 transition text-xs flex items-center space-x-1">
+                <i class="fa-solid fa-volume-high text-[10px]"></i>
+                <span class="text-[10px] font-mono-code hidden sm:inline">Announce</span>
+              </button>
+            </div>
+
+            <button onclick="addToCart(${p.id})" class="w-full py-2 rounded-xl bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-bold font-mono-code text-xs tracking-wider uppercase transition shadow-md shadow-cyan-950 flex items-center justify-center space-x-1.5">
+              <i class="fa-solid fa-cart-plus"></i>
+              <span>Add To Cart</span>
+            </button>
+          </div>
+
+        </div>
+      `).join('');
+    }
+
+    /* ===================================================================
+       CART DRAWER MANAGEMENT
+       =================================================================== */
+    function toggleCartDrawer(open) {
+      playBeep(600, 0.05, 'sine');
+      const drawer = document.getElementById('cartDrawer');
+      const backdrop = document.getElementById('cartBackdrop');
+
+      if (open) {
+        backdrop.classList.remove('hidden');
+        setTimeout(() => {
+          backdrop.classList.remove('opacity-0');
+          drawer.classList.remove('translate-x-full');
+        }, 10);
+      } else {
+        backdrop.classList.add('opacity-0');
+        drawer.classList.add('translate-x-full');
+        setTimeout(() => backdrop.classList.add('hidden'), 300);
+      }
+    }
+
+    function addToCart(id) {
+      const product = productsData.find(p => p.id === id);
+      if (!product) return;
+
+      playCartChime();
+
+      const existing = cart.find(item => item.id === id);
+      if (existing) {
+        existing.qty += 1;
+      } else {
+        cart.push({ ...product, qty: 1 });
+      }
+
+      speakText(`Added ${product.name} to cart.`);
+      updateCartUI();
+      toggleCartDrawer(true);
+    }
+
+    function updateCartQty(id, delta) {
+      playBeep(700, 0.04, 'square');
+      const item = cart.find(i => i.id === id);
+      if (!item) return;
+
+      item.qty += delta;
+      if (item.qty <= 0) {
+        cart = cart.filter(i => i.id !== id);
+      }
+      updateCartUI();
+    }
+
+    function removeFromCart(id) {
+      playBeep(450, 0.06, 'triangle');
+      cart = cart.filter(i => i.id !== id);
+      updateCartUI();
+    }
+
+    function updateCartUI() {
+      const list = document.getElementById('cartItemsList');
+      const countBadge = document.getElementById('cartCountBadge');
+      const checkoutBtn = document.getElementById('checkoutBtn');
+
+      const totalItems = cart.reduce((sum, i) => sum + i.qty, 0);
+      countBadge.innerText = totalItems;
+
+      if (cart.length === 0) {
+        list.innerHTML = `
+          <div class="h-full flex flex-col items-center justify-center text-center space-y-2 py-12 text-slate-500 font-mono-code text-xs">
+            <i class="fa-solid fa-cart-flatbed text-3xl text-slate-700"></i>
+            <p>Your cyber shopping cart is empty.</p>
+          </div>
+        `;
+        checkoutBtn.disabled = true;
+        document.getElementById('cartSubtotal').innerText = '$0.00';
+        document.getElementById('cartTax').innerText = '$0.00';
+        document.getElementById('cartGrandTotal').innerText = '$0.00';
+        return;
+      }
+
+      checkoutBtn.disabled = false;
+
+      list.innerHTML = cart.map(item => `
+        <div class="p-3 rounded-xl bg-slate-900 border border-cyan-900/50 flex items-center justify-between gap-3">
+          <img src="${item.image}" onerror="this.src='https://placehold.co/100x100/0b172a/00f2fe?text=MZ'" class="w-12 h-12 rounded-lg object-cover bg-slate-950 border border-slate-800">
+          
+          <div class="flex-grow">
+            <h4 class="font-orbitron font-bold text-white text-xs line-clamp-1">${item.name}</h4>
+            <div class="text-[11px] font-mono-code text-cyan-400">$${item.price.toLocaleString()}</div>
+          </div>
+
+          <!-- Quantity Adjusters -->
+          <div class="flex items-center space-x-1.5 bg-slate-950 px-2 py-1 rounded-lg border border-slate-800 font-mono-code text-xs">
+            <button onclick="updateCartQty(${item.id}, -1)" class="text-slate-400 hover:text-white px-1">-</button>
+            <span class="text-white font-bold px-1">${item.qty}</span>
+            <button onclick="updateCartQty(${item.id}, 1)" class="text-slate-400 hover:text-white px-1">+</button>
+          </div>
+
+          <!-- Remove Item Button -->
+          <button onclick="removeFromCart(${item.id})" class="text-red-400 hover:text-red-300 p-1 text-xs">
+            <i class="fa-solid fa-trash-can"></i>
+          </button>
+        </div>
+      `).join('');
+
+      const subtotal = cart.reduce((sum, i) => sum + (i.price * i.qty), 0);
+      const tax = subtotal * 0.05;
+      const grandTotal = subtotal + tax;
+
+      document.getElementById('cartSubtotal').innerText = `$${subtotal.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})}`;
+      document.getElementById('cartTax').innerText = `$${tax.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})}`;
+      document.getElementById('cartGrandTotal').innerText = `$${grandTotal.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})}`;
+    }
+
+    /* ===================================================================
+       STRIPE PAYMENT CHECKOUT MODAL LOGIC
+       =================================================================== */
+    function openCheckoutModal() {
+      if (cart.length === 0) return;
+      playBeep(700, 0.08, 'sine');
+      
+      const subtotal = cart.reduce((sum, i) => sum + (i.price * i.qty), 0);
+      const grandTotal = subtotal * 1.05;
+
+      document.getElementById('payAmountButton').innerText = `$${grandTotal.toLocaleString('en-US', {minimumFractionDigits:2, maximumFractionDigits:2})}`;
+
+      // Reset views
+      document.getElementById('paymentFormView').classList.remove('hidden');
+      document.getElementById('paymentProcessingView').classList.add('hidden');
+      document.getElementById('paymentSuccessView').classList.add('hidden');
+
+      const modal = document.getElementById('checkoutModal');
+      const card = document.getElementById('checkoutModalCard');
+
+      modal.classList.remove('hidden');
+      setTimeout(() => {
+        modal.classList.remove('opacity-0');
+        card.classList.remove('scale-95');
+      }, 10);
+    }
+
+    function closeCheckoutModal() {
+      playBeep(400, 0.05, 'sine');
+      const modal = document.getElementById('checkoutModal');
+      const card = document.getElementById('checkoutModalCard');
+
+      modal.classList.add('opacity-0');
+      card.classList.add('scale-95');
+      setTimeout(() => {
+        modal.classList.add('hidden');
+      }, 300);
+    }
+
+    function formatCardNumber(input) {
+      let val = input.value.replace(/\D/g, '');
+      val = val.substring(0, 16);
+      let formatted = val.match(/.{1,4}/g)?.join(' ') || '';
+      input.value = formatted;
+      updateCardPreview();
+    }
+
+    function updateCardPreview() {
+      const num = document.getElementById('payNumber').value || '•••• •••• •••• 4242';
+      const name = document.getElementById('payName').value || 'ALEX V. MERCER';
+      const exp = document.getElementById('payExp').value || '12/28';
+
+      document.getElementById('cardDisplayNumber').innerText = num;
+      document.getElementById('cardDisplayName').innerText = name;
+      document.getElementById('cardDisplayExp').innerText = exp;
+    }
+
+    function handlePaymentSubmit(e) {
+      e.preventDefault();
+      playBeep(850, 0.1, 'sine');
+
+      document.getElementById('paymentFormView').classList.add('hidden');
+      document.getElementById('paymentProcessingView').classList.remove('hidden');
+
+      speakText("Processing Stripe payment transaction through MZ quantum mesh.");
+
+      setTimeout(() => {
+        document.getElementById('paymentProcessingView').classList.add('hidden');
+        document.getElementById('paymentSuccessView').classList.remove('hidden');
+
+        const txId = '#MZ-' + Math.floor(10000 + Math.random() * 90000) + '-X';
+        document.getElementById('successTxId').innerText = txId;
+
+        playSuccessFanfare();
+        speakText("Payment successful! Your order has been placed.");
+
+        // Clear Cart
+        cart = [];
+        updateCartUI();
+      }, 2500);
+    }
+
+    function triggerMzLogoEffect() {
+      playSuccessFanfare();
+      speakText("MZ Quantum Tech System Sync Active.");
+    }
+  </script>
+</body>
+</html>

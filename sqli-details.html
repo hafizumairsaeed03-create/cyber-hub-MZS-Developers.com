@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SQL Injection (SQLi) Details - Cyber Academy</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+    <!-- NAVBAR -->
+    <nav class="navbar">
+        <div class="logo">Cyber Academy</div>
+        <ul class="nav-links">
+            <li><a href="home.html">Home</a></li>
+            <li><a href="services.html">Services</a></li>
+            <li><a href="ethical-hacking.html">Ethical Hacking</a></li>
+            <li><a href="web-pentesting.html">Web PenTesting</a></li>
+            <li><a href="home.html#contact">Contact</a></li>
+        </ul>
+        <div class="nav-btns">
+            <button class="btn-outline">Login</button>
+            <button class="btn-primary">Register</button>
+        </div>
+    </nav>
+
+    <!-- CLEAN TEXT & HEADINGS SECTION -->
+    <section class="section-container" style="margin-top: 100px; max-width: 900px;">
+        <span class="badge">VULNERABILITY DEEP DIVE</span>
+        <h1 style="font-size: 2.8rem; margin-top: 10px; color: #fff;">SQL Injection (SQLi) Audit & Prevention</h1>
+        <p class="section-desc" style="font-size: 1.1rem; line-height: 1.7; color: #cbd5e1; margin-top: 15px;">
+            SQL Injection occurs when malicious SQL queries are injected into data input fields. This allows attackers to bypass authentication, access, modify, or delete sensitive database contents, and sometimes gain full control of the host server.
+        </p>
+
+        <hr style="border: 0; height: 1px; background: #334155; margin: 40px 0;">
+
+        <!-- 1. TYPES OF SQLI -->
+        <h2 style="color: #00f2fe; font-size: 1.8rem; margin-bottom: 15px;">1. Types of SQL Injection We Test For</h2>
+        
+        <h3 style="color: #fff; font-size: 1.3rem; margin-top: 20px;">A. In-Band SQLi (Classic)</h3>
+        <p style="color: #94a3b8; line-height: 1.6;">The attacker uses the same channel of communication to launch the attack and gather results.</p>
+        <ul style="color: #cbd5e1; margin-left: 20px; line-height: 1.8;">
+            <li><strong>Error-Based SQLi:</strong> Forces the database to generate error messages revealing sensitive structure details.</li>
+            <li><strong>Union-Based SQLi:</strong> Uses the UNION operator to combine malicious query results with original database output.</li>
+        </ul>
+
+        <h3 style="color: #fff; font-size: 1.3rem; margin-top: 20px;">B. Inferential SQLi (Blind SQLi)</h3>
+        <p style="color: #94a3b8; line-height: 1.6;">No data is directly transferred to the screen; the attacker infers database structure by sending true/false payloads.</p>
+        <ul style="color: #cbd5e1; margin-left: 20px; line-height: 1.8;">
+            <li><strong>Boolean-Based Blind:</strong> Evaluates application responses (HTTP status or content change) based on TRUE/FALSE conditions.</li>
+            <li><strong>Time-Based Blind:</strong> Pauses database execution (e.g., SLEEP commands) to infer valid SQL queries based on response times.</li>
+        </ul>
+
+        <h3 style="color: #fff; font-size: 1.3rem; margin-top: 20px;">C. Out-of-Band SQLi & Second-Order SQLi</h3>
+        <ul style="color: #cbd5e1; margin-left: 20px; line-height: 1.8;">
+            <li><strong>Out-of-Band SQLi:</strong> Executed when results cannot be seen directly, forcing DNS or HTTP requests to controlled servers.</li>
+            <li><strong>Second-Order SQLi:</strong> Malicious input is stored safely first, but executed during a secondary background database action.</li>
+        </ul>
+
+        <hr style="border: 0; height: 1px; background: #334155; margin: 40px 0;">
+
+        <!-- 2. PREVENTION & REMEDIATION -->
+        <h2 style="color: #00f2fe; font-size: 1.8rem; margin-bottom: 15px;">2. Prevention & Remediation Guidance</h2>
+        <ul style="color: #cbd5e1; margin-left: 20px; line-height: 2;">
+            <li><strong>Parameterized Queries (Prepared Statements):</strong> Completely separates code from data so inputs cannot alter SQL logic.</li>
+            <li><strong>Stored Procedures:</strong> Encapsulates queries safely on the database server using strongly-typed input variables.</li>
+            <li><strong>Allow-List Input Validation:</strong> Validates data types, string length, and pattern matches before processing queries.</li>
+            <li><strong>Principle of Least Privilege:</strong> Restricts database user accounts to read-only or strictly necessary table permissions.</li>
+        </ul>
+
+        <hr style="border: 0; height: 1px; background: #334155; margin: 40px 0;">
+
+        <!-- 3. TOOLS USED -->
+        <h2 style="color: #00f2fe; font-size: 1.8rem; margin-bottom: 15px;">3. Security Testing Tools Used</h2>
+        <p style="color: #cbd5e1; line-height: 1.7;">
+            Our penetration testing team uses industry-standard toolkits including <strong>SQLmap</strong> (automated detection), <strong>Burp Suite Professional</strong> (request interception & payload analysis), <strong>OWASP ZAP</strong>, and custom Python exploitation scripts to verify zero false positives.
+        </p>
+
+        <!-- ACTION BUTTONS -->
+        <div style="margin-top: 50px; display: flex; align-items: center; gap: 20px;">
+            <a href="web-pentesting.html" class="btn-outline" style="text-decoration: none;">&larr; Back to Web PenTesting</a>
+            <a href="home.html#contact" class="btn-primary" style="text-decoration: none;">Request SQLi Security Audit</a>
+        </div>
+    </section>
+
+</body>
+</html>

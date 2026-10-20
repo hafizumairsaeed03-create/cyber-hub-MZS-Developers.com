@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MZ Portal - Modern Digital Login & Dashboard</title>
+  <style>
+    :root {
+      --bg-gradient: radial-gradient(circle at 50% 0%, #0f172a 0%, #020617 85%);
+      --card-bg: rgba(15, 23, 42, 0.75);
+      --border-glow: rgba(56, 189, 248, 0.4);
+      --accent-cyan: #38bdf8;
+      --accent-blue: #0ea5e9;
+      --text-main: #f8fafc;
+      --text-sub: #94a3b8;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+    }
+
+    body {
+      background: var(--bg-gradient);
+      color: var(--text-main);
+      padding: 30px 20px;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 900px;
+    }
+
+    /* Top Studio Header with MZ Logo */
+    .top-header {
+      background: var(--card-bg);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--border-glow);
+      border-radius: 20px;
+      padding: 20px 30px;
+      margin-bottom: 25px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    }
+
+    .studio-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(14, 165, 233, 0.15);
+      color: #bae6fd;
+      padding: 5px 12px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      margin-bottom: 6px;
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      text-transform: uppercase;
+    }
+
+    .header-title {
+      font-size: 22px;
+      font-weight: 800;
+      background: linear-gradient(to right, #ffffff, #38bdf8);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    /* Sleek Glowing MZ Logo */
+    .mz-logo-box {
+      width: 65px;
+      height: 65px;
+      background: linear-gradient(135deg, #020617, #0369a1);
+      color: #38bdf8;
+      font-weight: 900;
+      font-size: 24px;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 2px solid var(--accent-cyan);
+      box-shadow: 0 0 20px rgba(56, 189, 248, 0.4), inset 0 0 10px rgba(56, 189, 248, 0.3);
+      letter-spacing: 2px;
+    }
+
+    /* Main Card Container */
+    .main-card {
+      background: var(--card-bg);
+      backdrop-filter: blur(16px);
+      border: 1px solid var(--border-glow);
+      border-radius: 24px;
+      padding: 40px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Login Form View */
+    .auth-view {
+      display: block;
+      transition: all 0.4s ease;
+    }
+
+    .auth-header {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .auth-header h2 {
+      font-size: 26px;
+      color: var(--text-main);
+      margin-bottom: 8px;
+    }
+
+    .auth-header p {
+      font-size: 13px;
+      color: var(--text-sub);
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 12px;
+      color: var(--text-sub);
+      font-weight: 600;
+      margin-bottom: 8px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .digital-input {
+      width: 100%;
+      background: rgba(2, 6, 23, 0.8);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      color: #fff;
+      padding: 14px 18px;
+      border-radius: 12px;
+      font-size: 14px;
+      outline: none;
+      transition: all 0.3s;
+    }
+
+    .digital-input:focus {
+      border-color: var(--accent-cyan);
+      box-shadow: 0 0 15px rgba(56, 189, 248, 0.3);
+    }
+
+    .login-btn {
+      width: 100%;
+      background: linear-gradient(135deg, #0284c7, #0369a1);
+      color: #fff;
+      border: 1px solid #38bdf8;
+      padding: 15px;
+      border-radius: 12px;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      box-shadow: 0 0 20px rgba(14, 165, 233, 0.4);
+      transition: all 0.3s;
+      margin-top: 10px;
+    }
+
+    .login-btn:hover {
+      background: linear-gradient(135deg, #0ea5e9, #0284c7);
+      transform: translateY(-2px);
+      box-shadow: 0 0 30px rgba(56, 189, 248, 0.7);
+    }
+
+    /* Dashboard View (Hidden by default, shown after click) */
+    .dashboard-view {
+      display: none;
+      animation: fadeIn 0.4s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .dash-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 25px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .welcome-text h3 {
+      font-size: 20px;
+      color: var(--accent-cyan);
+      margin-bottom: 4px;
+    }
+
+    .welcome-text p {
+      font-size: 12px;
+      color: var(--text-sub);
+    }
+
+    .logout-btn {
+      background: rgba(239, 68, 68, 0.15);
+      color: #f87171;
+      border: 1px solid rgba(239, 68, 68, 0.4);
+      padding: 8px 16px;
+      border-radius: 10px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    .logout-btn:hover {
+      background: rgba(239, 68, 68, 0.3);
+      box-shadow: 0 0 15px rgba(239, 68, 68, 0.4);
+    }
+
+    .grid-stats {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    @media(max-width: 700px) {
+      .grid-stats { grid-template-columns: 1fr; }
+    }
+
+    .stat-card {
+      background: rgba(2, 6, 23, 0.6);
+      border: 1px solid rgba(56, 189, 248, 0.2);
+      border-radius: 16px;
+      padding: 20px;
+    }
+
+    .stat-title {
+      font-size: 11px;
+      color: var(--text-sub);
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+    }
+
+    .prog-line {
+      margin-bottom: 12px;
+    }
+
+    .prog-info {
+      display: flex;
+      justify-content: space-between;
+      font-size: 13px;
+      margin-bottom: 6px;
+    }
+
+    .prog-bg {
+      width: 100%;
+      height: 6px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+
+    .prog-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #0ea5e9, #38bdf8);
+      border-radius: 3px;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    
+    <!-- Top Header with MZ Logo -->
+    <div class="top-header">
+      <div>
+        <span class="studio-badge">⚡ MZ Studio Production</span>
+        <h1 class="header-title">Student Secure Portal Hub</h1>
+      </div>
+      <div class="mz-logo-box">MZ</div>
+    </div>
+
+    <!-- Main Card Body -->
+    <div class="main-card">
+      
+      <!-- 1. LOGIN INTERFACE (Default) -->
+      <div id="loginSection" class="auth-view">
+        <div class="auth-header">
+          <h2>🔐 Student Portal Login</h2>
+          <p>Enter your credentials to access your academic dashboard[cite: 9]</p>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Student Email / ID</label>
+          <input type="text" id="usernameInput" class="digital-input" value="student_mz@ university.edu">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Secure Password</label>
+          <input type="password" id="passwordInput" class="digital-input" value="mypassword123">
+        </div>
+
+        <button class="login-btn" onclick="handleLogin()">Login to Dashboard 🚀</button>
+      </div>
+
+      <!-- 2. LIVE DASHBOARD INTERFACE (Appears after clicking login) -->
+      <div id="dashboardSection" class="dashboard-view">
+        <div class="dash-top">
+          <div class="welcome-text">
+            <h3>Welcome Back, Student!</h3>
+            <p>Session Authenticated • Live Secure System Active[cite: 9]</p>
+          </div>
+          <button class="logout-btn" onclick="handleLogout()">Logout 🔒</button>
+        </div>
+
+        <div class="grid-stats">
+          <!-- Courses Progress -->
+          <div class="stat-card">
+            <div class="stat-title">Enrolled Courses & Progress</div>
+            
+            <div class="prog-line">
+              <div class="prog-info"><span>Web Dev (HTML/CSS)</span><b style="color:#38bdf8;">88%</b></div>
+              <div class="prog-bg"><div class="prog-fill" style="width: 88%;"></div></div>
+            </div>
+
+            <div class="prog-line" style="margin-top: 14px;">
+              <div class="prog-info"><span>Graphic Design & CorelDRAW</span><b style="color:#34d399;">94%</b></div>
+              <div class="prog-bg"><div class="prog-fill" style="width: 94%; background: linear-gradient(90deg, #10b981, #34d399);"></div></div>
+            </div>
+          </div>
+
+          <!-- Grades & GPA -->
+          <div class="stat-card">
+            <div class="stat-title">Grade Tracking & Records[cite: 9]</div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; font-size: 13px;">
+              <span style="color: var(--text-sub);">Semester GPA:</span>
+              <b style="font-size: 18px; color: #38bdf8; text-shadow: 0 0 10px rgba(56,189,248,0.4);">3.85 / 4.00</b>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; font-size: 13px;">
+              <span style="color: var(--text-sub);">Assignment Status:</span>
+              <b style="color: #34d399;">All Verified & Submitted</b>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    function handleLogin() {
+      // Smooth transition from login to live interactive dashboard
+      document.getElementById('loginSection').style.display = 'none';
+      document.getElementById('dashboardSection').style.display = 'block';
+    }
+
+    function handleLogout() {
+      // Return back to login screen
+      document.getElementById('dashboardSection').style.display = 'none';
+      document.getElementById('loginSection').style.display = 'block';
+    }
+  </script>
+</body>
+</html>

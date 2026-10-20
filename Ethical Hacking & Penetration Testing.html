@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ethical Hacking & Penetration Testing - Cyber Academy</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-deep: #070b14;
+            --panel-bg: #0c1322;
+            --border-color: #1a2744;
+            --neon-cyan: #00f2fe;
+            --neon-green: #10b981;
+            --text-main: #f8fafc;
+            --text-dim: #94a3b8;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
+        body { background-color: var(--bg-deep); color: var(--text-main); min-height: 100vh; padding-bottom: 50px; }
+        nav { display: flex; justify-content: space-between; align-items: center; padding: 20px 60px; border-bottom: 1px solid var(--border-color); background: var(--panel-bg); }
+        .logo { font-size: 1.3rem; font-weight: bold; color: #fff; }
+        .logo span { color: var(--neon-cyan); }
+        .back-btn { background: transparent; border: 1px solid var(--neon-cyan); color: var(--neon-cyan); padding: 8px 18px; border-radius: 6px; text-decoration: none; font-size: 0.85rem; transition: 0.3s; }
+        .back-btn:hover { background: rgba(0,242,254,0.1); }
+        .container { max-width: 900px; margin: 40px auto; padding: 0 20px; }
+        .content-box { background: var(--panel-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 40px; }
+        .content-box h1 { color: #fff; font-size: 2.2rem; margin-bottom: 15px; }
+        .content-box h1 span { color: var(--neon-cyan); }
+        .badge { display: inline-block; background: rgba(0,242,254,0.1); color: var(--neon-cyan); padding: 5px 12px; border-radius: 4px; font-size: 0.8rem; font-weight: 600; margin-bottom: 20px; }
+        .section-title { color: var(--neon-cyan); font-size: 1.3rem; margin: 25px 0 10px 0; border-left: 3px solid var(--neon-cyan); padding-left: 10px; }
+        .content-box p { color: var(--text-dim); font-size: 0.95rem; line-height: 1.7; margin-bottom: 15px; }
+        .content-list { margin: 10px 0 20px 20px; display: flex; flex-direction: column; gap: 8px; color: var(--text-dim); }
+        .content-list li { font-size: 0.95rem; line-height: 1.6; }
+        .content-list li strong { color: #fff; }
+        .enroll-btn { display: inline-block; background: var(--neon-green); color: #000; padding: 12px 25px; border-radius: 6px; text-decoration: none; font-weight: bold; margin-top: 30px; }
+    </style>
+</head>
+<body>
+    <nav>
+        <div class="logo">Cyber <span>Academy</span> // Course Detail</div>
+        <a href="courses.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i> Back to Courses</a>
+    </nav>
+    <div class="container">
+        <div class="content-box">
+            <span class="badge">Intermediate • 6 Weeks Program</span>
+            <h1>Ethical Hacking & <span>Penetration Testing</span></h1>
+            <h3 class="section-title">1. Ethical Hacking Kya Hai?</h3>
+            <p>Ethical Hacking woh amal hai jisme security experts kisi system ya network ki kamzoriyan (vulnerabilities) check karne ke liye hackar ki tarah attack karte hain, lekin maqsad system ko nuksan dena nahi balkay un khamiyon ko pehle hi theek karna hota hai.</p>
+            <h3 class="section-title">2. Is Course Mein Aap Kya Seekhein Ge?</h3>
+            <ul class="content-list">
+                <li><strong>Reconnaissance & Footprinting:</strong> Target system ki maloomat jama karna aur scanning techniques.</li>
+                <li><strong>Vulnerability Assessment:</strong> System mein mojood security flaws aur bugs ka pata lagana.</li>
+                <li><strong>Web Exploitation:</strong> SQL Injection, XSS, aur OWASP Top 10 web vulnerabilities ko test karna.</li>
+                <li><strong>Penetration Testing Reports:</strong> Professional security audit reports tayar karne ka tariqa.</li>
+            </ul>
+            <a href="#" class="enroll-btn" onclick="alert('Enrolled Successfully!'); return false;">Enroll in this Course Now</a>
+        </div>
+    </div>
+</body>
+</html>

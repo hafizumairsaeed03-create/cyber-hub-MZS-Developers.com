@@ -1,0 +1,882 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MZ Packet Sniffer & Traffic Analyzer - MZ Security Edition</title>
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            mono: ['Fira Code', 'monospace'],
+          },
+          colors: {
+            brand: {
+              50: '#f0f9ff',
+              100: '#e0f2fe',
+              400: '#38bdf8',
+              500: '#0ea5e9',
+              600: '#0284c7',
+              900: '#0369a1',
+              glow: '#00d2ff'
+            },
+            cyber: {
+              bg: '#030712',
+              card: '#060d1b',
+              border: '#10223e',
+              accent: '#0088cc',
+              danger: '#f43f5e',
+              warning: '#f59e0b',
+              success: '#10b981',
+              purple: '#a855f7'
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      background-color: #030712;
+      color: #f3f4f6;
+      font-family: 'Inter', sans-serif;
+      overflow-x: hidden;
+    }
+    .font-mono { fontFamily: 'Fira Code', monospace; }
+
+    /* Glowing Effects */
+    .glow-mz-logo {
+      background: linear-gradient(135deg, #0088cc 0%, #00d2ff 100%);
+      box-shadow: 0 0 20px rgba(0, 210, 255, 0.6), inset 0 0 10px rgba(255, 255, 255, 0.5);
+      border: 1px solid rgba(255, 255, 255, 0.6);
+      text-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+    }
+
+    .glow-card {
+      background: #060d1b;
+      border: 1px solid rgba(0, 136, 204, 0.35);
+      box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.7);
+    }
+    .glow-card:hover {
+      border-color: rgba(0, 210, 255, 0.6);
+      box-shadow: 0 0 15px rgba(0, 136, 204, 0.25);
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #030712;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #10223e;
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #0088cc;
+    }
+
+    /* Table Highlight Pulse */
+    @keyframes rowPulse {
+      0% { background-color: rgba(0, 210, 255, 0.15); }
+      100% { background-color: transparent; }
+    }
+    .new-packet-row {
+      animation: rowPulse 0.8s ease-out;
+    }
+
+    /* Pulse Indicator */
+    .pulse-dot {
+      box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+      animation: pulse-green 1.5s infinite;
+    }
+    @keyframes pulse-green {
+      0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+      70% { transform: scale(1); box-shadow: 0 0 0 8px rgba(16, 185, 129, 0); }
+      100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+    }
+  </style>
+</head>
+
+<body class="min-h-screen flex flex-col bg-cyber-bg text-slate-200">
+
+  <header class="border-b border-cyber-border bg-cyber-card/90 backdrop-blur sticky top-0 z-40 px-4 py-3">
+    <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+      
+      <!-- Title & Branding -->
+      <div class="flex items-center gap-4 w-full sm:w-auto justify-between sm:justify-start">
+        <div class="flex items-center gap-3">
+          <div class="glow-mz-logo w-12 h-12 rounded-xl flex items-center justify-center font-extrabold text-2xl text-white tracking-widest transition-transform hover:scale-105 cursor-pointer" onclick="playAudio('click')">
+            MZ
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="px-2 py-0.5 text-xs font-semibold rounded-md bg-sky-950 text-sky-400 border border-sky-800/60 uppercase tracking-wider">Networking</span>
+              <span id="liveStatusBadge" class="flex items-center gap-1.5 px-2 py-0.5 text-xs font-medium rounded-md bg-emerald-950/80 text-emerald-400 border border-emerald-800/60">
+                <span class="w-2 h-2 rounded-full bg-emerald-400 pulse-dot"></span> Sniffing Active
+              </span>
+            </div>
+            <h1 class="text-xl font-bold text-white tracking-tight flex items-center gap-2 mt-0.5">
+              Packet Sniffer & Traffic Analyzer
+            </h1>
+            <p class="text-xs text-slate-400 hidden sm:block">Wireshark-grade deep packet inspection, real-time telemetry & network forensic suite</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Buttons Toolbar -->
+      <div class="flex items-center gap-2 flex-wrap w-full sm:w-auto justify-end">
+        <button id="toggleCaptureBtn" onclick="toggleCapture()" class="px-4 py-2 rounded-lg font-semibold text-xs flex items-center gap-2 transition bg-rose-600 hover:bg-rose-500 text-white shadow-lg shadow-rose-900/30">
+          <i class="fa-solid fa-square" id="captureIcon"></i>
+          <span id="captureBtnText">Stop Capture</span>
+        </button>
+
+        <button onclick="clearPackets()" class="px-3 py-2 rounded-lg font-medium text-xs bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 flex items-center gap-1.5 transition">
+          <i class="fa-solid fa-trash-can text-slate-400"></i> Clear
+        </button>
+
+        <button onclick="toggleAudio()" id="soundToggleBtn" class="px-3 py-2 rounded-lg font-medium text-xs bg-slate-800 hover:bg-slate-700 text-emerald-400 border border-slate-700 flex items-center gap-1.5 transition">
+          <i class="fa-solid fa-volume-high" id="soundIcon"></i> Sound ON
+        </button>
+
+        <button onclick="openPythonModal()" class="px-3 py-2 rounded-lg font-medium text-xs bg-sky-950 hover:bg-sky-900 text-sky-300 border border-sky-700/60 flex items-center gap-1.5 transition">
+          <i class="fa-solid fa-code"></i> Export Scapy Py
+        </button>
+      </div>
+
+    </div>
+  </header>
+
+       
+        <!-- Top Decorative Ambient Glows -->
+        <div class="absolute -top-20 -right-20 w-44 h-44 bg-cyan-500/20 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="absolute -bottom-20 -left-20 w-44 h-44 bg-blue-600/20 rounded-full blur-3xl pointer-events-none"></div>
+
+        <!-- Aapka sniffer wala baqi saara content yahan aayega -->
+
+    </div>
+</main>
+    <!-- Metrics Stat Bar -->
+    <div class="grid grid-cols-2 md:grid-cols-5 gap-3">
+      <div class="glow-card rounded-xl p-3 flex flex-col justify-between">
+        <span class="text-xs text-slate-400 font-medium">Total Packets</span>
+        <div class="flex items-baseline justify-between mt-1">
+          <span id="statTotalPackets" class="text-2xl font-bold font-mono text-sky-400">0</span>
+          <i class="fa-solid fa-network-wired text-sky-500/40 text-lg"></i>
+        </div>
+      </div>
+
+      <div class="glow-card rounded-xl p-3 flex flex-col justify-between">
+        <span class="text-xs text-slate-400 font-medium">Data Transferred</span>
+        <div class="flex items-baseline justify-between mt-1">
+          <span id="statDataBytes" class="text-2xl font-bold font-mono text-emerald-400">0 KB</span>
+          <i class="fa-solid fa-database text-emerald-500/40 text-lg"></i>
+        </div>
+      </div>
+
+      <div class="glow-card rounded-xl p-3 flex flex-col justify-between">
+        <span class="text-xs text-slate-400 font-medium">Bandwidth Speed</span>
+        <div class="flex items-baseline justify-between mt-1">
+          <span id="statBandwidth" class="text-2xl font-bold font-mono text-purple-400">0 KB/s</span>
+          <i class="fa-solid fa-gauge-high text-purple-500/40 text-lg"></i>
+        </div>
+      </div>
+
+      <div class="glow-card rounded-xl p-3 flex flex-col justify-between">
+        <span class="text-xs text-slate-400 font-medium">Anomalies / Threats</span>
+        <div class="flex items-baseline justify-between mt-1">
+          <span id="statAnomalies" class="text-2xl font-bold font-mono text-rose-400">0</span>
+          <i class="fa-solid fa-shield-cat text-rose-500/40 text-lg"></i>
+        </div>
+      </div>
+
+      <div class="glow-card rounded-xl p-3 col-span-2 md:col-span-1 flex flex-col justify-between">
+        <span class="text-xs text-slate-400 font-medium">Active Protocol</span>
+        <div class="flex items-baseline justify-between mt-1">
+          <span id="statTopProtocol" class="text-2xl font-bold font-mono text-amber-400">TCP</span>
+          <i class="fa-solid fa-diagram-project text-amber-500/40 text-lg"></i>
+        </div>
+      </div>
+    </div>
+
+    <!-- Telemetry Realtime Charts Row -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
+      <!-- Bandwidth Live Canvas Graph -->
+      <div class="lg:col-span-2 glow-card rounded-xl p-4 flex flex-col">
+        <div class="flex items-center justify-between mb-2">
+          <h2 class="text-xs font-semibold uppercase tracking-wider text-sky-400 flex items-center gap-2">
+            <i class="fa-solid fa-chart-line"></i> Real-Time Throughput (KB/s)
+          </h2>
+          <span class="text-xs font-mono text-slate-400" id="liveFps">60 FPS</span>
+        </div>
+        <div class="relative w-full h-44 bg-slate-950/80 rounded-lg border border-slate-800/80 overflow-hidden">
+          <canvas id="bandwidthCanvas" class="w-full h-full"></canvas>
+        </div>
+      </div>
+
+      <!-- Live Protocol Distribution Chart -->
+      <div class="glow-card rounded-xl p-4 flex flex-col">
+        <h2 class="text-xs font-semibold uppercase tracking-wider text-sky-400 mb-2 flex items-center gap-2">
+          <i class="fa-solid fa-chart-pie"></i> Protocol Breakdown
+        </h2>
+        <div class="relative flex-1 min-h-[160px] flex items-center justify-center">
+          <canvas id="protocolChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filter & Search Controls -->
+    <div class="glow-card rounded-xl p-3 flex flex-col md:flex-row items-center justify-between gap-3">
+      <div class="flex items-center gap-2 w-full md:w-auto overflow-x-auto pb-1 md:pb-0">
+        <span class="text-xs font-medium text-slate-400 uppercase tracking-wide">Filter:</span>
+        <button onclick="setProtocolFilter('ALL')" class="proto-btn active-proto text-xs font-mono px-2.5 py-1 rounded bg-sky-600 text-white font-semibold">ALL</button>
+        <button onclick="setProtocolFilter('TCP')" class="proto-btn text-xs font-mono px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300">TCP</button>
+        <button onclick="setProtocolFilter('UDP')" class="proto-btn text-xs font-mono px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300">UDP</button>
+        <button onclick="setProtocolFilter('ICMP')" class="proto-btn text-xs font-mono px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300">ICMP</button>
+        <button onclick="setProtocolFilter('HTTP')" class="proto-btn text-xs font-mono px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300">HTTP</button>
+        <button onclick="setProtocolFilter('DNS')" class="proto-btn text-xs font-mono px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300">DNS</button>
+      </div>
+
+      <div class="relative w-full md:w-72">
+        <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-xs text-slate-500"></i>
+        <input type="text" id="searchInput" onkeyup="filterPackets()" placeholder="Filter IP, Payload or Info..." class="w-full bg-slate-950 border border-slate-800 text-slate-200 text-xs rounded-lg pl-8 pr-3 py-1.5 focus:outline-none focus:border-sky-500 font-mono">
+      </div>
+    </div>
+
+    <div class="glow-card rounded-xl overflow-hidden flex flex-col">
+      <div class="bg-slate-900/90 px-4 py-2.5 border-b border-cyber-border flex items-center justify-between">
+        <h2 class="text-xs font-bold uppercase tracking-wider text-slate-300 flex items-center gap-2">
+          <i class="fa-solid fa-list-check text-sky-400"></i> Live Captured Packet Stream
+        </h2>
+        <span class="text-xs text-slate-400">Click any packet to inspect raw bytes & details</span>
+      </div>
+
+      <div class="overflow-x-auto max-h-72">
+        <table class="w-full text-left text-xs font-mono">
+          <thead class="bg-slate-950 text-slate-400 sticky top-0 border-b border-slate-800 uppercase text-[10px] tracking-wider">
+            <tr>
+              <th class="p-2.5 w-12 text-center">#</th>
+              <th class="p-2.5 w-24">Time</th>
+              <th class="p-2.5 w-32">Source IP</th>
+              <th class="p-2.5 w-32">Destination IP</th>
+              <th class="p-2.5 w-20 text-center">Proto</th>
+              <th class="p-2.5 w-20 text-right">Size</th>
+              <th class="p-2.5">Info / Summary</th>
+              <th class="p-2.5 w-16 text-center">Inspect</th>
+            </tr>
+          </thead>
+          <tbody id="packetTableBody" class="divide-y divide-slate-800/60">
+            <!-- Packet rows inject dynamically -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      
+      <!-- Detailed Inspector Panel -->
+      <div class="glow-card rounded-xl p-4 flex flex-col h-80">
+        <div class="flex items-center justify-between border-b border-slate-800 pb-2 mb-2">
+          <h2 class="text-xs font-bold uppercase tracking-wider text-sky-400 flex items-center gap-2">
+            <i class="fa-solid fa-microscope"></i> Deep Packet Inspector
+          </h2>
+          <span id="inspectPacketId" class="text-xs font-mono text-slate-500">No packet selected</span>
+        </div>
+        
+        <div id="inspectorContent" class="flex-1 overflow-y-auto space-y-3 pr-1 text-xs">
+          <div class="h-full flex flex-col items-center justify-center text-slate-600 gap-2">
+            <i class="fa-solid fa-hand-pointer text-2xl"></i>
+            <p>Click on any packet row in the stream above to view detailed headers, flags & Hex payload dump.</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Interactive Shell / Console Log -->
+      <div class="glow-card rounded-xl p-4 flex flex-col h-80">
+        <div class="flex items-center justify-between border-b border-slate-800 pb-2 mb-2">
+          <h2 class="text-xs font-bold uppercase tracking-wider text-emerald-400 flex items-center gap-2">
+            <i class="fa-solid fa-terminal"></i> MZ Sniffer Interactive Console
+          </h2>
+          <button onclick="clearConsole()" class="text-[10px] text-slate-400 hover:text-white underline">Clear</button>
+        </div>
+
+        <div id="terminalLog" class="flex-1 bg-slate-950 rounded-lg p-3 font-mono text-xs overflow-y-auto space-y-1.5 border border-slate-800/80 text-slate-300">
+          <div><span class="text-emerald-400">[SYSTEM]</span> MZ Packet Sniffer v2.4 initialized on interface eth0.</div>
+          <div><span class="text-sky-400">[INFO]</span> Audio synthesizer ready. Promiscuous mode enabled.</div>
+        </div>
+
+        <!-- Command input bar -->
+        <div class="mt-2 flex items-center gap-2">
+          <span class="font-mono text-xs text-emerald-400">$</span>
+          <input type="text" id="termInput" onkeydown="handleTermCommand(event)" placeholder="Type 'help', 'status', 'start', 'stop'..." class="flex-1 bg-slate-950 border border-slate-800 text-xs text-slate-200 rounded px-2.5 py-1.5 font-mono focus:outline-none focus:border-emerald-500">
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+
+  <footer class="border-t border-cyber-border bg-cyber-card py-4 mt-6 text-center text-xs text-slate-500">
+    <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between px-4 gap-2">
+      <div class="flex items-center gap-2">
+        <span class="w-2 h-2 rounded-full bg-sky-400"></span>
+        <span>Built by <strong>MZ Security Lab</strong> | Network Traffic & Security Forensics Engine</span>
+      </div>
+      <div>Designed for Educational & Network Engineering Audits</div>
+    </div>
+  </footer>
+
+  <div id="pythonModal" class="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="glow-card rounded-2xl max-w-2xl w-full p-5 space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <h3 class="text-sm font-bold text-sky-400 flex items-center gap-2 font-mono">
+          <i class="fa-brands fa-python text-lg text-amber-400"></i> Python Scapy Packet Sniffer Script
+        </h3>
+        <button onclick="closePythonModal()" class="text-slate-400 hover:text-white text-lg"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <p class="text-xs text-slate-400">Copy this Python script to run live packet sniffing on your local interface using Scapy:</p>
+
+      <div class="relative bg-slate-950 rounded-xl p-3 border border-slate-800">
+        <pre class="font-mono text-xs text-sky-300 overflow-x-auto max-h-72" id="pythonCodeBlock">
+from scapy.all import sniff, IP, TCP, UDP, ICMP
+
+def packet_callback(packet):
+    if packet.haslayer(IP):
+        ip_src = packet[IP].src
+        ip_dst = packet[IP].dst
+        proto = packet[IP].proto
+        print(f"[+] MZ-Sniffer: {ip_src} -> {ip_dst} | Protocol: {proto}")
+
+print("[*] Starting MZ Network Sniffer...")
+sniff(prn=packet_callback, store=0)
+        </pre>
+      </div>
+
+      <div class="flex justify-end gap-2">
+        <button onclick="copyPythonScript()" class="px-4 py-2 rounded-lg text-xs font-semibold bg-sky-600 hover:bg-sky-500 text-white flex items-center gap-1.5 transition">
+          <i class="fa-regular fa-copy"></i> Copy Script
+        </button>
+        <button onclick="closePythonModal()" class="px-4 py-2 rounded-lg text-xs font-semibold bg-slate-800 text-slate-300 hover:bg-slate-700">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /* =========================================================
+       1. WEB AUDIO SYNTHESIZER (Custom Sound Effects)
+       ========================================================= */
+    let soundEnabled = true;
+    let audioCtx = null;
+
+    function initAudio() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+    }
+
+    function playAudio(type) {
+      if (!soundEnabled) return;
+      try {
+        initAudio();
+        if (audioCtx.state === 'suspended') {
+          audioCtx.resume();
+        }
+
+        const now = audioCtx.currentTime;
+
+        if (type === 'packet') {
+          // Subtle high click beep
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(800 + Math.random() * 400, now);
+          gain.gain.setValueAtTime(0.015, now);
+          gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.04);
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.start(now);
+          osc.stop(now + 0.04);
+
+        } else if (type === 'anomaly') {
+          // Warning alert tone
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.type = 'sawtooth';
+          osc.frequency.setValueAtTime(300, now);
+          osc.frequency.linearRampToValueAtTime(150, now + 0.15);
+          gain.gain.setValueAtTime(0.08, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.start(now);
+          osc.stop(now + 0.15);
+
+        } else if (type === 'click') {
+          // MZ Logo click synth
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(520, now);
+          osc.frequency.exponentialRampToValueAtTime(880, now + 0.1);
+          gain.gain.setValueAtTime(0.05, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.start(now);
+          osc.stop(now + 0.1);
+        }
+      } catch (e) {
+        // Fallback silently if audio context fails
+      }
+    }
+
+    function toggleAudio() {
+      soundEnabled = !soundEnabled;
+      const btn = document.getElementById('soundToggleBtn');
+      const icon = document.getElementById('soundIcon');
+      if (soundEnabled) {
+        btn.classList.remove('text-rose-400');
+        btn.classList.add('text-emerald-400');
+        btn.innerHTML = `<i class="fa-solid fa-volume-high"></i> Sound ON`;
+        playAudio('click');
+      } else {
+        btn.classList.remove('text-emerald-400');
+        btn.classList.add('text-rose-400');
+        btn.innerHTML = `<i class="fa-solid fa-volume-xmark"></i> Sound OFF`;
+      }
+    }
+
+    /* =========================================================
+       2. STATE & DATA INITIALIZATION
+       ========================================================= */
+    let capturing = true;
+    let packetCount = 0;
+    let totalBytes = 0;
+    let anomalyCount = 0;
+    let packets = [];
+    let activeFilter = 'ALL';
+    let selectedPacket = null;
+
+    const protocolCounts = { TCP: 0, UDP: 0, ICMP: 0, HTTP: 0, DNS: 0 };
+    const mockIPs = [
+      '192.168.1.105', '192.168.1.1', '10.0.0.42', '172.16.0.12',
+      '8.8.8.8', '1.1.1.1', '142.250.190.46', '104.16.123.96'
+    ];
+
+    const mockPayloads = [
+      'GET /api/v1/telemetry HTTP/1.1\\r\\nHost: mz-lab.local',
+      'DNS Standard query 0x41a2 AAAA api.mz-security.io',
+      'SYN Seq=0 Win=64240 Len=0 MSS=1460 SACK_PERM',
+      'UDP Payload len=48 Data: 0x4d5a2d5345435552495459',
+      'HTTP/1.1 200 OK (text/json) {"status":"authenticated"}',
+      'ICMP Echo (ping) request id=0x0001 seq=12',
+      'TLSv1.3 Handshake Client Hello [MZ Shield]'
+    ];
+
+    /* =========================================================
+       3. BANDWIDTH CANVAS GRAPH ENGINE
+       ========================================================= */
+    const canvas = document.getElementById('bandwidthCanvas');
+    const ctx = canvas.getContext('2d');
+    let graphData = new Array(60).fill(0);
+    let currentSpeed = 0;
+
+    function resizeCanvas() {
+      canvas.width = canvas.parentElement.clientWidth;
+      canvas.height = canvas.parentElement.clientHeight;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    function drawBandwidthGraph() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Draw Grid Lines
+      ctx.strokeStyle = '#0f1d32';
+      ctx.lineWidth = 1;
+      for (let y = 0; y < canvas.height; y += 25) {
+        ctx.beginPath();
+        ctx.moveTo(0, y);
+        ctx.lineTo(canvas.width, y);
+        ctx.stroke();
+      }
+
+      // Draw Area Graph
+      const step = canvas.width / (graphData.length - 1);
+      const maxVal = Math.max(...graphData, 80);
+
+      ctx.beginPath();
+      ctx.moveTo(0, canvas.height);
+
+      for (let i = 0; i < graphData.length; i++) {
+        const x = i * step;
+        const y = canvas.height - (graphData[i] / maxVal) * (canvas.height - 20);
+        ctx.lineTo(x, y);
+      }
+
+      ctx.lineTo(canvas.width, canvas.height);
+      ctx.closePath();
+
+      // Gradient Fill
+      const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+      gradient.addColorStop(0, 'rgba(0, 210, 255, 0.4)');
+      gradient.addColorStop(1, 'rgba(0, 136, 204, 0.0)');
+      ctx.fillStyle = gradient;
+      ctx.fill();
+
+      // Line Stroke
+      ctx.beginPath();
+      for (let i = 0; i < graphData.length; i++) {
+        const x = i * step;
+        const y = canvas.height - (graphData[i] / maxVal) * (canvas.height - 20);
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+      ctx.strokeStyle = '#00d2ff';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+
+      requestAnimationFrame(drawBandwidthGraph);
+    }
+    requestAnimationFrame(drawBandwidthGraph);
+
+    /* =========================================================
+       4. PROTOCOL CHART ENGINE (Chart.js)
+       ========================================================= */
+    const protoChartCtx = document.getElementById('protocolChart').getContext('2d');
+    const protoChart = new Chart(protoChartCtx, {
+      type: 'doughnut',
+      data: {
+        labels: ['TCP', 'UDP', 'ICMP', 'HTTP', 'DNS'],
+        datasets: [{
+          data: [1, 1, 1, 1, 1],
+          backgroundColor: ['#0ea5e9', '#a855f7', '#f43f5e', '#10b981', '#f59e0b'],
+          borderWidth: 2,
+          borderColor: '#060d1b'
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: 'right',
+            labels: { color: '#94a3b8', font: { family: 'Fira Code', size: 10 } }
+          }
+        },
+        cutout: '70%'
+      }
+    });
+
+    /* =========================================================
+       5. PACKET GENERATION & SNIFFER LOGIC
+       ========================================================= */
+    function generatePacket() {
+      if (!capturing) return;
+
+      packetCount++;
+      const protos = ['TCP', 'UDP', 'ICMP', 'HTTP', 'DNS'];
+      const proto = protos[Math.floor(Math.random() * protos.length)];
+      const size = Math.floor(Math.random() * 1200) + 64;
+      totalBytes += size;
+      currentSpeed += size / 1024;
+
+      protocolCounts[proto]++;
+
+      const isAnomaly = Math.random() < 0.08; // 8% chance of suspicious packet
+      if (isAnomaly) {
+        anomalyCount++;
+        playAudio('anomaly');
+      } else {
+        playAudio('packet');
+      }
+
+      const now = new Date();
+      const timeStr = now.toTimeString().split(' ')[0] + '.' + Math.floor(now.getMilliseconds() / 10);
+
+      const packet = {
+        id: packetCount,
+        time: timeStr,
+        src: mockIPs[Math.floor(Math.random() * mockIPs.length)],
+        dst: mockIPs[Math.floor(Math.random() * mockIPs.length)],
+        proto: proto,
+        size: size,
+        payload: mockPayloads[Math.floor(Math.random() * mockPayloads.length)],
+        isAnomaly: isAnomaly,
+        ttl: Math.floor(Math.random() * 64) + 64,
+        flags: proto === 'TCP' ? '[SYN, ACK]' : '[NONE]'
+      };
+
+      packets.unshift(packet);
+      if (packets.length > 100) packets.pop();
+
+      renderPacketRow(packet);
+      updateTelemetryUI();
+    }
+
+    function renderPacketRow(pkt) {
+      if (activeFilter !== 'ALL' && pkt.proto !== activeFilter) return;
+
+      const tbody = document.getElementById('packetTableBody');
+      const tr = document.createElement('tr');
+      
+      let badgeColor = 'bg-sky-950 text-sky-400 border-sky-800';
+      if (pkt.proto === 'UDP') badgeColor = 'bg-purple-950 text-purple-400 border-purple-800';
+      if (pkt.proto === 'ICMP') badgeColor = 'bg-rose-950 text-rose-400 border-rose-800';
+      if (pkt.proto === 'HTTP') badgeColor = 'bg-emerald-950 text-emerald-400 border-emerald-800';
+      if (pkt.proto === 'DNS') badgeColor = 'bg-amber-950 text-amber-400 border-amber-800';
+
+      tr.className = `new-packet-row hover:bg-slate-800/50 cursor-pointer transition border-b border-slate-800/40 ${pkt.isAnomaly ? 'bg-rose-950/20' : ''}`;
+      tr.onclick = () => selectPacket(pkt);
+
+      tr.innerHTML = `
+        <td class="p-2.5 text-center text-slate-500">${pkt.id}</td>
+        <td class="p-2.5 text-slate-400">${pkt.time}</td>
+        <td class="p-2.5 text-sky-300">${pkt.src}</td>
+        <td class="p-2.5 text-emerald-300">${pkt.dst}</td>
+        <td class="p-2.5 text-center">
+          <span class="px-2 py-0.5 rounded text-[10px] font-bold border ${badgeColor}">${pkt.proto}</span>
+        </td>
+        <td class="p-2.5 text-right text-slate-300">${pkt.size} B</td>
+        <td class="p-2.5 text-slate-400 truncate max-w-xs">${pkt.isAnomaly ? '⚠️ [ANOMALY] ' : ''}${pkt.payload}</td>
+        <td class="p-2.5 text-center">
+          <button class="text-sky-400 hover:text-white"><i class="fa-solid fa-eye"></i></button>
+        </td>
+      `;
+
+      tbody.insertBefore(tr, tbody.firstChild);
+
+      // Maintain max DOM rows
+      if (tbody.children.length > 50) {
+        tbody.removeChild(tbody.lastChild);
+      }
+    }
+
+    function updateTelemetryUI() {
+      document.getElementById('statTotalPackets').innerText = packetCount.toLocaleString();
+      document.getElementById('statDataBytes').innerText = (totalBytes / 1024).toFixed(1) + ' KB';
+      document.getElementById('statAnomalies').innerText = anomalyCount;
+
+      // Update Chart
+      protoChart.data.datasets[0].data = [
+        protocolCounts.TCP,
+        protocolCounts.UDP,
+        protocolCounts.ICMP,
+        protocolCounts.HTTP,
+        protocolCounts.DNS
+      ];
+      protoChart.update('none');
+
+      // Top protocol calculate
+      let topP = 'TCP';
+      let maxP = 0;
+      for (const [p, val] of Object.entries(protocolCounts)) {
+        if (val > maxP) { maxP = val; topP = p; }
+      }
+      document.getElementById('statTopProtocol').innerText = topP;
+    }
+
+    // Bandwidth Speed Meter Refresh
+    setInterval(() => {
+      graphData.push(currentSpeed);
+      graphData.shift();
+      document.getElementById('statBandwidth').innerText = currentSpeed.toFixed(1) + ' KB/s';
+      currentSpeed = 0;
+    }, 1000);
+
+    // Dynamic Sniffing Loop
+    setInterval(generatePacket, 400);
+
+    /* =========================================================
+       6. PACKET INSPECTOR PANEL
+       ========================================================= */
+    function selectPacket(pkt) {
+      selectedPacket = pkt;
+      playAudio('click');
+
+      document.getElementById('inspectPacketId').innerText = `Packet #${pkt.id} [${pkt.proto}]`;
+
+      // Generate Hex Dump
+      let hexDump = '';
+      for (let i = 0; i < pkt.payload.length; i++) {
+        const code = pkt.payload.charCodeAt(i).toString(16).padStart(2, '0');
+        hexDump += code + ' ';
+        if ((i + 1) % 8 === 0) hexDump += ' ';
+      }
+
+      const inspector = document.getElementById('inspectorContent');
+      inspector.innerHTML = `
+        <!-- Ethernet & IP Header -->
+        <div class="bg-slate-950 p-2.5 rounded-lg border border-slate-800 space-y-1">
+          <div class="text-sky-400 font-bold">► Ethernet II, Src: 00:1A:2B:3C:4D:5E, Dst: 00:11:22:33:44:55</div>
+          <div class="text-emerald-400 font-bold">► Internet Protocol Version 4 (IPv4)</div>
+          <div class="pl-3 text-slate-400 font-mono space-y-0.5 text-[11px]">
+            <div>Source IP: <span class="text-white">${pkt.src}</span></div>
+            <div>Destination IP: <span class="text-white">${pkt.dst}</span></div>
+            <div>Time to Live (TTL): ${pkt.ttl}</div>
+            <div>Header Checksum: 0x4a2d [Correct]</div>
+          </div>
+        </div>
+
+        <!-- Transport Layer -->
+        <div class="bg-slate-950 p-2.5 rounded-lg border border-slate-800 space-y-1">
+          <div class="text-purple-400 font-bold">► ${pkt.proto} Protocol Header</div>
+          <div class="pl-3 text-slate-400 font-mono space-y-0.5 text-[11px]">
+            <div>Flags: <span class="text-amber-400">${pkt.flags}</span></div>
+            <div>Packet Length: ${pkt.size} bytes</div>
+            <div>Checksum Status: Verified</div>
+          </div>
+        </div>
+
+        <!-- Hex Payload Dump -->
+        <div class="bg-slate-950 p-2.5 rounded-lg border border-slate-800">
+          <div class="text-slate-400 font-bold mb-1">► Raw Hex Dump & ASCII Payload</div>
+          <div class="font-mono text-[11px] text-emerald-400 bg-black/60 p-2 rounded overflow-x-auto break-all">
+            ${hexDump.toUpperCase()}
+          </div>
+          <div class="mt-2 text-[11px] text-slate-300 font-mono bg-black/40 p-2 rounded">
+            "${pkt.payload}"
+          </div>
+        </div>
+      `;
+    }
+
+    /* =========================================================
+       7. INTERACTIVE CONSOLE ENGINE
+       ========================================================= */
+    function handleTermCommand(e) {
+      if (e.key === 'Enter') {
+        const input = document.getElementById('termInput');
+        const cmd = input.value.trim().toLowerCase();
+        input.value = '';
+
+        const term = document.getElementById('terminalLog');
+        const line = document.createElement('div');
+
+        if (cmd === 'help') {
+          line.innerHTML = `<span class="text-sky-400">[HELP]</span> Available commands: <b>status</b>, <b>start</b>, <b>stop</b>, <b>clear</b>, <b>stats</b>, <b>mz</b>`;
+        } else if (cmd === 'status') {
+          line.innerHTML = `<span class="text-emerald-400">[STATUS]</span> Capture: ${capturing ? 'ACTIVE' : 'STOPPED'} | Packets: ${packetCount} | Anomalies: ${anomalyCount}`;
+        } else if (cmd === 'start') {
+          if (!capturing) toggleCapture();
+          line.innerHTML = `<span class="text-emerald-400">[SYSTEM]</span> Packet capture engine started.`;
+        } else if (cmd === 'stop') {
+          if (capturing) toggleCapture();
+          line.innerHTML = `<span class="text-rose-400">[SYSTEM]</span> Packet capture paused.`;
+        } else if (cmd === 'clear') {
+          clearConsole();
+          return;
+        } else if (cmd === 'mz') {
+          line.innerHTML = `<span class="text-amber-400">[MZ LABS]</span> MZ Packet Sniffer Edition 2.4 - Security Suite Operational.`;
+        } else {
+          line.innerHTML = `<span class="text-rose-400">[ERROR]</span> Command '${cmd}' not recognized. Type 'help'.`;
+        }
+
+        term.appendChild(line);
+        term.scrollTop = term.scrollHeight;
+      }
+    }
+
+    function clearConsole() {
+      document.getElementById('terminalLog').innerHTML = `<div><span class="text-emerald-400">[SYSTEM]</span> Console cleared.</div>`;
+    }
+
+    /* =========================================================
+       8. TOOLBAR ACTIONS & FILTERS
+       ========================================================= */
+    function toggleCapture() {
+      capturing = !capturing;
+      playAudio('click');
+
+      const btn = document.getElementById('toggleCaptureBtn');
+      const badge = document.getElementById('liveStatusBadge');
+      const text = document.getElementById('captureBtnText');
+      const icon = document.getElementById('captureIcon');
+
+      if (capturing) {
+        btn.className = "px-4 py-2 rounded-lg font-semibold text-xs flex items-center gap-2 transition bg-rose-600 hover:bg-rose-500 text-white shadow-lg shadow-rose-900/30";
+        text.innerText = "Stop Capture";
+        icon.className = "fa-solid fa-square";
+        badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-400 pulse-dot"></span> Sniffing Active`;
+        badge.className = "flex items-center gap-1.5 px-2 py-0.5 text-xs font-medium rounded-md bg-emerald-950/80 text-emerald-400 border border-emerald-800/60";
+      } else {
+        btn.className = "px-4 py-2 rounded-lg font-semibold text-xs flex items-center gap-2 transition bg-emerald-600 hover:bg-emerald-500 text-white shadow-lg shadow-emerald-900/30";
+        text.innerText = "Start Capture";
+        icon.className = "fa-solid fa-play";
+        badge.innerHTML = `<span class="w-2 h-2 rounded-full bg-amber-400"></span> Paused`;
+        badge.className = "flex items-center gap-1.5 px-2 py-0.5 text-xs font-medium rounded-md bg-amber-950/80 text-amber-400 border border-amber-800/60";
+      }
+    }
+
+    function clearPackets() {
+      playAudio('click');
+      packets = [];
+      packetCount = 0;
+      totalBytes = 0;
+      anomalyCount = 0;
+      for (let key in protocolCounts) protocolCounts[key] = 0;
+
+      document.getElementById('packetTableBody').innerHTML = '';
+      updateTelemetryUI();
+    }
+
+    function setProtocolFilter(proto) {
+      playAudio('click');
+      activeFilter = proto;
+
+      document.querySelectorAll('.proto-btn').forEach(btn => {
+        if (btn.innerText === proto) {
+          btn.className = "proto-btn active-proto text-xs font-mono px-2.5 py-1 rounded bg-sky-600 text-white font-semibold";
+        } else {
+          btn.className = "proto-btn text-xs font-mono px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300";
+        }
+      });
+
+      // Re-render table with filter
+      const tbody = document.getElementById('packetTableBody');
+      tbody.innerHTML = '';
+      packets.forEach(pkt => renderPacketRow(pkt));
+    }
+
+    function filterPackets() {
+      const query = document.getElementById('searchInput').value.toLowerCase();
+      const rows = document.querySelectorAll('#packetTableBody tr');
+      rows.forEach(row => {
+        const text = row.innerText.toLowerCase();
+        row.style.display = text.includes(query) ? '' : 'none';
+      });
+    }
+
+    /* Python Modal Controls */
+    function openPythonModal() {
+      playAudio('click');
+      document.getElementById('pythonModal').classList.remove('hidden');
+    }
+
+    function closePythonModal() {
+      document.getElementById('pythonModal').classList.add('hidden');
+    }
+
+    function copyPythonScript() {
+      playAudio('click');
+      const code = document.getElementById('pythonCodeBlock').innerText;
+      navigator.clipboard.writeText(code).then(() => {
+        alert('Python Scapy code copied to clipboard!');
+      });
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IDOR & Broken Access Control - Cyber Academy</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+    <!-- NAVBAR -->
+    <nav class="navbar">
+        <div class="logo">Cyber Academy</div>
+        <ul class="nav-links">
+            <li><a href="home.html">Home</a></li>
+            <li><a href="services.html">Services</a></li>
+            <li><a href="ethical-hacking.html">Ethical Hacking</a></li>
+            <li><a href="web-pentesting.html">Web PenTesting</a></li>
+            <li><a href="home.html#contact">Contact</a></li>
+        </ul>
+        <div class="nav-btns">
+            <button class="btn-outline">Login</button>
+            <button class="btn-primary">Register</button>
+        </div>
+    </nav>
+
+    <!-- CLEAN TEXT & HEADINGS SECTION -->
+    <section class="section-container" style="margin-top: 100px; max-width: 900px;">
+        <span class="badge">VULNERABILITY DEEP DIVE</span>
+        <h1 style="font-size: 2.8rem; margin-top: 10px; color: #fff;">IDOR & Broken Access Control Testing</h1>
+        <p class="section-desc" style="font-size: 1.1rem; line-height: 1.7; color: #cbd5e1; margin-top: 15px;">
+            Insecure Direct Object References (IDOR) and Access Control flaws occur when applications fail to properly verify whether an authenticated user has permission to view, edit, or delete specific system objects or administrative routes.
+        </p>
+
+        <hr style="border: 0; height: 1px; background: #334155; margin: 40px 0;">
+
+        <!-- 1. ACCESS CONTROL VECTORS -->
+        <h2 style="color: #00f2fe; font-size: 1.8rem; margin-bottom: 15px;">1. Types of Access Control Flaws We Test</h2>
+        
+        <h3 style="color: #fff; font-size: 1.3rem; margin-top: 20px;">A. Horizontal Privilege Escalation (IDOR)</h3>
+        <p style="color: #94a3b8; line-height: 1.6;">Manipulating object identifiers to access records belonging to another user with the same role.</p>
+        <ul style="color: #cbd5e1; margin-left: 20px; line-height: 1.8;">
+            <li><strong>Parameter Tampering:</strong> Changing IDs in URL or API requests (`?account_id=1001` to `1002`).</li>
+            <li><strong>Private Data Exposure:</strong> Downloading other users' private PDFs, invoices, or personal documents.</li>
+        </ul>
+
+        <h3 style="color: #fff; font-size: 1.3rem; margin-top: 20px;">B. Vertical Privilege Escalation</h3>
+        <p style="color: #94a3b8; line-height: 1.6;">Bypassing role authorization to perform actions reserved for higher privilege levels (e.g., Admins).</p>
+        <ul style="color: #cbd5e1; margin-left: 20px; line-height: 1.8;">
+            <li><strong>Unrestricted Admin Endpoints:</strong> Accessing paths like `/admin/delete-user` as a regular guest.</li>
+            <li><strong>Header Manipulation:</strong> Tampering with role parameters (e.g. `role: admin` or `is_admin: true`).</li>
+        </ul>
+
+        <h3 style="color: #fff; font-size: 1.3rem; margin-top: 20px;">C. CORS & Origin Misconfigurations</h3>
+        <ul style="color: #cbd5e1; margin-left: 20px; line-height: 1.8;">
+            <li><strong>Over-Permissive Origin Policies:</strong> Exploiting `Access-Control-Allow-Origin: *` with credentials enabled to extract sensitive data.</li>
+        </ul>
+
+        <hr style="border: 0; height: 1px; background: #334155; margin: 40px 0;">
+
+        <!-- 2. MITIGATION GUIDELINES -->
+        <h2 style="color: #00f2fe; font-size: 1.8rem; margin-bottom: 15px;">2. Prevention & Remediation Guidelines</h2>
+        <ul style="color: #cbd5e1; margin-left: 20px; line-height: 2;">
+            <li><strong>Server-Side Authorization Checks:</strong> Enforce strict access control logic on every single API endpoint and request.</li>
+            <li><strong>Use Indirect Object References:</strong> Replace sequential numeric IDs (`?id=5`) with unpredictable cryptographic GUIDs/UUIDs.</li>
+            <li><strong>Deny by Default:</strong> Block access to all routes unless explicitly permitted for a specific role.</li>
+            <li><strong>Disable Directory Browsing:</strong> Ensure web servers do not list directory files or backup folders publicly.</li>
+        </ul>
+
+        <hr style="border: 0; height: 1px; background: #334155; margin: 40px 0;">
+
+        <!-- 3. TESTING TOOLS -->
+        <h2 style="color: #00f2fe; font-size: 1.8rem; margin-bottom: 15px;">3. Security Assessment Tools</h2>
+        <p style="color: #cbd5e1; line-height: 1.7;">
+            We utilize specialized extension plugins like <strong>Burp Suite Autorize</strong>, <strong>Autorize Matrix</strong>, <strong>Postman API Auditor</strong>, and manual dual-account differential testing to catch all access control bugs.
+        </p>
+
+        <!-- ACTION BUTTONS -->
+        <div style="margin-top: 50px; display: flex; align-items: center; gap: 20px;">
+            <a href="web-pentesting.html" class="btn-outline" style="text-decoration: none;">&larr; Back to Web PenTesting</a>
+            <a href="home.html#contact" class="btn-primary" style="text-decoration: none;">Request Access Audit</a>
+        </div>
+    </section>
+
+</body>
+</html>

@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Broken Authentication - Cyber Academy</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+    <!-- NAVBAR -->
+    <nav class="navbar">
+        <div class="logo">Cyber Academy</div>
+        <ul class="nav-links">
+            <li><a href="home.html">Home</a></li>
+            <li><a href="services.html">Services</a></li>
+            <li><a href="ethical-hacking.html">Ethical Hacking</a></li>
+            <li><a href="web-pentesting.html">Web PenTesting</a></li>
+            <li><a href="home.html#contact">Contact</a></li>
+        </ul>
+        <div class="nav-btns">
+            <button class="btn-outline">Login</button>
+            <button class="btn-primary">Register</button>
+        </div>
+    </nav>
+
+    <!-- CLEAN TEXT & HEADINGS SECTION -->
+    <section class="section-container" style="margin-top: 100px; max-width: 900px;">
+        <span class="badge">VULNERABILITY DEEP DIVE</span>
+        <h1 style="font-size: 2.8rem; margin-top: 10px; color: #fff;">Broken Authentication & Session Audit</h1>
+        <p class="section-desc" style="font-size: 1.1rem; line-height: 1.7; color: #cbd5e1; margin-top: 15px;">
+            Broken Authentication occurs when identity management mechanisms are implemented incorrectly. Attackers can exploit implementation flaws to compromise passwords, keys, or session tokens and assume other users' identities.
+        </p>
+
+        <hr style="border: 0; height: 1px; background: #334155; margin: 40px 0;">
+
+        <!-- 1. AUTHENTICATION FLAWS TESTED -->
+        <h2 style="color: #00f2fe; font-size: 1.8rem; margin-bottom: 15px;">1. Key Authentication Vectors We Audit</h2>
+        
+        <h3 style="color: #fff; font-size: 1.3rem; margin-top: 20px;">A. Password & Credential Flaws</h3>
+        <p style="color: #94a3b8; line-height: 1.6;">Testing credential validation logic against automated attack vectors.</p>
+        <ul style="color: #cbd5e1; margin-left: 20px; line-height: 1.8;">
+            <li><strong>Credential Stuffing & Brute Force:</strong> Checking lack of rate limiting or account lockout policies on login forms.</li>
+            <li><strong>Weak Password Policies:</strong> Testing acceptance of easily guessable or leaked default passwords.</li>
+        </ul>
+
+        <h3 style="color: #fff; font-size: 1.3rem; margin-top: 20px;">B. Session Management Weaknesses</h3>
+        <p style="color: #94a3b8; line-height: 1.6;">Auditing session handling before and after user authentication.</p>
+        <ul style="color: #cbd5e1; margin-left: 20px; line-height: 1.8;">
+            <li><strong>Session Fixation:</strong> Verifying if session IDs change upon successful user login.</li>
+            <li><strong>Insecure Session Tokens:</strong> Inspecting HTTPOnly, Secure, and SameSite flags on session cookies.</li>
+        </ul>
+
+        <h3 style="color: #fff; font-size: 1.3rem; margin-top: 20px;">C. Multi-Factor Authentication (MFA) Bypasses</h3>
+        <ul style="color: #cbd5e1; margin-left: 20px; line-height: 1.8;">
+            <li><strong>Direct Endpoint Access:</strong> Bypassing MFA steps by directly requesting post-login URLs.</li>
+            <li><strong>OTP Brute Forcing:</strong> Testing rate limits on short numeric 2FA/OTP validation fields.</li>
+        </ul>
+
+        <hr style="border: 0; height: 1px; background: #334155; margin: 40px 0;">
+
+        <!-- 2. MITIGATION GUIDELINES -->
+        <h2 style="color: #00f2fe; font-size: 1.8rem; margin-bottom: 15px;">2. Mitigation & Hardening Rules</h2>
+        <ul style="color: #cbd5e1; margin-left: 20px; line-height: 2;">
+            <li><strong>Implement Multi-Factor Authentication (MFA):</strong> Require secondary authentication for sensitive or administrative logins.</li>
+            <li><strong>Enforce Strict Rate Limiting:</strong> Block IP addresses or lock accounts after multiple consecutive failed attempts.</li>
+            <li><strong>Secure Cookie Flags:</strong> Set `HttpOnly`, `Secure`, and `SameSite=Strict` on all authentication tokens.</li>
+            <li><strong>Session Invalidation:</strong> Terminate session tokens completely on user logout and inactivity timeouts.</li>
+        </ul>
+
+        <hr style="border: 0; height: 1px; background: #334155; margin: 40px 0;">
+
+        <!-- 3. TOOLS USED -->
+        <h2 style="color: #00f2fe; font-size: 1.8rem; margin-bottom: 15px;">3. Audit Tools & Methodology</h2>
+        <p style="color: #cbd5e1; line-height: 1.7;">
+            We perform manual session manipulation and automated testing using <strong>Burp Suite Intruder</strong>, <strong>THC-Hydra</strong>, custom Python session analysis scripts, and OWASP ZAP token analyzer.
+        </p>
+
+        <!-- ACTION BUTTONS -->
+        <div style="margin-top: 50px; display: flex; align-items: center; gap: 20px;">
+            <a href="web-pentesting.html" class="btn-outline" style="text-decoration: none;">&larr; Back to Web PenTesting</a>
+            <a href="home.html#contact" class="btn-primary" style="text-decoration: none;">Request Auth Audit</a>
+        </div>
+    </section>
+
+</body>
+</html>

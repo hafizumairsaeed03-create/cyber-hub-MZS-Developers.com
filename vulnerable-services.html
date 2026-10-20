@@ -1,0 +1,1358 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MZ Automated Web Vulnerability Scanner - MZ Security</title>
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            cyberDark: '#030712',
+            cyberCard: '#070f1e',
+            cyberBorder: 'rgba(0, 242, 254, 0.25)',
+            neonCyan: '#00f2fe',
+            neonBlue: '#0088cc',
+            neonPurple: '#a855f7',
+            neonGreen: '#10b981',
+            neonRed: '#ef4444',
+            neonAmber: '#f59e0b'
+          },
+          fontFamily: {
+            orbitron: ['Orbitron', 'sans-serif'],
+            mono: ['Space Mono', 'monospace'],
+            sans: ['Rajdhani', 'sans-serif']
+          },
+          animation: {
+            'glow-pulse': 'glowPulse 2s infinite ease-in-out',
+            'radar-spin': 'radarSpin 3s linear infinite',
+            'laser-line': 'laserLine 2s ease-in-out infinite'
+          },
+          keyframes: {
+            glowPulse: {
+              '0%, 100%': { boxShadow: '0 0 15px rgba(0, 242, 254, 0.25), inset 0 0 10px rgba(0, 242, 254, 0.1)' },
+              '50%': { boxShadow: '0 0 30px rgba(0, 242, 254, 0.65), inset 0 0 20px rgba(0, 242, 254, 0.3)' }
+            },
+            radarSpin: {
+              '0%': { transform: 'rotate(0deg)' },
+              '100%': { transform: 'rotate(360deg)' }
+            },
+            laserLine: {
+              '0%': { top: '0%' },
+              '50%': { top: '100%' },
+              '100%': { top: '0%' }
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Google Fonts & FontAwesome Icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800;900&family=Rajdhani:wght@500;600;700&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    body {
+      font-family: 'Rajdhani', sans-serif;
+      background-color: #030712;
+      color: #f8fafc;
+      overflow-x: hidden;
+    }
+
+    /* Cyber Background Grid Overlay */
+    .bg-grid-cyber {
+      background-image: linear-gradient(to right, rgba(0, 242, 254, 0.04) 1px, transparent 1px),
+                        linear-gradient(to bottom, rgba(0, 242, 254, 0.04) 1px, transparent 1px);
+      background-size: 30px 30px;
+    }
+
+    /* Custom Glassmorphism Cards */
+    .cyber-glass-card {
+      background: rgba(7, 15, 30, 0.88);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(0, 242, 254, 0.22);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7), inset 0 0 15px rgba(0, 242, 254, 0.03);
+    }
+
+    .cyber-glass-glow {
+      background: rgba(7, 15, 30, 0.94);
+      backdrop-filter: blur(20px);
+      border: 1px solid #00f2fe;
+      box-shadow: 0 0 25px rgba(0, 242, 254, 0.25), inset 0 0 20px rgba(0, 136, 204, 0.12);
+    }
+
+    /* Glowing Text Header Effects */
+    .glow-text-cyan {
+      text-shadow: 0 0 10px rgba(0, 242, 254, 0.8), 0 0 20px rgba(0, 242, 254, 0.4);
+    }
+    
+    .glow-text-red {
+      text-shadow: 0 0 10px rgba(239, 68, 68, 0.8), 0 0 20px rgba(239, 68, 68, 0.4);
+    }
+
+    /* Custom Scrollbars */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #030712;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #0088cc;
+      border-radius: 3px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #00f2fe;
+    }
+
+    /* Pulsing Threat Indicator Animation */
+    @keyframes pulseThreat {
+      0% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.5; transform: scale(1.1); }
+      100% { opacity: 1; transform: scale(1); }
+    }
+    .pulse-alarm {
+      animation: pulseThreat 1s infinite ease-in-out;
+    }
+
+    .tab-btn.active {
+      background: linear-gradient(90deg, rgba(0, 242, 254, 0.25), rgba(0, 136, 204, 0.35));
+      border-color: #00f2fe;
+      color: #00f2fe;
+      box-shadow: 0 0 12px rgba(0, 242, 254, 0.3);
+    }
+  </style>
+</head>
+
+<body class="min-h-screen bg-cyberDark text-slate-100 bg-grid-cyber flex flex-col justify-between selection:bg-neonCyan selection:text-black">
+
+  <!-- HEADER & NAVBAR -->
+  <header class="w-full border-b border-cyan-900/40 bg-cyberDark/90 backdrop-blur-md sticky top-0 z-40 px-4 lg:px-8 py-3">
+    <div class="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-4">
+      
+      <!-- MZ Security Glowing Branding -->
+      <div class="flex items-center space-x-3.5">
+        <div class="relative group cursor-pointer" onclick="triggerMzLogoPulse()" title="MZ Security Quantum Engine">
+          <div class="absolute -inset-1 bg-gradient-to-r from-neonCyan via-blue-500 to-purple-600 rounded-xl blur opacity-75 group-hover:opacity-100 transition duration-300"></div>
+          <div class="relative w-11 h-11 bg-gradient-to-br from-cyan-950 via-slate-900 to-blue-950 rounded-lg flex items-center justify-center border border-neonCyan shadow-lg">
+            <i class="fa-solid fa-shield-halved text-neonCyan text-xl group-hover:scale-110 transition duration-300"></i>
+          </div>
+        </div>
+
+        <div>
+          <div class="flex items-center space-x-2">
+            <span class="font-orbitron font-black text-xl text-transparent bg-clip-text bg-gradient-to-r from-neonCyan via-blue-400 to-cyan-200 tracking-wider">
+              MZ SECURITY
+            </span>
+            <span class="px-2 py-0.5 text-[10px] font-mono rounded border border-cyan-500/40 text-cyan-300 bg-cyan-950/60 font-bold uppercase">
+              Cyber Security
+            </span>
+          </div>
+          <p class="text-xs text-slate-400 font-mono hidden sm:block">Automated Web Vulnerability Scanner • Python Engine v4.8</p>
+        </div>
+      </div>
+
+      <!-- Realtime System Status & Audio Controls -->
+      <div class="flex items-center space-x-3">
+        
+        <!-- Live Status Pill -->
+        <div class="hidden md:flex items-center space-x-2 px-3 py-1 rounded-full bg-slate-950 border border-slate-800 text-xs font-mono">
+          <span id="statusPingDot" class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping"></span>
+          <span id="systemStatusText" class="text-slate-300">ENGINE READY</span>
+        </div>
+
+        <!-- Audio Sound Effects Toggle -->
+        <button id="soundToggleBtn" onclick="toggleAudioSystem()" class="flex items-center space-x-2 px-3 py-1.5 rounded-lg border border-cyan-500/40 bg-cyan-950/40 hover:bg-cyan-900/60 transition text-xs font-semibold text-cyan-300">
+          <i id="soundIcon" class="fa-solid fa-volume-high text-neonCyan"></i>
+          <span id="soundStatusText">AUDIO: ON</span>
+        </button>
+
+        <!-- Voice Synthesis Toggle -->
+        <button id="voiceToggleBtn" onclick="toggleVoiceAnnouncements()" class="flex items-center space-x-2 px-3 py-1.5 rounded-lg border border-purple-500/40 bg-purple-950/40 hover:bg-purple-900/60 transition text-xs font-semibold text-purple-300">
+          <i id="voiceIcon" class="fa-solid fa-comment-dots text-purple-400"></i>
+          <span id="voiceStatusText">VOICE: ON</span>
+        </button>
+
+        <!-- Export Summary Quick Button -->
+        <button onclick="openExportModal()" class="px-3.5 py-1.5 rounded-lg bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-mono font-bold text-xs tracking-wider uppercase transition shadow-lg shadow-cyan-950/60 flex items-center space-x-1.5 border border-cyan-400/40">
+          <i class="fa-solid fa-file-export"></i>
+          <span class="hidden sm:inline">Export Report</span>
+        </button>
+
+      </div>
+
+    </div>
+  </header>
+
+  <!-- MAIN CONTAINER -->
+  <main class="max-w-7xl mx-auto px-4 lg:px-8 py-6 w-full flex-grow space-y-6">
+
+    <!-- HERO SCANNER CONTROLLER CARD -->
+    <div class="cyber-glass-glow rounded-2xl p-5 md:p-7 relative overflow-hidden transition-all duration-300">
+      
+      <!-- Top Ambient Decorative Glows -->
+      <div class="absolute -top-24 -right-24 w-56 h-56 bg-cyan-500/15 rounded-full blur-3xl pointer-events-none"></div>
+      <div class="absolute -bottom-24 -left-24 w-56 h-56 bg-blue-600/15 rounded-full blur-3xl pointer-events-none"></div>
+
+      <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-4 border-b border-slate-800/80">
+        <div>
+          <div class="flex items-center space-x-2 mb-1">
+            <span class="px-2.5 py-0.5 rounded text-[10px] font-mono uppercase bg-cyan-950 text-cyan-300 border border-cyan-500/50 font-bold tracking-widest">
+              Python Tool to Scan Web Applications
+            </span>
+            <span class="text-xs text-slate-400 font-mono hidden md:inline">• 1,420 Security Signatures Loaded</span>
+          </div>
+          <h1 class="text-2xl md:text-3xl font-black font-orbitron text-white tracking-wide glow-text-cyan flex items-center gap-3">
+            <span>Automated Web Vulnerability Scanner</span>
+          </h1>
+        </div>
+
+        <!-- Preset Target Selector Badges -->
+        <div class="flex items-center space-x-2 text-xs font-mono">
+          <span class="text-slate-400 whitespace-nowrap hidden sm:inline">Sample Targets:</span>
+          <button onclick="setSampleTarget('https://demo.testfire.net')" class="px-2.5 py-1 rounded bg-slate-900 border border-cyan-900 text-cyan-400 hover:border-cyan-400 transition">TestFire</button>
+          <button onclick="setSampleTarget('http://dvwa.mz-security.internal')" class="px-2.5 py-1 rounded bg-slate-900 border border-cyan-900 text-cyan-400 hover:border-cyan-400 transition">DVWA Web</button>
+          <button onclick="setSampleTarget('https://juice-shop.mz-app.io')" class="px-2.5 py-1 rounded bg-slate-900 border border-cyan-900 text-cyan-400 hover:border-cyan-400 transition">OWASP Juice</button>
+        </div>
+      </div>
+
+      <!-- Target URL Bar & Controls -->
+      <div class="mt-5 grid grid-cols-1 lg:grid-cols-12 gap-3 items-center">
+        
+        <!-- Input URL Field -->
+        <div class="lg:col-span-8 relative">
+          <div class="absolute left-3.5 top-1/2 -translate-y-1/2 text-neonCyan font-mono text-sm">
+            <i class="fa-solid fa-globe"></i>
+          </div>
+          <input type="url" id="targetUrlInput" value="https://juice-shop.mz-app.io" placeholder="Enter Target Web Application URL (e.g. https://target-app.com)..." class="w-full bg-slate-950 border border-cyan-800/80 rounded-xl pl-10 pr-24 py-3 text-sm font-mono text-white focus:outline-none focus:border-neonCyan focus:ring-1 focus:ring-neonCyan transition shadow-inner">
+          <span class="absolute right-3 top-1/2 -translate-y-1/2 text-[11px] font-mono text-slate-400 bg-slate-900 px-2 py-0.5 rounded border border-slate-800">
+            HTTP / HTTPS
+          </span>
+        </div>
+
+        <!-- Scan Action Controls -->
+        <div class="lg:col-span-4 flex items-center space-x-2">
+          
+          <button id="startScanBtn" onclick="startVulnerabilityScan()" class="flex-1 py-3 px-4 rounded-xl bg-gradient-to-r from-cyan-500 via-blue-600 to-indigo-600 hover:from-cyan-400 hover:to-indigo-500 text-white font-orbitron font-bold text-xs tracking-wider uppercase transition shadow-lg shadow-cyan-950 flex items-center justify-center space-x-2 border border-cyan-300/40">
+            <i class="fa-solid fa-play text-emerald-300"></i>
+            <span>Start Security Scan</span>
+          </button>
+
+          <button id="stopScanBtn" onclick="stopVulnerabilityScan()" disabled class="py-3 px-4 rounded-xl bg-red-950/60 border border-red-500/40 text-red-400 hover:bg-red-900/80 disabled:opacity-40 disabled:cursor-not-allowed font-orbitron font-bold text-xs tracking-wider uppercase transition flex items-center justify-center space-x-1.5">
+            <i class="fa-solid fa-stop"></i>
+            <span class="hidden sm:inline">Stop</span>
+          </button>
+
+        </div>
+
+      </div>
+
+      <!-- Scan Configuration Checkboxes -->
+      <div class="mt-4 pt-4 border-t border-slate-800/80 flex flex-wrap items-center justify-between gap-3 text-xs font-mono">
+        <span class="text-slate-400 font-bold uppercase tracking-wider flex items-center gap-1.5">
+          <i class="fa-solid fa-sliders text-cyan-400"></i> Active Modules:
+        </span>
+
+        <div class="flex flex-wrap gap-3 text-slate-300">
+          <label class="flex items-center space-x-1.5 cursor-pointer hover:text-cyan-300">
+            <input type="checkbox" id="modSqli" checked class="accent-neonCyan rounded">
+            <span>SQL Injection (SQLi)</span>
+          </label>
+
+          <label class="flex items-center space-x-1.5 cursor-pointer hover:text-cyan-300">
+            <input type="checkbox" id="modXss" checked class="accent-neonCyan rounded">
+            <span>Cross-Site Scripting (XSS)</span>
+          </label>
+
+          <label class="flex items-center space-x-1.5 cursor-pointer hover:text-cyan-300">
+            <input type="checkbox" id="modCsrf" checked class="accent-neonCyan rounded">
+            <span>CSRF & Headers</span>
+          </label>
+
+          <label class="flex items-center space-x-1.5 cursor-pointer hover:text-cyan-300">
+            <input type="checkbox" id="modSsl" checked class="accent-neonCyan rounded">
+            <span>SSL/TLS Ciphers</span>
+          </label>
+
+          <label class="flex items-center space-x-1.5 cursor-pointer hover:text-cyan-300">
+            <input type="checkbox" id="modPorts" checked class="accent-neonCyan rounded">
+            <span>Port Scanner (Nmap)</span>
+          </label>
+        </div>
+
+        <div class="flex items-center space-x-2 text-slate-400">
+          <span>Scan Depth:</span>
+          <select id="scanDepthSelect" class="bg-slate-950 border border-cyan-800 text-cyan-300 rounded px-2 py-1 text-xs focus:outline-none focus:border-neonCyan">
+            <option value="quick">Quick Recon</option>
+            <option value="standard" selected>Standard Penetration Test</option>
+            <option value="deep">Deep Forensic Audit</option>
+          </select>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- VISUALIZERS & TELEMETRY GRID -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      
+      <!-- RADAR SWEEP CANVAS CARD -->
+      <div class="lg:col-span-4 cyber-glass-card rounded-2xl p-4 flex flex-col justify-between relative overflow-hidden">
+        
+        <div class="flex items-center justify-between mb-3 border-b border-slate-800 pb-2">
+          <div class="flex items-center space-x-2">
+            <i class="fa-solid fa-radar text-neonCyan animate-spin" style="animation-duration: 8s;"></i>
+            <h3 class="font-orbitron font-bold text-sm text-white">Target Telemetry Radar</h3>
+          </div>
+          <span id="radarStatusTag" class="text-[10px] font-mono px-2 py-0.5 rounded bg-cyan-950 text-cyan-300 border border-cyan-800">
+            STANDBY
+          </span>
+        </div>
+
+        <!-- Canvas Container -->
+        <div class="relative w-full aspect-square max-h-[260px] mx-auto flex items-center justify-center">
+          <canvas id="radarCanvas" width="260" height="260" class="w-full h-full rounded-full bg-slate-950 border border-cyan-500/30 shadow-inner"></canvas>
+        </div>
+
+        <div class="mt-3 pt-2 border-t border-slate-800/80 flex justify-between text-[11px] font-mono text-slate-400">
+          <span>Active Nodes: <strong id="radarNodesCount" class="text-neonCyan">0</strong></span>
+          <span>Target Ping: <strong id="radarPingText" class="text-emerald-400">-- ms</strong></span>
+        </div>
+      </div>
+
+      <!-- HTTP CODE RAIN / MATRIX STREAM CANVAS CARD -->
+      <div class="lg:col-span-5 cyber-glass-card rounded-2xl p-4 flex flex-col justify-between">
+        
+        <div class="flex items-center justify-between mb-2 border-b border-slate-800 pb-2">
+          <div class="flex items-center space-x-2">
+            <i class="fa-solid fa-code text-purple-400"></i>
+            <h3 class="font-orbitron font-bold text-sm text-white">HTTP Payload Stream</h3>
+          </div>
+          <span class="text-[10px] font-mono text-purple-300 bg-purple-950/60 px-2 py-0.5 rounded border border-purple-800">
+            200 OK / GET / POST
+          </span>
+        </div>
+
+        <!-- Matrix Canvas Output -->
+        <div class="relative w-full h-[220px] rounded-xl overflow-hidden bg-slate-950 border border-purple-900/40">
+          <canvas id="matrixCanvas" class="w-full h-full block"></canvas>
+          <div class="absolute bottom-2 right-2 text-[9px] font-mono text-slate-500 bg-black/70 px-2 py-0.5 rounded backdrop-blur">
+            FUZZING ENGINE V4
+          </div>
+        </div>
+
+        <div class="mt-2 text-[11px] font-mono text-slate-400 flex justify-between items-center">
+          <span class="line-clamp-1">Testing Payload: <span id="currentPayloadText" class="text-cyan-300">Ready</span></span>
+          <span id="requestsPerSecText" class="text-slate-500 font-bold">0 Req/s</span>
+        </div>
+      </div>
+
+      <!-- THREAT LEVEL METERS & RISK SCORE CARD -->
+      <div class="lg:col-span-3 cyber-glass-card rounded-2xl p-4 flex flex-col justify-between">
+        
+        <div class="flex items-center justify-between mb-2 border-b border-slate-800 pb-2">
+          <div class="flex items-center space-x-2">
+            <i class="fa-solid fa-gauge-high text-neonRed"></i>
+            <h3 class="font-orbitron font-bold text-sm text-white">Risk Score Gauge</h3>
+          </div>
+        </div>
+
+        <!-- Gauge Visual Circle -->
+        <div class="relative w-36 h-36 mx-auto my-2 flex items-center justify-center">
+          <svg class="w-full h-full -rotate-90" viewBox="0 0 100 100">
+            <circle cx="50" cy="50" r="42" stroke="#0f172a" stroke-width="10" fill="transparent" />
+            <circle id="riskGaugeCircle" cx="50" cy="50" r="42" stroke="#10b981" stroke-width="10" stroke-dasharray="263.89" stroke-dashoffset="263.89" stroke-linecap="round" fill="transparent" class="transition-all duration-700 ease-out" />
+          </svg>
+          <div class="absolute text-center flex flex-col items-center">
+            <span id="riskScoreValue" class="text-3xl font-black font-orbitron text-white">0</span>
+            <span id="riskScoreLabel" class="text-[10px] font-mono font-bold uppercase px-2 py-0.5 rounded bg-emerald-950 text-emerald-400 border border-emerald-800 mt-1">
+              LOW RISK
+            </span>
+          </div>
+        </div>
+
+        <!-- Vulnerability Counter Grid -->
+        <div class="grid grid-cols-4 gap-1.5 pt-2 border-t border-slate-800/80 text-center font-mono">
+          <div class="p-1.5 rounded bg-red-950/40 border border-red-500/30">
+            <div id="cntCritical" class="text-base font-bold text-red-400">0</div>
+            <div class="text-[9px] text-slate-400 uppercase">CRIT</div>
+          </div>
+          <div class="p-1.5 rounded bg-orange-950/40 border border-orange-500/30">
+            <div id="cntHigh" class="text-base font-bold text-orange-400">0</div>
+            <div class="text-[9px] text-slate-400 uppercase">HIGH</div>
+          </div>
+          <div class="p-1.5 rounded bg-amber-950/40 border border-amber-500/30">
+            <div id="cntMedium" class="text-base font-bold text-amber-400">0</div>
+            <div class="text-[9px] text-slate-400 uppercase">MED</div>
+          </div>
+          <div class="p-1.5 rounded bg-blue-950/40 border border-blue-500/30">
+            <div id="cntLow" class="text-base font-bold text-blue-400">0</div>
+            <div class="text-[9px] text-slate-400 uppercase">LOW</div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- TERMINAL & VULNERABILITY FINDINGS SECTION -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      
+      <!-- INTERACTIVE PYTHON CLI TERMINAL SIMULATOR -->
+      <div class="lg:col-span-5 cyber-glass-card rounded-2xl p-4 flex flex-col h-[480px]">
+        
+        <div class="flex items-center justify-between mb-3 border-b border-slate-800 pb-2">
+          <div class="flex items-center space-x-2">
+            <i class="fa-solid fa-terminal text-neonCyan"></i>
+            <h3 class="font-orbitron font-bold text-sm text-white">MZ Python Engine CLI Terminal</h3>
+          </div>
+          <div class="flex items-center space-x-2">
+            <button onclick="clearTerminalOutput()" class="text-xs text-slate-400 hover:text-white" title="Clear Console">
+              <i class="fa-solid fa-trash-can"></i>
+            </button>
+            <span class="w-3 h-3 rounded-full bg-red-500/80 inline-block"></span>
+            <span class="w-3 h-3 rounded-full bg-amber-500/80 inline-block"></span>
+            <span class="w-3 h-3 rounded-full bg-emerald-500/80 inline-block"></span>
+          </div>
+        </div>
+
+        <!-- Terminal Output View -->
+        <div id="terminalBody" class="flex-grow bg-slate-950 border border-slate-800 rounded-xl p-3 font-mono text-xs text-slate-200 overflow-y-auto space-y-1.5 leading-relaxed selection:bg-cyan-500 selection:text-black">
+          <div class="text-cyan-400">[+] MZ Security Python Engine v4.8 [Core Module Loaded]</div>
+          <div class="text-slate-400">Type <span class="text-yellow-300 font-bold">'help'</span> for CLI commands or click 'Start Security Scan' above.</div>
+          <div class="text-slate-500">------------------------------------------------------------</div>
+        </div>
+
+        <!-- Terminal Input Prompt -->
+        <form onsubmit="handleTerminalCommand(event)" class="mt-3 flex items-center space-x-2 bg-slate-950 border border-cyan-800 rounded-lg px-3 py-2">
+          <span class="text-neonCyan font-mono font-bold text-xs">$ mz-scanner &gt;</span>
+          <input type="text" id="terminalInput" placeholder="type 'help', 'scan', 'clear', 'vulns', or 'code'..." class="flex-grow bg-transparent font-mono text-xs text-white focus:outline-none">
+          <button type="submit" class="text-cyan-400 hover:text-neonCyan text-xs">
+            <i class="fa-solid fa-paper-plane"></i>
+          </button>
+        </form>
+
+      </div>
+
+      <!-- DETAILED VULNERABILITY FINDINGS REPORT -->
+      <div class="lg:col-span-7 cyber-glass-card rounded-2xl p-4 flex flex-col h-[480px]">
+        
+        <!-- Header & Filter Tabs -->
+        <div class="flex flex-wrap items-center justify-between gap-2 mb-3 border-b border-slate-800 pb-2">
+          <div class="flex items-center space-x-2">
+            <i class="fa-solid fa-bug text-neonRed"></i>
+            <h3 class="font-orbitron font-bold text-sm text-white">Vulnerability Findings & Remediation</h3>
+          </div>
+
+          <!-- Severity Filter Buttons -->
+          <div class="flex items-center space-x-1 text-xs font-mono">
+            <button onclick="filterFindings('all')" id="tab-all" class="tab-btn active px-2.5 py-1 rounded border border-slate-800 bg-slate-900 text-slate-300">
+              All (<span id="filterCountAll">0</span>)
+            </button>
+            <button onclick="filterFindings('CRITICAL')" id="tab-CRITICAL" class="tab-btn px-2.5 py-1 rounded border border-slate-800 bg-slate-900 text-red-400">
+              Critical
+            </button>
+            <button onclick="filterFindings('HIGH')" id="tab-HIGH" class="tab-btn px-2.5 py-1 rounded border border-slate-800 bg-slate-900 text-orange-400">
+              High
+            </button>
+            <button onclick="filterFindings('MEDIUM')" id="tab-MEDIUM" class="tab-btn px-2.5 py-1 rounded border border-slate-800 bg-slate-900 text-amber-400">
+              Medium
+            </button>
+            <button onclick="filterFindings('LOW')" id="tab-LOW" class="tab-btn px-2.5 py-1 rounded border border-slate-800 bg-slate-900 text-blue-400">
+              Low
+            </button>
+          </div>
+        </div>
+
+        <!-- Vulnerabilities Scroll Area -->
+        <div id="findingsContainer" class="flex-grow overflow-y-auto space-y-3 pr-1">
+          
+          <!-- Empty Placeholder -->
+          <div id="emptyFindingsView" class="h-full flex flex-col items-center justify-center text-center p-8 text-slate-500 font-mono text-xs">
+            <i class="fa-solid fa-shield-virus text-4xl text-cyan-900 mb-2 animate-bounce"></i>
+            <p class="font-bold text-slate-400">No Vulnerabilities Logged Yet</p>
+            <p class="text-[11px] mt-1 max-w-sm">Initiate a security scan above to test target endpoint against SQLi, XSS, CSRF, SSL/TLS, and Open Port exploits.</p>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- EXPORT REPORT MODAL -->
+  <div id="exportModal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden opacity-0 transition-opacity duration-300">
+    <div id="exportModalCard" class="cyber-glass-glow w-full max-w-xl rounded-2xl p-6 border border-cyan-400/60 relative shadow-2xl transform scale-95 transition-transform duration-300">
+      
+      <button onclick="closeExportModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-lg">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+
+      <div class="flex items-center space-x-3 mb-4 border-b border-slate-800 pb-3">
+        <div class="w-10 h-10 rounded-xl bg-cyan-950 border border-cyan-500/50 flex items-center justify-center text-neonCyan text-xl">
+          <i class="fa-solid fa-file-shield"></i>
+        </div>
+        <div>
+          <h3 class="font-orbitron font-bold text-white text-base">Export Security Audit Report</h3>
+          <p class="text-xs text-slate-400 font-mono">MZ Vulnerability Engine • Executive & Technical Summary</p>
+        </div>
+      </div>
+
+      <div class="space-y-4 font-mono text-xs">
+        <div class="p-3 rounded-xl bg-slate-950 border border-cyan-900/50 space-y-2">
+          <div class="flex justify-between text-slate-300">
+            <span>Target Web App:</span>
+            <strong id="expModalTarget" class="text-cyan-300">https://juice-shop.mz-app.io</strong>
+          </div>
+          <div class="flex justify-between text-slate-300">
+            <span>Overall Risk Assessment:</span>
+            <strong id="expModalRisk" class="text-emerald-400">LOW RISK (0/100)</strong>
+          </div>
+          <div class="flex justify-between text-slate-300">
+            <span>Total Threats Identified:</span>
+            <strong id="expModalThreats" class="text-white">0 Findings</strong>
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-slate-400 mb-1.5">Select Export Format:</label>
+          <div class="grid grid-cols-3 gap-2">
+            <button onclick="downloadReport('json')" class="p-3 rounded-xl bg-slate-900 border border-cyan-800 hover:border-neonCyan text-center text-slate-200 transition">
+              <i class="fa-solid fa-file-code text-cyan-400 text-lg block mb-1"></i>
+              JSON Data
+            </button>
+            <button onclick="downloadReport('html')" class="p-3 rounded-xl bg-slate-900 border border-cyan-800 hover:border-neonCyan text-center text-slate-200 transition">
+              <i class="fa-solid fa-file-lines text-purple-400 text-lg block mb-1"></i>
+              HTML Report
+            </button>
+            <button onclick="copyReportText()" class="p-3 rounded-xl bg-slate-900 border border-cyan-800 hover:border-neonCyan text-center text-slate-200 transition">
+              <i class="fa-solid fa-copy text-emerald-400 text-lg block mb-1"></i>
+              Copy Summary
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-6 pt-4 border-t border-slate-800 flex justify-end">
+        <button onclick="closeExportModal()" class="px-5 py-2 rounded-xl bg-cyan-950 border border-cyan-600 text-cyan-300 font-mono text-xs font-bold hover:bg-cyan-900 transition">
+          Close Window
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="w-full border-t border-cyan-900/30 py-4 px-4 text-center text-xs font-mono text-slate-500">
+    <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
+      <div>© 2026 MZ SECURITY • AUTOMATED WEB VULNERABILITY SCANNER</div>
+      <div class="flex items-center space-x-4 text-cyan-400/80">
+        <span>OWASP TOP 10 COVERAGE</span>
+        <span>CVSS v3.1 SCORING</span>
+        <span>PYTHON CYBER ENGINE</span>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    /* ===================================================================
+       VULNERABILITY SIGNATURE DATASET (SIMULATED EXPLOIT PAYLOADS & RE-MEDIATION)
+       =================================================================== */
+    const vulnSignatures = [
+      {
+        id: "SQLI-001",
+        title: "SQL Injection (SQLi) in Login Endpoint",
+        category: "SQL Injection",
+        severity: "CRITICAL",
+        cvss: 9.8,
+        endpoint: "/api/v1/auth/login",
+        cve: "CVE-2024-8891",
+        payload: "' OR '1'='1' -- -",
+        description: "An unauthenticated SQL injection vulnerability was detected in the HTTP POST body parameters. The user input is directly concatenated into a SQL statement without parameterization, allowing database bypass and arbitrary data extraction.",
+        remediation: `# Python Remediation (SQLAlchemy Parameterized Query)
+from sqlalchemy import text
+
+# SECURE FIX: Use parameterized placeholders
+def authenticate_user(db_session, username, password):
+    query = text("SELECT * FROM users WHERE username = :user AND password_hash = :pass")
+    result = db_session.execute(query, {"user": username, "pass": hash_pass(password)})
+    return result.fetchone()`
+      },
+      {
+        id: "XSS-002",
+        title: "Reflected Cross-Site Scripting (XSS)",
+        category: "Cross-Site Scripting",
+        severity: "HIGH",
+        cvss: 8.2,
+        endpoint: "/search?q=<script>",
+        cve: "CVE-2024-7712",
+        payload: "<script>alert(document.cookie)</script>",
+        description: "Reflected XSS discovered in search parameter 'q'. User-supplied input is echoed in response body without proper HTML entity escaping or Content Security Policy (CSP) enforcement.",
+        remediation: `# Python Flask Security Escape Fix
+from flask import escape, render_template
+
+@app.route('/search')
+def search():
+    query = request.args.get('q', '')
+    # SECURE FIX: HTML escape parameter or use Jinja2 autoescaping
+    safe_query = escape(query)
+    return render_template('results.html', query=safe_query)`
+      },
+      {
+        id: "CSRF-003",
+        title: "Missing Anti-CSRF Token on Password Reset",
+        category: "CSRF",
+        severity: "HIGH",
+        cvss: 7.5,
+        endpoint: "/user/password/update",
+        cve: "CVE-2023-9011",
+        payload: "POST /user/password/update HTTP/1.1 (No SameSite or CSRF Header)",
+        description: "State-changing POST endpoint lacks cryptographic SameSite attribute and CSRF nonce token, exposing users to cross-site request forgery attacks.",
+        remediation: `# Python Django CSRF Protection Fix
+from django.views.decorators.csrf import csrf_protect
+
+@csrf_protect
+def update_password(request):
+    # SECURE FIX: Validate request.META['HTTP_X_CSRFTOKEN']
+    pass`
+      },
+      {
+        id: "SSL-004",
+        title: "Weak SSL/TLS Cipher Suites (TLS 1.0 / 1.1 Supported)",
+        category: "SSL/TLS",
+        severity: "MEDIUM",
+        cvss: 5.9,
+        endpoint: "https://target-app.com:443",
+        cve: "CVE-2022-4091",
+        payload: "Cipher: TLS_RSA_WITH_3DES_EDE_CBC_SHA",
+        description: "Server supports legacy TLS 1.0 and 1.1 protocols along with weak 3DES ciphers susceptible to SWEET32 attacks.",
+        remediation: `# Nginx Secure TLS Cipher Config Fix
+ssl_protocols TLSv1.2 TLSv1.3;
+ssl_ciphers ECDHE-ECDSA-AES128-GCM-SHA256:ECDHE-RSA-AES128-GCM-SHA256:ECDHE-ECDSA-AES256-GCM-SHA384;
+ssl_prefer_server_ciphers off;`
+      },
+      {
+        id: "PORT-005",
+        title: "Exposed Unauthenticated Redis Port 6379",
+        category: "Open Ports",
+        severity: "CRITICAL",
+        cvss: 9.1,
+        endpoint: "TCP Port 6379 (Open)",
+        cve: "CVE-2023-3388",
+        payload: "redis-cli -h target-app.com INFO",
+        description: "In-memory database Redis port 6379 is publicly reachable without authentication enabled, allowing remote code execution via cron modification.",
+        remediation: `# Linux UFW Firewall Rules Fix
+sudo ufw deny 6379/tcp
+# Redis Config Fix (/etc/redis/redis.conf)
+bind 127.0.0.1
+requirepass "SuperSecretQuantumPass123!"`
+      },
+      {
+        id: "HEAD-006",
+        title: "Missing Security Response Headers (HSTS & CSP)",
+        category: "Header Misconfig",
+        severity: "LOW",
+        cvss: 3.7,
+        endpoint: "HTTP Response Headers",
+        cve: "N/A",
+        payload: "Header Check: Strict-Transport-Security Missing",
+        description: "HTTP response headers lack HTTP Strict Transport Security (HSTS) and Content-Security-Policy (CSP) directives.",
+        remediation: `# Python Fast-API Middleware Header Fix
+@app.middleware("http")
+async def add_security_headers(request, call_next):
+    response = await call_next(request)
+    response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
+    response.headers["Content-Security-Policy"] = "default-src 'self'"
+    return response`
+      }
+    ];
+
+    /* ===================================================================
+       APPLICATION STATE VARIABLES
+       =================================================================== */
+    let isScanning = false;
+    let scanInterval = null;
+    let currentFindings = [];
+    let activeFilter = 'all';
+
+    let isAudioEnabled = true;
+    let isVoiceEnabled = true;
+    let audioCtx = null;
+
+    // Radar canvas state
+    let radarAngle = 0;
+    let radarTargets = [];
+
+    // Matrix canvas state
+    let matrixCols = [];
+
+    /* ===================================================================
+       INITIALIZATION
+       =================================================================== */
+    window.addEventListener('DOMContentLoaded', () => {
+      initRadarCanvas();
+      initMatrixCanvas();
+      animateVisualizers();
+      logTerminal("System initialized. Ready for web security assessment.", "cyan");
+    });
+
+    /* ===================================================================
+       AUDIO & SPEECH SYNTHESIS ENGINE (WEB AUDIO API + WEB SPEECH API)
+       =================================================================== */
+    function initAudioContext() {
+      if (!audioCtx) {
+        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+        audioCtx = new AudioContextClass();
+      }
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+    }
+
+    function toggleAudioSystem() {
+      isAudioEnabled = !isAudioEnabled;
+      const icon = document.getElementById('soundIcon');
+      const text = document.getElementById('soundStatusText');
+
+      if (isAudioEnabled) {
+        icon.className = 'fa-solid fa-volume-high text-neonCyan';
+        text.innerText = 'AUDIO: ON';
+        playBeep(800, 0.08, 'sine');
+      } else {
+        icon.className = 'fa-solid fa-volume-xmark text-slate-400';
+        text.innerText = 'AUDIO: OFF';
+      }
+    }
+
+    function toggleVoiceAnnouncements() {
+      isVoiceEnabled = !isVoiceEnabled;
+      const icon = document.getElementById('voiceIcon');
+      const text = document.getElementById('voiceStatusText');
+
+      if (isVoiceEnabled) {
+        icon.className = 'fa-solid fa-comment-dots text-purple-400';
+        text.innerText = 'VOICE: ON';
+        speakText("Voice engine active.");
+      } else {
+        icon.className = 'fa-solid fa-comment-slash text-slate-400';
+        text.innerText = 'VOICE: OFF';
+        if (window.speechSynthesis) window.speechSynthesis.cancel();
+      }
+    }
+
+    function playBeep(freq = 600, duration = 0.08, type = 'sine') {
+      if (!isAudioEnabled) return;
+      initAudioContext();
+      try {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+
+        gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        osc.start();
+        osc.stop(audioCtx.currentTime + duration);
+      } catch (e) {}
+    }
+
+    function playAlarmSound() {
+      if (!isAudioEnabled) return;
+      initAudioContext();
+      try {
+        const now = audioCtx.currentTime;
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(900, now);
+        osc.frequency.exponentialRampToValueAtTime(400, now + 0.25);
+
+        gain.gain.setValueAtTime(0.12, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
+
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+
+        osc.start(now);
+        osc.stop(now + 0.25);
+      } catch (e) {}
+    }
+
+    function playCompletionChime() {
+      if (!isAudioEnabled) return;
+      initAudioContext();
+      try {
+        const now = audioCtx.currentTime;
+        [523.25, 659.25, 783.99, 1046.50].forEach((freq, i) => {
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(freq, now + i * 0.08);
+
+          gain.gain.setValueAtTime(0.1, now + i * 0.08);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.08 + 0.3);
+
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+
+          osc.start(now + i * 0.08);
+          osc.stop(now + i * 0.08 + 0.3);
+        });
+      } catch (e) {}
+    }
+
+    function speakText(text) {
+      if (!isVoiceEnabled || !('speechSynthesis' in window)) return;
+      try {
+        window.speechSynthesis.cancel();
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.rate = 1.05;
+        utterance.pitch = 1.0;
+        window.speechSynthesis.speak(utterance);
+      } catch (e) {}
+    }
+
+    function triggerMzLogoPulse() {
+      playCompletionChime();
+      speakText("MZ Security Vulnerability Scanner. Core operational.");
+    }
+
+    /* ===================================================================
+       SCAN CONTROL LOGIC
+       =================================================================== */
+    function setSampleTarget(url) {
+      playBeep(700, 0.05, 'sine');
+      document.getElementById('targetUrlInput').value = url;
+      logTerminal(`Sample target updated: ${url}`, "yellow");
+    }
+
+    function startVulnerabilityScan() {
+      const urlInput = document.getElementById('targetUrlInput').value.trim();
+      if (!urlInput) {
+        logTerminal("[!] Error: Please specify a valid target URL.", "red");
+        return;
+      }
+
+      if (isScanning) return;
+
+      isScanning = true;
+      currentFindings = [];
+      updateFindingsUI();
+      updateGaugeUI();
+
+      document.getElementById('startScanBtn').disabled = true;
+      document.getElementById('startScanBtn').classList.add('opacity-50');
+      document.getElementById('stopScanBtn').disabled = false;
+      document.getElementById('radarStatusTag').innerText = "SCANNING";
+      document.getElementById('radarStatusTag').className = "text-[10px] font-mono px-2 py-0.5 rounded bg-red-950 text-red-400 border border-red-800 animate-pulse";
+      document.getElementById('systemStatusText').innerText = "SCAN IN PROGRESS";
+      document.getElementById('statusPingDot').className = "w-2.5 h-2.5 rounded-full bg-red-500 animate-ping";
+
+      playBeep(900, 0.1, 'sine');
+      speakText(`Initiating automated web security scan on target ${urlInput.replace('https://', '').replace('http://', '')}`);
+
+      logTerminal(`[+] Target URL: ${urlInput}`, "cyan");
+      logTerminal(`[+] Loading Python scanner modules...`, "slate");
+      logTerminal(`[+] Phase 1: DNS & Port Discovery...`, "yellow");
+
+      // Generate random radar threat points
+      radarTargets = Array.from({ length: 6 }, () => ({
+        x: Math.random() * 200 + 30,
+        y: Math.random() * 200 + 30,
+        detected: false,
+        severity: ['CRITICAL', 'HIGH', 'MEDIUM', 'LOW'][Math.floor(Math.random() * 4)]
+      }));
+
+      let index = 0;
+      scanInterval = setInterval(() => {
+        if (!isScanning) return;
+
+        if (index < vulnSignatures.length) {
+          const finding = vulnSignatures[index];
+          currentFindings.push(finding);
+          updateFindingsUI();
+          updateGaugeUI();
+
+          // Terminal & Audio alerts
+          logTerminal(`[!] THREAT DETECTED: [${finding.severity}] ${finding.title}`, finding.severity === 'CRITICAL' ? 'red' : finding.severity === 'HIGH' ? 'orange' : 'yellow');
+          document.getElementById('currentPayloadText').innerText = finding.payload;
+
+          if (finding.severity === 'CRITICAL' || finding.severity === 'HIGH') {
+            playAlarmSound();
+            speakText(`Security threat identified: ${finding.category} with ${finding.severity} severity.`);
+          } else {
+            playBeep(750, 0.06, 'triangle');
+          }
+
+          index++;
+        } else {
+          stopVulnerabilityScan(true);
+        }
+      }, 2400);
+    }
+
+    function stopVulnerabilityScan(completed = false) {
+      if (!isScanning) return;
+
+      isScanning = false;
+      clearInterval(scanInterval);
+
+      document.getElementById('startScanBtn').disabled = false;
+      document.getElementById('startScanBtn').classList.remove('opacity-50');
+      document.getElementById('stopScanBtn').disabled = true;
+      document.getElementById('radarStatusTag').innerText = completed ? "FINISHED" : "ABORTED";
+      document.getElementById('radarStatusTag').className = "text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-800";
+      document.getElementById('systemStatusText').innerText = "ENGINE READY";
+      document.getElementById('statusPingDot').className = "w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping";
+      document.getElementById('requestsPerSecText').innerText = "0 Req/s";
+
+      if (completed) {
+        playCompletionChime();
+        speakText(`Security scan completed. Identified ${currentFindings.length} vulnerability findings.`);
+        logTerminal(`[+] Security scan complete. ${currentFindings.length} findings logged.`, "emerald");
+      } else {
+        playBeep(400, 0.1, 'square');
+        speakText("Security scan aborted by user.");
+        logTerminal(`[-] Security scan stopped by user operator.`, "red");
+      }
+    }
+
+    /* ===================================================================
+       UI RENDERERS (GAUGE, FINDINGS REPORT & FILTERS)
+       =================================================================== */
+    function updateGaugeUI() {
+      const cntCrit = currentFindings.filter(f => f.severity === 'CRITICAL').length;
+      const cntHigh = currentFindings.filter(f => f.severity === 'HIGH').length;
+      const cntMed = currentFindings.filter(f => f.severity === 'MEDIUM').length;
+      const cntLow = currentFindings.filter(f => f.severity === 'LOW').length;
+
+      document.getElementById('cntCritical').innerText = cntCrit;
+      document.getElementById('cntHigh').innerText = cntHigh;
+      document.getElementById('cntMedium').innerText = cntMed;
+      document.getElementById('cntLow').innerText = cntLow;
+
+      // Calculate score out of 100
+      let riskScore = (cntCrit * 30) + (cntHigh * 20) + (cntMed * 10) + (cntLow * 5);
+      if (riskScore > 100) riskScore = 100;
+
+      document.getElementById('riskScoreValue').innerText = riskScore;
+
+      const circle = document.getElementById('riskGaugeCircle');
+      const label = document.getElementById('riskScoreLabel');
+      const circumference = 2 * Math.PI * 42; // ~263.89
+      const offset = circumference - (riskScore / 100) * circumference;
+
+      circle.style.strokeDashoffset = offset;
+
+      if (riskScore >= 70) {
+        circle.setAttribute('stroke', '#ef4444');
+        label.innerText = 'CRITICAL RISK';
+        label.className = 'text-[10px] font-mono font-bold uppercase px-2 py-0.5 rounded bg-red-950 text-red-400 border border-red-800 mt-1 pulse-alarm';
+      } else if (riskScore >= 40) {
+        circle.setAttribute('stroke', '#f97316');
+        label.innerText = 'HIGH RISK';
+        label.className = 'text-[10px] font-mono font-bold uppercase px-2 py-0.5 rounded bg-orange-950 text-orange-400 border border-orange-800 mt-1';
+      } else if (riskScore > 0) {
+        circle.setAttribute('stroke', '#f59e0b');
+        label.innerText = 'MODERATE RISK';
+        label.className = 'text-[10px] font-mono font-bold uppercase px-2 py-0.5 rounded bg-amber-950 text-amber-400 border border-amber-800 mt-1';
+      } else {
+        circle.setAttribute('stroke', '#10b981');
+        label.innerText = 'LOW RISK';
+        label.className = 'text-[10px] font-mono font-bold uppercase px-2 py-0.5 rounded bg-emerald-950 text-emerald-400 border border-emerald-800 mt-1';
+      }
+    }
+
+    function filterFindings(sev) {
+      playBeep(600, 0.04, 'sine');
+      activeFilter = sev;
+
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+      const activeBtn = document.getElementById(`tab-${sev}`);
+      if (activeBtn) activeBtn.classList.add('active');
+
+      updateFindingsUI();
+    }
+
+    function updateFindingsUI() {
+      const container = document.getElementById('findingsContainer');
+      const emptyView = document.getElementById('emptyFindingsView');
+
+      document.getElementById('filterCountAll').innerText = currentFindings.length;
+
+      let filtered = currentFindings;
+      if (activeFilter !== 'all') {
+        filtered = currentFindings.filter(f => f.severity === activeFilter);
+      }
+
+      if (filtered.length === 0) {
+        container.innerHTML = '';
+        container.appendChild(emptyView);
+        emptyView.classList.remove('hidden');
+        return;
+      }
+
+      emptyView.classList.add('hidden');
+
+      container.innerHTML = filtered.map(f => {
+        const badgeColor = f.severity === 'CRITICAL' ? 'bg-red-950 border-red-500 text-red-400' :
+                           f.severity === 'HIGH' ? 'bg-orange-950 border-orange-500 text-orange-400' :
+                           f.severity === 'MEDIUM' ? 'bg-amber-950 border-amber-500 text-amber-400' :
+                           'bg-blue-950 border-blue-500 text-blue-400';
+
+        return `
+          <div class="p-3.5 rounded-xl bg-slate-900 border border-cyan-900/60 hover:border-cyan-400/80 transition space-y-2 font-mono text-xs">
+            <div class="flex items-start justify-between gap-2">
+              <div>
+                <span class="px-2 py-0.5 rounded border text-[10px] font-bold ${badgeColor} uppercase tracking-wider">
+                  ${f.severity} • CVSS ${f.cvss}
+                </span>
+                <span class="text-slate-400 text-[11px] ml-2 font-mono">${f.cve}</span>
+                <h4 class="font-orbitron font-bold text-white text-sm mt-1.5">${f.title}</h4>
+              </div>
+              
+              <button onclick="copyPayload('${encodeURIComponent(f.payload)}')" class="px-2 py-1 rounded bg-slate-950 border border-slate-800 text-slate-400 hover:text-cyan-300 transition text-[10px]" title="Copy Payload">
+                <i class="fa-solid fa-copy"></i> PoC
+              </button>
+            </div>
+
+            <div class="text-slate-300 text-xs font-sans leading-relaxed">
+              ${f.description}
+            </div>
+
+            <div class="p-2 rounded bg-slate-950 border border-slate-800/80 text-[11px]">
+              <span class="text-slate-500 font-mono block mb-1">PROOF OF CONCEPT (PoC) PAYLOAD:</span>
+              <code class="text-cyan-300 break-all font-mono">${f.payload}</code>
+            </div>
+
+            <details class="cursor-pointer group">
+              <summary class="text-cyan-400 text-xs font-bold hover:text-neonCyan flex items-center space-x-1 py-1">
+                <i class="fa-solid fa-code text-[11px]"></i>
+                <span>View Python Remediation Code</span>
+              </summary>
+              <div class="mt-2 p-2.5 rounded-lg bg-slate-950 border border-cyan-900/60 text-[11px]">
+                <pre class="text-emerald-300 font-mono overflow-x-auto">${f.remediation}</pre>
+              </div>
+            </details>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function copyPayload(encodedPayload) {
+      const text = decodeURIComponent(encodedPayload);
+      navigator.clipboard.writeText(text);
+      playBeep(800, 0.05, 'sine');
+      logTerminal(`[+] PoC payload copied to clipboard.`, "emerald");
+    }
+
+    /* ===================================================================
+       PYTHON CLI TERMINAL SIMULATION ENGINE
+       =================================================================== */
+    function logTerminal(msg, color = "slate") {
+      const body = document.getElementById('terminalBody');
+      const div = document.createElement('div');
+
+      const colorMap = {
+        cyan: "text-neonCyan font-bold",
+        red: "text-red-400 font-bold",
+        yellow: "text-amber-300",
+        emerald: "text-emerald-400 font-bold",
+        orange: "text-orange-400",
+        slate: "text-slate-300"
+      };
+
+      div.className = colorMap[color] || "text-slate-300";
+      div.innerText = msg;
+      body.appendChild(div);
+      body.scrollTop = body.scrollHeight;
+    }
+
+    function clearTerminalOutput() {
+      playBeep(500, 0.05, 'sine');
+      const body = document.getElementById('terminalBody');
+      body.innerHTML = `
+        <div class="text-cyan-400">[+] MZ Security Python Engine Console Cleared.</div>
+      `;
+    }
+
+    function handleTerminalCommand(e) {
+      e.preventDefault();
+      const input = document.getElementById('terminalInput');
+      const cmd = input.value.trim().toLowerCase();
+      if (!cmd) return;
+
+      playBeep(700, 0.04, 'square');
+      logTerminal(`$ mz-scanner > ${cmd}`, "cyan");
+      input.value = '';
+
+      if (cmd === 'help') {
+        logTerminal("Available CLI Commands:", "yellow");
+        logTerminal("  scan     - Trigger automated security audit", "slate");
+        logTerminal("  stop     - Abort running security scan", "slate");
+        logTerminal("  vulns    - Print active findings summary", "slate");
+        logTerminal("  clear    - Clear terminal screen", "slate");
+        logTerminal("  code     - View Python engine code snippet", "slate");
+        logTerminal("  about    - Display engine version & build info", "slate");
+      } else if (cmd === 'scan') {
+        startVulnerabilityScan();
+      } else if (cmd === 'stop') {
+        stopVulnerabilityScan();
+      } else if (cmd === 'clear') {
+        clearTerminalOutput();
+      } else if (cmd === 'vulns') {
+        logTerminal(`[+] Total Findings: ${currentFindings.length}`, "emerald");
+        currentFindings.forEach((f, i) => {
+          logTerminal(` ${i+1}. [${f.severity}] ${f.title}`, f.severity === 'CRITICAL' ? 'red' : 'yellow');
+        });
+      } else if (cmd === 'code') {
+        logTerminal("[+] Python Core Engine Code Snippet:", "yellow");
+        logTerminal("import requests, urllib.parse, re\nclass MZScanner:\n    def __init__(self, target):\n        self.target = target\n    def test_sqli(self):\n        payloads = [\"' OR '1'='1\", \"' UNION SELECT 1--\"]\n        # Active fuzzing engine executing...", "emerald");
+      } else if (cmd === 'about') {
+        logTerminal("MZ Security Automated Web Vulnerability Scanner", "cyan");
+        logTerminal("Build: v4.8-PYTHON-STABLE | CVSS v3.1 Engine | OWASP Top 10", "slate");
+      } else {
+        logTerminal(`[-] Unknown command '${cmd}'. Type 'help' for options.`, "red");
+      }
+    }
+
+    /* ===================================================================
+       CANVAS VISUALIZERS (RADAR & MATRIX PAYLOAD STREAM)
+       =================================================================== */
+    function initRadarCanvas() {
+      const canvas = document.getElementById('radarCanvas');
+      const ctx = canvas.getContext('2d');
+      // Set fixed dimensions
+      canvas.width = 260;
+      canvas.height = 260;
+    }
+
+    function initMatrixCanvas() {
+      const canvas = document.getElementById('matrixCanvas');
+      canvas.width = canvas.parentElement.clientWidth;
+      canvas.height = 220;
+
+      const cols = Math.floor(canvas.width / 14);
+      matrixCols = Array.from({ length: cols }, () => Math.floor(Math.random() * -20));
+    }
+
+    function animateVisualizers() {
+      drawRadar();
+      drawMatrix();
+      requestAnimationFrame(animateVisualizers);
+    }
+
+    function drawRadar() {
+      const canvas = document.getElementById('radarCanvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      const cx = canvas.width / 2;
+      const cy = canvas.height / 2;
+      const r = cx - 10;
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Radar Concentric Circles
+      ctx.strokeStyle = 'rgba(0, 242, 254, 0.2)';
+      ctx.lineWidth = 1;
+
+      [0.25, 0.5, 0.75, 1].forEach(factor => {
+        ctx.beginPath();
+        ctx.arc(cx, cy, r * factor, 0, Math.PI * 2);
+        ctx.stroke();
+      });
+
+      // Axis Lines
+      ctx.beginPath();
+      ctx.moveTo(cx - r, cy); ctx.lineTo(cx + r, cy);
+      ctx.moveTo(cx, cy - r); ctx.lineTo(cx, cy + r);
+      ctx.stroke();
+
+      // Rotating Sweep Beam
+      radarAngle += isScanning ? 0.04 : 0.015;
+      if (radarAngle > Math.PI * 2) radarAngle = 0;
+
+      ctx.save();
+      ctx.translate(cx, cy);
+      ctx.rotate(radarAngle);
+
+      const grad = ctx.createConicGradient(0, 0, 0);
+      grad.addColorStop(0, 'rgba(0, 242, 254, 0.4)');
+      grad.addColorStop(0.2, 'rgba(0, 242, 254, 0.0)');
+      grad.addColorStop(1, 'rgba(0, 242, 254, 0.0)');
+
+      ctx.fillStyle = grad;
+      ctx.beginPath();
+      ctx.arc(0, 0, r, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Line edge
+      ctx.strokeStyle = '#00f2fe';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(0, 0);
+      ctx.lineTo(r, 0);
+      ctx.stroke();
+
+      ctx.restore();
+
+      // Threat targets on radar
+      document.getElementById('radarNodesCount').innerText = isScanning ? radarTargets.length : 0;
+      document.getElementById('radarPingText').innerText = isScanning ? (Math.floor(Math.random() * 20) + 12) + " ms" : "-- ms";
+
+      if (isScanning) {
+        radarTargets.forEach(pt => {
+          ctx.beginPath();
+          ctx.arc(pt.x, pt.y, 4, 0, Math.PI * 2);
+          ctx.fillStyle = pt.severity === 'CRITICAL' ? '#ef4444' : '#f59e0b';
+          ctx.shadowColor = pt.severity === 'CRITICAL' ? '#ef4444' : '#f59e0b';
+          ctx.shadowBlur = 8;
+          ctx.fill();
+          ctx.shadowBlur = 0;
+        });
+      }
+    }
+
+    function drawMatrix() {
+      const canvas = document.getElementById('matrixCanvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+
+      ctx.fillStyle = 'rgba(3, 7, 18, 0.18)';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      ctx.fillStyle = '#00f2fe';
+      ctx.font = '11px monospace';
+
+      const chars = '01GETPOSTSELECTWHEREUNIONORSQLIXSSCSRF403200500';
+
+      matrixCols.forEach((y, i) => {
+        const char = chars[Math.floor(Math.random() * chars.length)];
+        const x = i * 14;
+
+        ctx.fillStyle = (i % 3 === 0) ? '#a855f7' : '#00f2fe';
+        ctx.fillText(char, x, y);
+
+        if (y > canvas.height + Math.random() * 50) {
+          matrixCols[i] = 0;
+        } else {
+          matrixCols[i] = y + 14;
+        }
+      });
+
+      if (isScanning) {
+        document.getElementById('requestsPerSecText').innerText = (Math.floor(Math.random() * 120) + 180) + " Req/s";
+      }
+    }
+
+    /* ===================================================================
+       EXPORT REPORT MODAL & FILE GENERATOR
+       =================================================================== */
+    function openExportModal() {
+      playBeep(700, 0.05, 'sine');
+      const modal = document.getElementById('exportModal');
+      const card = document.getElementById('exportModalCard');
+
+      const target = document.getElementById('targetUrlInput').value || 'https://juice-shop.mz-app.io';
+      document.getElementById('expModalTarget').innerText = target;
+      document.getElementById('expModalThreats').innerText = `${currentFindings.length} Vulnerabilities`;
+
+      modal.classList.remove('hidden');
+      setTimeout(() => {
+        modal.classList.remove('opacity-0');
+        card.classList.remove('scale-95');
+      }, 10);
+    }
+
+    function closeExportModal() {
+      playBeep(500, 0.05, 'sine');
+      const modal = document.getElementById('exportModal');
+      const card = document.getElementById('exportModalCard');
+
+      modal.classList.add('opacity-0');
+      card.classList.add('scale-95');
+      setTimeout(() => {
+        modal.classList.add('hidden');
+      }, 300);
+    }
+
+    function downloadReport(format) {
+      playBeep(800, 0.08, 'sine');
+      const target = document.getElementById('targetUrlInput').value;
+
+      const reportData = {
+        tool: "MZ Security Automated Web Vulnerability Scanner",
+        version: "4.8",
+        target: target,
+        timestamp: new Date().toISOString(),
+        findingsCount: currentFindings.length,
+        findings: currentFindings
+      };
+
+      if (format === 'json') {
+        const blob = new Blob([JSON.stringify(reportData, null, 2)], { type: 'application/json' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = `mz-security-audit-${Date.now()}.json`;
+        a.click();
+      } else if (format === 'html') {
+        const htmlContent = `
+          <!DOCTYPE html>
+          <html>
+          <head><title>MZ Security Report - ${target}</title></head>
+          <body style="font-family:sans-serif; background:#030712; color:#fff; padding:20px;">
+            <h1>MZ Security Vulnerability Report</h1>
+            <p>Target: ${target}</p>
+            <p>Total Findings: ${currentFindings.length}</p>
+            <hr/>
+            ${currentFindings.map(f => `
+              <div style="border:1px solid #00f2fe; margin-bottom:15px; padding:15px; background:#070f1e;">
+                <h2>[${f.severity}] ${f.title}</h2>
+                <p><strong>Endpoint:</strong> ${f.endpoint}</p>
+                <p><strong>CVE:</strong> ${f.cve} | <strong>CVSS:</strong> ${f.cvss}</p>
+                <p>${f.description}</p>
+                <code>PoC: ${f.payload}</code>
+              </div>
+            `).join('')}
+          </body>
+          </html>
+        `;
+        const blob = new Blob([htmlContent], { type: 'text/html' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = `mz-security-audit-${Date.now()}.html`;
+        a.click();
+      }
+
+      speakText("Security report exported successfully.");
+      logTerminal(`[+] Exported audit report in ${format.toUpperCase()} format.`, "emerald");
+    }
+
+    function copyReportText() {
+      const target = document.getElementById('targetUrlInput').value;
+      const text = `MZ SECURITY AUDIT REPORT\nTarget: ${target}\nTotal Threats: ${currentFindings.length}\nFindings:\n` +
+                   currentFindings.map(f => `- [${f.severity}] ${f.title} (${f.endpoint})`).join('\n');
+
+      navigator.clipboard.writeText(text);
+      playBeep(850, 0.05, 'sine');
+      logTerminal(`[+] Report summary copied to clipboard.`, "emerald");
+    }
+  </script>
+</body>
+</html>

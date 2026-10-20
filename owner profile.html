@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Owner Profile - Mr Zubair Khan</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            500: '#22c55e',
+                            600: '#16a34a',
+                            700: '#15803d',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    animation: {
+                        'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.04);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .light .glass-card {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.05);
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col justify-between selection:bg-brand-500 selection:text-white transition-colors duration-300">
+
+    <!-- Background Glow Elements -->
+    <div class="fixed inset-0 overflow-hidden pointer-events-none z-0">
+        <div class="absolute -top-40 -left-40 w-96 h-96 bg-blue-600/20 rounded-full blur-3xl animate-pulse-slow"></div>
+        <div class="absolute top-1/3 -right-40 w-96 h-96 bg-purple-600/20 rounded-full blur-3xl animate-pulse-slow"></div>
+        <div class="absolute -bottom-40 left-1/3 w-96 h-96 bg-pink-600/20 rounded-full blur-3xl animate-pulse-slow"></div>
+    </div>
+
+    <!-- Navigation Header -->
+    <header class="sticky top-0 z-50 backdrop-blur-lg border-b border-white/10 bg-slate-950/70 light:bg-white/70 transition-colors">
+        <div class="w-full max-w-[1600px] mx-auto px-4 sm:px-8 lg:px-12 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+                <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-blue-600 to-purple-600 flex items-center justify-center text-white font-bold text-lg shadow-lg shadow-purple-500/30">
+                    ZK
+                </div>
+                <span class="font-bold text-lg tracking-tight hover:opacity-80 transition">Zubair Khan<span class="text-brand-500">.</span></span>
+            </div>
+            
+            <div class="flex items-center gap-3">
+                <button id="themeToggleBtn" onclick="toggleTheme()" class="p-2.5 rounded-xl glass-card hover:bg-white/10 transition text-sm flex items-center gap-2 text-slate-300 light:text-slate-700">
+                    <i id="themeIcon" class="fa-solid fa-moon text-amber-400"></i>
+                    <span class="text-xs font-medium hidden sm:inline" id="themeText">Dark</span>
+                </button>
+                <a href="#contact" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-500 hover:to-purple-500 text-white font-medium text-xs sm:text-sm shadow-lg shadow-purple-500/25 transition duration-300 transform active:scale-95">
+                    Contact Now
+                </a>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="w-full px-4 sm:px-8 py-8 z-10 relative"></main>
+        <!-- Modern Hero Banner Section -->
+        <section class="relative overflow-hidden rounded-3xl border border-white/10 bg-gradient-to-r from-slate-900 via-purple-950/80 to-slate-900 shadow-2xl backdrop-blur-2xl mb-8">
+            <!-- Background Radial Lighting -->
+            <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-purple-600/20 via-indigo-600/10 to-transparent pointer-events-none"></div>
+            <div class="absolute -top-24 -left-24 w-72 h-72 bg-purple-500/30 rounded-full blur-3xl pointer-events-none"></div>
+            <div class="absolute -bottom-24 -right-24 w-72 h-72 bg-blue-500/20 rounded-full blur-3xl pointer-events-none"></div>
+
+            <!-- Banner Cover Top Bar -->
+            <div class="relative h-48 md:h-60 w-full bg-[radial-gradient(#ffffff15_1px,transparent_1px)] [background-size:16px_16px] flex justify-end p-6">
+                <span class="h-fit px-4 py-1.5 rounded-full text-xs font-semibold bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 backdrop-blur-md shadow-lg flex items-center gap-2">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                    Verified Business Owner
+                </span>
+            </div>
+
+            <!-- Profile Info Bar -->
+            <div class="relative px-6 md:px-10 pb-8 pt-0 flex flex-col md:flex-row items-center md:items-end justify-between gap-6 -mt-20 md:-mt-24">
+                
+                <!-- Profile Picture & Text Info -->
+                <div class="flex flex-col md:flex-row items-center md:items-end gap-6 text-center md:text-left">
+                    
+                    <!-- Badi Profile Pic Frame -->
+                    <div class="relative group">
+                        <div class="absolute -inset-1 bg-gradient-to-r from-purple-600 via-pink-600 to-blue-600 rounded-full blur opacity-75 group-hover:opacity-100 transition duration-500"></div>
+                        <div class="relative w-36 h-36 md:w-44 md:h-44 rounded-full p-1.5 bg-slate-900">
+                            <img src="my-pic.jpg" alt="Mr Zubair Khan" class="w-full h-full rounded-full object-cover object-top border-2 border-slate-800 shadow-2xl transition duration-300 group-hover:scale-105" onerror="this.onerror=null; this.src='https://placehold.co/400x400/1e293b/ffffff?text=Mr+Zubair+Khan';">
+                        </div>
+                        <div class="absolute bottom-2 right-2 w-6 h-6 rounded-full bg-emerald-500 border-4 border-slate-900 shadow-lg" title="Online & Active"></div>
+                    </div>
+
+                    <!-- Profile Info -->
+                    <div class="mb-2">
+                        <div class="flex items-center justify-center md:justify-start gap-2">
+                            <h1 class="text-3xl md:text-4xl font-extrabold text-white tracking-tight">Mr Zubair Khan</h1>
+                            <i class="fas fa-check-circle text-blue-500 text-xl" title="Verified Profile"></i>
+                        </div>
+                        <p class="text-purple-400 font-semibold text-sm md:text-base mt-1">BUSINESS OWNER & ENTREPRENEUR</p>
+                        <div class="flex items-center justify-center md:justify-start gap-4 text-xs text-slate-400 mt-2">
+                            <span class="flex items-center gap-1"><i class="fas fa-map-marker-alt text-purple-400"></i> Pakistan</span>
+                            <span>•</span>
+                            <span class="flex items-center gap-1"><i class="fas fa-briefcase text-purple-400"></i> Tech & Digital Ventures</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Action Buttons -->
+                <div class="flex items-center gap-3 w-full md:w-auto">
+                    <a href="https://wa.me/?text=Hello%20Mr%20Zubair%20Khan" target="_blank" class="flex-1 md:flex-initial px-6 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-medium text-sm flex items-center justify-center gap-2 shadow-lg shadow-emerald-900/30 transition-all duration-300 hover:-translate-y-0.5">
+                        <i class="fab fa-whatsapp text-lg"></i> WhatsApp
+                    </a>
+                    <a href="#contact" class="flex-1 md:flex-initial px-6 py-3 rounded-xl bg-slate-800/80 hover:bg-slate-700 border border-slate-700 text-white font-medium text-sm flex items-center justify-center gap-2 shadow-lg transition-all duration-300 hover:-translate-y-0.5">
+                        <i class="fas fa-envelope text-purple-400"></i> Message
+                    </a>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- Main Content Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+
+            <!-- Left Column (4 Cols) -->
+            <div class="lg:col-span-4 space-y-8">
+                
+                <!-- Quick Info Card -->
+                <div class="glass-card rounded-2xl p-6 sm:p-8 shadow-xl">
+                    <h3 class="text-lg font-bold text-white light:text-slate-900 mb-5 flex items-center gap-2 border-b border-white/10 light:border-slate-200 pb-3">
+                        <i class="fa-solid fa-user-gear text-purple-400"></i>
+                        Quick Info & Profile Details
+                    </h3>
+                    <ul class="space-y-4 text-sm">
+                        <li class="flex items-center justify-between pb-2 border-b border-white/5">
+                            <span class="text-slate-400 flex items-center gap-2"><i class="fa-solid fa-user text-slate-500"></i> Full Name</span>
+                            <span class="font-semibold text-slate-200 light:text-slate-800">Mr Zubair Khan</span>
+                        </li>
+                        <li class="flex items-center justify-between pb-2 border-b border-white/5">
+                            <span class="text-slate-400 flex items-center gap-2"><i class="fa-solid fa-crown text-amber-400"></i> Role</span>
+                            <span class="font-semibold text-purple-400">Page Owner / Founder</span>
+                        </li>
+                        <li class="flex items-center justify-between pb-2 border-b border-white/5">
+                            <span class="text-slate-400 flex items-center gap-2"><i class="fa-solid fa-lightbulb text-amber-500"></i> Focus</span>
+                            <span class="font-semibold text-slate-200 light:text-slate-800">Software & Web Solutions</span>
+                        </li>
+                        <li class="flex items-center justify-between pb-2 border-b border-white/5">
+                            <span class="text-slate-400 flex items-center gap-2"><i class="fa-solid fa-chart-line text-emerald-400"></i> Experience</span>
+                            <span class="font-semibold text-slate-200 light:text-slate-800">5+ Years Professional</span>
+                        </li>
+                        <li class="flex items-center justify-between">
+                            <span class="text-slate-400 flex items-center gap-2"><i class="fa-solid fa-signal text-blue-400"></i> Status</span>
+                            <span class="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                                <span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> Available for Business
+                            </span>
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Personal Message Card -->
+                <div class="glass-card rounded-2xl p-6 sm:p-8 shadow-xl bg-gradient-to-br from-purple-900/20 to-blue-900/20 border border-purple-500/20">
+                    <div class="flex items-start gap-4">
+                        <div class="p-3 bg-purple-500/20 text-purple-400 rounded-xl">
+                            <i class="fa-solid fa-quote-left text-2xl"></i>
+                        </div>
+                        <div>
+                            <h4 class="font-bold text-white light:text-slate-900 text-sm mb-1.5">Owner Message / خوش آمدید</h4>
+                            <p class="text-xs sm:text-sm text-slate-300 light:text-slate-600 leading-relaxed italic">
+                                "Welcome to my official profile page! Sub say pehle yahan aane ka shukriya. Main humesha quality output or successful partnerships per focus karta hoon. Feel free to connect for any projects or business inquiries."
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Languages Spoken -->
+                <div class="glass-card rounded-2xl p-6 sm:p-8 shadow-xl">
+                    <h3 class="text-lg font-bold text-white light:text-slate-900 mb-4 flex items-center gap-2 border-b border-white/10 light:border-slate-200 pb-3">
+                        <i class="fa-solid fa-language text-blue-400"></i>
+                        Languages
+                    </h3>
+                    <div class="flex flex-wrap gap-2.5">
+                        <span class="px-3.5 py-2 rounded-xl bg-white/5 light:bg-slate-200 text-xs font-medium text-slate-300 light:text-slate-700 border border-white/10">English (Professional)</span>
+                        <span class="px-3.5 py-2 rounded-xl bg-white/5 light:bg-slate-200 text-xs font-medium text-slate-300 light:text-slate-700 border border-white/10">Urdu (Native)</span>
+                        <span class="px-3.5 py-2 rounded-xl bg-white/5 light:bg-slate-200 text-xs font-medium text-slate-300 light:text-slate-700 border border-white/10">Pashto (Native)</span>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Right Column (8 Cols) -->
+            <div class="lg:col-span-8 space-y-8">
+
+                <!-- About Me Section -->
+                <section class="glass-card rounded-2xl p-6 sm:p-8 shadow-xl">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="p-3 rounded-xl bg-blue-500/10 text-blue-400">
+                            <i class="fa-solid fa-user-tie text-2xl"></i>
+                        </div>
+                        <div>
+                            <h2 class="text-xl sm:text-2xl font-bold text-white light:text-slate-900">About Me</h2>
+                            <p class="text-xs sm:text-sm text-slate-400 light:text-slate-500">Who is Mr Zubair Khan?</p>
+                        </div>
+                    </div>
+                    <p class="text-slate-300 light:text-slate-600 text-sm sm:text-base leading-relaxed mb-4">
+                        Hello! I am <strong class="text-white light:text-slate-900">Mr Zubair Khan</strong>, a dedicated Business Owner, Digital Creator, and Strategic Thinker. Passionate about software innovation, modern web technology, and impactful digital strategies.
+                    </p>
+                    <p class="text-slate-300 light:text-slate-600 text-sm sm:text-base leading-relaxed">
+                        Mera maqsad humesha innovative ideas ko reality me badalna hai. With strong experience in web architecture, software systems, and modern digital development, I strive to build sustainable business value and long-term professional relationships.
+                    </p>
+                </section>
+
+                <!-- Technical Expertise & Skills Section -->
+                <section class="glass-card rounded-2xl p-6 sm:p-8 shadow-xl">
+                    <div class="flex items-center gap-3 mb-6">
+                        <div class="w-10 h-10 rounded-xl bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-400">
+                            <i class="fas fa-code text-lg"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold text-white light:text-slate-900">Technical Expertise & Skills</h3>
+                            <p class="text-xs text-slate-400 light:text-slate-500">Modern Software Engineering & Web Architecture</p>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- Card 1: Web Development -->
+                        <div class="p-4 rounded-xl bg-slate-800/40 border border-slate-700/50 hover:border-purple-500/40 transition-all duration-300">
+                            <div class="flex items-center gap-3 mb-2">
+                                <div class="w-8 h-8 rounded-lg bg-blue-500/10 text-blue-400 flex items-center justify-center">
+                                    <i class="fas fa-globe text-sm"></i>
+                                </div>
+                                <h4 class="font-semibold text-white light:text-slate-900">Full-Stack Web Development</h4>
+                            </div>
+                            <p class="text-xs text-slate-400 leading-relaxed">Custom, fast, and responsive websites built using modern frameworks, clean code architecture, and high performance standards.</p>
+                        </div>
+
+                        <!-- Card 2: Software Engineering -->
+                        <div class="p-4 rounded-xl bg-slate-800/40 border border-slate-700/50 hover:border-purple-500/40 transition-all duration-300">
+                            <div class="flex items-center gap-3 mb-2">
+                                <div class="w-8 h-8 rounded-lg bg-indigo-500/10 text-indigo-400 flex items-center justify-center">
+                                    <i class="fas fa-laptop-code text-sm"></i>
+                                </div>
+                                <h4 class="font-semibold text-white light:text-slate-900">Custom Software Solutions</h4>
+                            </div>
+                            <p class="text-xs text-slate-400 leading-relaxed">Scalable software systems, tailored management tools, and automated digital workflows engineered for business growth.</p>
+                        </div>
+
+                        <!-- Card 3: UI/UX & Web Aesthetics -->
+                        <div class="p-4 rounded-xl bg-slate-800/40 border border-slate-700/50 hover:border-purple-500/40 transition-all duration-300">
+                            <div class="flex items-center gap-3 mb-2">
+                                <div class="w-8 h-8 rounded-lg bg-pink-500/10 text-pink-400 flex items-center justify-center">
+                                    <i class="fas fa-paint-brush text-sm"></i>
+                                </div>
+                                <h4 class="font-semibold text-white light:text-slate-900">UI/UX & Web Aesthetics</h4>
+                            </div>
+                            <p class="text-xs text-slate-400 leading-relaxed">Crafting visually stunning glassmorphism interfaces, smooth animations, and intuitive user experiences across devices.</p>
+                        </div>
+
+                        <!-- Card 4: Web Security & Optimization -->
+                        <div class="p-4 rounded-xl bg-slate-800/40 border border-slate-700/50 hover:border-purple-500/40 transition-all duration-300">
+                            <div class="flex items-center gap-3 mb-2">
+                                <div class="w-8 h-8 rounded-lg bg-emerald-500/10 text-emerald-400 flex items-center justify-center">
+                                    <i class="fas fa-shield-alt text-sm"></i>
+                                </div>
+                                <h4 class="font-semibold text-white light:text-slate-900">API Integration & Cloud Systems</h4>
+                            </div>
+                            <p class="text-xs text-slate-400 leading-relaxed">Seamless third-party API connectivity, database setup, cloud hosting management, and enhanced web security protocols.</p>
+                        </div>
+                    </div>
+                </section>
+
+               <!-- Interactive Contact & Social Media Section -->
+<section id="contact" class="glass-card rounded-2xl p-6 sm:p-8 shadow-xl">
+    <div class="flex items-center gap-3 mb-6">
+        <div class="p-3 rounded-xl bg-pink-500/10 text-pink-400">
+            <i class="fa-solid fa-paper-plane text-2xl"></i>
+        </div>
+        <div>
+            <h2 class="text-xl sm:text-2xl font-bold text-white light:text-slate-900">Get In Touch</h2>
+            <p class="text-xs sm:text-sm text-slate-400 light:text-slate-500">Connect with Mr Zubair Khan directly</p>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-5 mb-6">
+      <!-- Direct Gmail Compose Link -->
+<a href="https://mail.google.com/mail/?view=cm&fs=1&to=m.zubairkhan0314@gmail.com" target="_blank" class="flex items-center gap-4 p-4 rounded-xl bg-white/5 light:bg-slate-100 border border-white/5 hover:border-blue-500/50 hover:bg-white/10 transition-all duration-300 group">
+    <div class="w-12 h-12 rounded-xl bg-blue-500/20 text-blue-400 group-hover:scale-110 transition duration-300 flex items-center justify-center text-xl">
+        <i class="fa-solid fa-envelope"></i>
+    </div>
+    <div class="overflow-hidden">
+        <p class="text-xs text-slate-400 light:text-slate-500 font-medium">Official Email</p>
+        <span class="text-sm font-semibold text-slate-200 light:text-slate-800 group-hover:text-blue-400 transition truncate block">
+            m.zubairkhan0314@gmail.com
+        </span>
+    </div>
+</a>
+        <!-- Direct Phone/WhatsApp Card (Clickable) -->
+        <a href="https://wa.me/923000000000?text=Hello%20Mr%20Zubair%20Khan" target="_blank" class="flex items-center gap-4 p-4 rounded-xl bg-white/5 light:bg-slate-100 border border-white/5 hover:border-emerald-500/50 hover:bg-white/10 transition-all duration-300 group">
+            <div class="w-12 h-12 rounded-xl bg-emerald-500/20 text-emerald-400 group-hover:scale-110 transition duration-300 flex items-center justify-center text-xl">
+                <i class="fa-brands fa-whatsapp"></i>
+            </div>
+            <div>
+                <p class="text-xs text-slate-400 light:text-slate-500 font-medium">Phone / WhatsApp</p>
+                <span class="text-sm font-semibold text-slate-200 light:text-slate-800 group-hover:text-emerald-400 transition">
+                    +92 314 7357078
+                </span>
+            </div>
+        </a>
+    </div>
+
+    <!-- Social Media Links (Clickable Buttons) -->
+    <p class="text-xs font-semibold text-slate-400 light:text-slate-600 mb-3 uppercase tracking-wider">Follow & Connect On Social Media</p>
+    <div class="flex flex-wrap gap-3">
+        <!-- Facebook -->
+        <a href="https://facebook.com/your-profile" target="_blank" class="flex-1 min-w-[140px] py-3 px-4 rounded-xl bg-slate-900/60 light:bg-slate-200 hover:bg-blue-600 hover:text-white border border-white/10 text-slate-300 light:text-slate-700 text-xs font-semibold flex items-center justify-center gap-2 transition duration-300 hover:scale-105">
+            <i class="fa-brands fa-facebook text-lg text-blue-500"></i> Facebook
+        </a>
+        
+        <!-- Instagram -->
+        <a href="https://instagram.com/your-profile" target="_blank" class="flex-1 min-w-[140px] py-3 px-4 rounded-xl bg-slate-900/60 light:bg-slate-200 hover:bg-pink-600 hover:text-white border border-white/10 text-slate-300 light:text-slate-700 text-xs font-semibold flex items-center justify-center gap-2 transition duration-300 hover:scale-105">
+            <i class="fa-brands fa-instagram text-lg text-pink-500"></i> Instagram
+        </a>
+
+        <!-- Twitter / X -->
+        <a href="https://twitter.com/your-profile" target="_blank" class="flex-1 min-w-[140px] py-3 px-4 rounded-xl bg-slate-900/60 light:bg-slate-200 hover:bg-sky-500 hover:text-white border border-white/10 text-slate-300 light:text-slate-700 text-xs font-semibold flex items-center justify-center gap-2 transition duration-300 hover:scale-105">
+            <i class="fa-brands fa-x-twitter text-lg text-sky-400"></i> Twitter / X
+        </a>
+
+        <!-- LinkedIn -->
+        <a href="https://linkedin.com/in/your-profile" target="_blank" class="flex-1 min-w-[140px] py-3 px-4 rounded-xl bg-slate-900/60 light:bg-slate-200 hover:bg-blue-700 hover:text-white border border-white/10 text-slate-300 light:text-slate-700 text-xs font-semibold flex items-center justify-center gap-2 transition duration-300 hover:scale-105">
+            <i class="fa-brands fa-linkedin-in text-lg text-blue-400"></i> LinkedIn
+        </a>
+    </div>
+</section>
+
+                   
+
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="relative z-10 border-t border-white/10 light:border-slate-200 bg-slate-950/80 light:bg-white/80 py-6 mt-12 transition-colors">
+        <div class="w-full max-w-[1600px] mx-auto px-4 sm:px-8 lg:px-12 text-center sm:flex sm:items-center sm:justify-between text-xs sm:text-sm text-slate-500 light:text-slate-600">
+            <p>&copy; 2026 Mr Zubair Khan. All rights reserved.</p>
+            <p class="mt-2 sm:mt-0 flex items-center justify-center gap-1">
+                Designed with <i class="fa-solid fa-heart text-rose-500"></i> for Page Owner Profile
+            </p>
+        </div>
+    </footer>
+
+    <!-- Theme Switcher JavaScript Logic -->
+    <script>
+        function toggleTheme() {
+            const html = document.documentElement;
+            const themeIcon = document.getElementById('themeIcon');
+            const themeText = document.getElementById('themeText');
+
+            if (html.classList.contains('dark')) {
+                html.classList.remove('dark');
+                html.classList.add('light');
+                themeIcon.className = 'fa-solid fa-sun text-amber-500';
+                themeText.textContent = 'Light';
+            } else {
+                html.classList.remove('light');
+                html.classList.add('dark');
+                themeIcon.className = 'fa-solid fa-moon text-amber-400';
+                themeText.textContent = 'Dark';
+            }
+        }
+    </script>
+
+</body>
+</html>

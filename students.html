@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MZ Academy - Holographic Active Students Portal</title>
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        cyberDark: '#070a12',
+                        cyberNavy: '#0c1222',
+                        cyberCard: 'rgba(15, 23, 42, 0.75)',
+                        cyberBorder: 'rgba(0, 246, 255, 0.25)',
+                        cyberCyan: '#00f6ff',
+                        cyberPurple: '#a855f7',
+                        cyberGreen: '#10b981',
+                        cyberBlue: '#3b82f6'
+                    },
+                    boxShadow: {
+                        cyberGlow: '0 0 20px rgba(0, 246, 255, 0.35)',
+                        neonBorder: '0 0 10px rgba(0, 246, 255, 0.4), inset 0 0 15px rgba(0, 246, 255, 0.1)',
+                        purpleGlow: '0 0 20px rgba(168, 85, 247, 0.35)',
+                        cardDepth: '0 20px 50px rgba(0, 0, 0, 0.8), 0 0 20px rgba(0, 246, 255, 0.1)'
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap');
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #070a12;
+            color: #f1f5f9;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .font-orbitron {
+            font-family: 'Orbitron', sans-serif;
+        }
+
+        /* Cyberpunk Grid Overlay Background */
+        .cyber-grid-bg {
+            background-image: 
+                linear-gradient(to right, rgba(0, 246, 255, 0.05) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(0, 246, 255, 0.05) 1px, transparent 1px);
+            background-size: 30px 30px;
+        }
+
+        /* Glassmorphism Panel */
+        .glass-panel {
+            background: rgba(12, 18, 34, 0.65);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(0, 246, 255, 0.2);
+        }
+
+        .glass-panel:hover {
+            border-color: rgba(0, 246, 255, 0.5);
+            box-shadow: 0 0 25px rgba(0, 246, 255, 0.25);
+        }
+
+        /* Neon Glow Effects */
+        .neon-text-cyan {
+            color: #00f6ff;
+            text-shadow: 0 0 12px rgba(0, 246, 255, 0.7), 0 0 25px rgba(0, 246, 255, 0.4);
+        }
+
+        .neon-text-purple {
+            color: #c084fc;
+            text-shadow: 0 0 12px rgba(168, 85, 247, 0.7), 0 0 25px rgba(168, 85, 247, 0.4);
+        }
+
+        /* Animated Holographic Scanline */
+        .scanline {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, rgba(0, 246, 255, 0.8), transparent);
+            animation: scan 4s linear infinite;
+            pointer-events: none;
+            opacity: 0.6;
+        }
+
+        @keyframes scan {
+            0% { top: 0%; }
+            100% { top: 100%; }
+        }
+
+        /* Pulse Dot Animation */
+        .online-ping {
+            position: relative;
+        }
+        .online-ping::after {
+            content: '';
+            position: absolute;
+            width: 800px;
+            height: 100%;
+            top: 0;
+            left: 0;
+            border-radius: 50%;
+            background-color: #10b981;
+            animation: ping 1.5s cubic-bezier(0, 0, 0.2, 1) infinite;
+            opacity: 0.75;
+        }
+
+        @keyframes ping {
+            75%, 100% {
+                transform: scale(2.2);
+                opacity: 0;
+            }
+        }
+
+        /* Custom Scrollbars */
+        ::-webkit-scrollbar {
+            width: 5px;
+            height: 5px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #070a12;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(0, 246, 255, 0.3);
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #00f6ff;
+        }
+    </style>
+</head>
+<body class="cyber-grid-bg relative flex flex-col justify-between p-4 md:p-8 antialiased selection:bg-cyberCyan selection:text-cyberDark">
+
+    <!-- Background Glowing Orbs -->
+    <div class="fixed top-10 left-10 w-96 h-96 bg-cyberCyan/10 rounded-full blur-[120px] pointer-events-none"></div>
+    <div class="fixed bottom-10 right-10 w-96 h-96 bg-cyberPurple/10 rounded-full blur-[120px] pointer-events-none"></div>
+
+    <!-- TOP HEADER / BRANDING NAVIGATION -->
+    <header class="max-w-7xl w-full mx-auto flex flex-col sm:flex-row items-center justify-between pb-6 mb-8 border-b border-cyberBorder/40 gap-4 z-10">
+        
+        <!-- MZ Cyber Logo & Platform Identity -->
+        <div class="flex items-center space-x-4">
+            <div class="relative group cursor-pointer">
+                <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-cyberNavy via-cyberDark to-[#0f172a] border border-cyberCyan/50 flex items-center justify-center shadow-cyberGlow transition-transform duration-300 group-hover:scale-105">
+                    <span class="font-orbitron text-2xl font-black tracking-wider neon-text-cyan">MZ</span>
+                </div>
+                <span class="absolute -bottom-1 -right-1 flex h-3 w-3">
+                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyberCyan opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-3 w-3 bg-cyberCyan"></span>
+                </span>
+            </div>
+            <div>
+                <div class="flex items-center gap-2">
+                    <h1 class="font-orbitron text-xl font-bold tracking-wide text-white">MZ ACADEMY</h1>
+                    <span class="bg-cyberCyan/15 text-cyberCyan text-[10px] font-orbitron px-2 py-0.5 rounded-full border border-cyberCyan/40 font-semibold tracking-wider">HOLO-NET v2.4</span>
+                </div>
+                <p class="text-xs text-slate-400">Next-Gen Interactive Digital Learning Portal</p>
+            </div>
+        </div>
+
+        <!-- Global Status Badges & Quick Stats -->
+        <div class="flex items-center space-x-3 sm:space-x-4">
+            <div class="glass-panel px-4 py-2 rounded-xl flex items-center space-x-3">
+                <div class="w-2.5 h-2.5 rounded-full bg-emerald-400 online-ping"></div>
+                <div>
+                    <div class="text-[10px] uppercase font-orbitron text-slate-400 tracking-wider">Server Node</div>
+                    <div class="text-xs font-bold text-emerald-400 font-mono">100% ONLINE (12ms)</div>
+                </div>
+            </div>
+
+            <div class="glass-panel px-4 py-2 rounded-xl flex items-center space-x-3">
+                <i class="fa-solid fa-earth-americas text-cyberCyan text-base"></i>
+                <div>
+                    <div class="text-[10px] uppercase font-orbitron text-slate-400 tracking-wider">Global Reach</div>
+                    <div class="text-xs font-bold text-white font-mono">54 COUNTRIES</div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN DASHBOARD CONTENT GRID -->
+   <main class="w-full px-4 sm:px-8 py-8 z-10 relative"></main>     
+        <!-- TOP SECTION: Futuristic Hero Active Student Display -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            
+            <!-- MAIN HERO DASHBOARD CARD: 5,000+ Active Students -->
+            <div class="lg:col-span-2 glass-panel rounded-3xl p-6 md:p-8 relative overflow-hidden flex flex-col justify-between shadow-cardDepth group transition-all duration-300">
+                
+                <!-- Scanline Animation effect -->
+                <div class="scanline"></div>
+
+                <!-- Top Card Info Bar -->
+                <div class="flex justify-between items-start z-10">
+                    <div>
+                        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyberCyan/10 border border-cyberCyan/30 text-cyberCyan text-xs font-orbitron font-semibold uppercase tracking-widest mb-3">
+                            <i class="fa-solid fa-satellite-dish text-xs animate-pulse"></i> Real-time Telemetry
+                        </div>
+                        <h2 class="text-slate-400 font-medium text-xs sm:text-sm tracking-widest uppercase">Verified Enrolled Learners</h2>
+                    </div>
+
+                    <div class="glass-panel px-3 py-1.5 rounded-xl text-xs text-slate-300 flex items-center gap-2 font-mono">
+                        <span class="w-2 h-2 rounded-full bg-cyberCyan animate-ping"></span>
+                        LIVE METRICS DATA
+                    </div>
+                </div>
+
+                <!-- Central Digital Counter Display -->
+                <div class="my-8 z-10 flex flex-col sm:flex-row sm:items-baseline gap-2 sm:gap-6">
+                    <div class="flex items-baseline">
+                        <span id="activeCounter" class="font-orbitron text-6xl sm:text-7xl font-black neon-text-cyan tracking-tight">
+                            0
+                        </span>
+                        <span class="font-orbitron text-5xl sm:text-6xl font-black neon-text-cyan">+</span>
+                    </div>
+
+                    <div class="space-y-1">
+                        <p class="font-orbitron text-lg font-bold text-white tracking-widest uppercase">ACTIVE STUDENTS</p>
+                        <p class="text-xs text-slate-400 flex items-center gap-1.5 font-mono">
+                            <i class="fa-solid fa-arrow-trend-up text-emerald-400"></i>
+                            <span class="text-emerald-400 font-semibold">+22.8%</span> peak engagement rate
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Live Practical Telemetry Bar -->
+                <div class="pt-6 border-t border-cyberBorder/40 z-10 flex flex-wrap items-center justify-between gap-4">
+                    <div class="flex items-center space-x-3">
+                        <div class="flex -space-x-2.5 overflow-hidden">
+                            <img class="inline-block h-9 w-9 rounded-full ring-2 ring-cyberDark object-cover" src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80" alt="Student">
+                            <img class="inline-block h-9 w-9 rounded-full ring-2 ring-cyberDark object-cover" src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=120&q=80" alt="Student">
+                            <img class="inline-block h-9 w-9 rounded-full ring-2 ring-cyberDark object-cover" src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=120&q=80" alt="Student">
+                            <img class="inline-block h-9 w-9 rounded-full ring-2 ring-cyberDark object-cover" src="https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=120&q=80" alt="Student">
+                        </div>
+                        <span class="text-xs text-slate-300 font-medium font-mono"><strong class="text-cyberCyan">2,840</strong> students active right now</span>
+                    </div>
+
+                    <button onclick="triggerHoloPulse()" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-cyberCyan to-cyberBlue text-cyberDark font-orbitron font-bold text-xs uppercase tracking-wider hover:shadow-cyberGlow transition-all duration-300 active:scale-95 flex items-center gap-2">
+                        <i class="fa-solid fa-bolt"></i> Refresh Matrix
+                    </button>
+                </div>
+            </div>
+
+            <!-- SECONDARY ANALYTICS CARD: Active Lab Breakdown -->
+            <div class="glass-panel rounded-3xl p-6 shadow-cardDepth flex flex-col justify-between space-y-4">
+                <div>
+                    <h3 class="font-orbitron text-sm font-bold text-white uppercase tracking-wider flex items-center justify-between mb-4 pb-3 border-b border-cyberBorder/30">
+                        <span>Active Learning Hubs</span>
+                        <i class="fa-solid fa-microchip text-cyberCyan"></i>
+                    </h3>
+
+                    <div class="space-y-3 font-mono">
+                        <div class="bg-cyberDark/80 p-3 rounded-2xl border border-cyberBorder/30 flex justify-between items-center hover:border-cyberCyan/50 transition">
+                            <div class="flex items-center gap-3">
+                                <div class="w-8 h-8 rounded-xl bg-blue-500/20 text-blue-400 flex items-center justify-center text-xs font-bold border border-blue-500/30">
+                                    <i class="fa-solid fa-code"></i>
+                                </div>
+                                <div>
+                                    <p class="text-xs font-sans text-slate-400">Web Dev & Frontend</p>
+                                    <p class="text-sm font-bold text-white">1,850 Active</p>
+                                </div>
+                            </div>
+                            <span class="text-[10px] bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded-full font-semibold border border-emerald-500/30">98% ONLINE</span>
+                        </div>
+
+                        <div class="bg-cyberDark/80 p-3 rounded-2xl border border-cyberBorder/30 flex justify-between items-center hover:border-cyberPurple/50 transition">
+                            <div class="flex items-center gap-3">
+                                <div class="w-8 h-8 rounded-xl bg-purple-500/20 text-purple-400 flex items-center justify-center text-xs font-bold border border-purple-500/30">
+                                    <i class="fa-solid fa-bezier-curve"></i>
+                                </div>
+                                <div>
+                                    <p class="text-xs font-sans text-slate-400">Graphic & UI/UX</p>
+                                    <p class="text-sm font-bold text-white">1,620 Active</p>
+                                </div>
+                            </div>
+                            <span class="text-[10px] bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded-full font-semibold border border-emerald-500/30">95% ONLINE</span>
+                        </div>
+
+                        <div class="bg-cyberDark/80 p-3 rounded-2xl border border-cyberBorder/30 flex justify-between items-center hover:border-cyberCyan/50 transition">
+                            <div class="flex items-center gap-3">
+                                <div class="w-8 h-8 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center text-xs font-bold border border-amber-500/30">
+                                    <i class="fa-solid fa-pen-nib"></i>
+                                </div>
+                                <div>
+                                    <p class="text-xs font-sans text-slate-400">CorelDRAW & Vector</p>
+                                    <p class="text-sm font-bold text-white">1,530 Active</p>
+                                </div>
+                            </div>
+                            <span class="text-[10px] bg-emerald-500/20 text-emerald-400 px-2 py-0.5 rounded-full font-semibold border border-emerald-500/30">92% ONLINE</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Server Bandwidth Meter -->
+                <div class="pt-3 border-t border-cyberBorder/30">
+                    <div class="flex justify-between text-xs text-slate-400 mb-1.5 font-mono">
+                        <span>Holo-Stream Load</span>
+                        <span class="text-cyberCyan font-bold">78% Capacity</span>
+                    </div>
+                    <div class="w-full bg-cyberDark rounded-full h-2 border border-cyberBorder/40 overflow-hidden">
+                        <div class="bg-gradient-to-r from-cyberCyan to-cyberPurple h-2 rounded-full shadow-cyberGlow transition-all duration-500" style="width: 78%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- MIDDLE SECTION: Interactive Chart & Live Feed Ticker -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            
+            <!-- Interactive Growth & Activity Chart (2 Columns) -->
+            <div class="lg:col-span-2 glass-panel rounded-3xl p-6 shadow-cardDepth">
+                <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-3">
+                    <div>
+                        <h3 class="font-orbitron text-base font-bold text-white flex items-center gap-2">
+                            <i class="fa-solid fa-chart-line text-cyberCyan"></i> Student Active Growth Trends
+                        </h3>
+                        <p class="text-xs text-slate-400">Interactive holographic timeline metrics</p>
+                    </div>
+
+                    <!-- Chart Toggle Filters -->
+                    <div class="flex items-center space-x-2 bg-cyberDark/80 p-1 rounded-xl border border-cyberBorder/40">
+                        <button onclick="changeChartScope('6m')" id="btn-6m" class="px-3 py-1 rounded-lg text-xs font-orbitron text-cyberDark bg-cyberCyan transition-all font-bold">6 MONTHS</button>
+                        <button onclick="changeChartScope('30d')" id="btn-30d" class="px-3 py-1 rounded-lg text-xs font-orbitron text-slate-400 hover:text-white transition-all">30 DAYS</button>
+                        <button onclick="changeChartScope('7d')" id="btn-7d" class="px-3 py-1 rounded-lg text-xs font-orbitron text-slate-400 hover:text-white transition-all">7 DAYS</button>
+                    </div>
+                </div>
+
+                <!-- Chart Canvas Container -->
+                <div class="relative w-full h-64 sm:h-72">
+                    <canvas id="growthChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Live Action Ticker Stream (1 Column) -->
+            <div class="glass-panel rounded-3xl p-6 shadow-cardDepth flex flex-col justify-between">
+                <div>
+                    <div class="flex justify-between items-center mb-4 pb-3 border-b border-cyberBorder/30">
+                        <h3 class="font-orbitron text-sm font-bold text-white flex items-center gap-2 uppercase tracking-wider">
+                            <i class="fa-solid fa-rss text-cyberCyan"></i> Live Activity Stream
+                        </h3>
+                        <span class="flex h-2.5 w-2.5 relative">
+                            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyberCyan opacity-75"></span>
+                            <span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-cyberCyan"></span>
+                        </span>
+                    </div>
+
+                    <!-- Scrolling Live Action List -->
+                    <div class="space-y-3 font-mono text-xs overflow-hidden h-60 relative" id="tickerContainer">
+                        <!-- Dynamic ticker items inserted via JavaScript -->
+                    </div>
+                </div>
+
+                <div class="pt-3 border-t border-cyberBorder/30 text-[11px] text-slate-400 flex items-center justify-between">
+                    <span>Stream status: <strong class="text-emerald-400">ACTIVE</strong></span>
+                    <span class="font-mono text-cyberCyan">Realtime Feed</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- BOTTOM SECTION: Filterable Active Student Directory Grid -->
+        <div class="glass-panel rounded-3xl p-6 shadow-cardDepth">
+            
+            <!-- Filter Bar & Section Header -->
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4 border-b border-cyberBorder/30 pb-4">
+                <div>
+                    <h3 class="font-orbitron text-base font-bold text-white flex items-center gap-2">
+                        <i class="fa-solid fa-users text-cyberCyan"></i> Active Digital Student Directory
+                    </h3>
+                    <p class="text-xs text-slate-400">Explore verified learners online across practical courses</p>
+                </div>
+
+                <!-- Category Filter Buttons -->
+                <div class="flex flex-wrap gap-2" id="filterGroup">
+                    <button onclick="filterStudents('all', this)" class="px-3.5 py-1.5 rounded-xl text-xs font-orbitron bg-cyberCyan text-cyberDark font-bold border border-cyberCyan transition shadow-cyberGlow">
+                        ALL COURSES
+                    </button>
+                    <button onclick="filterStudents('web', this)" class="px-3.5 py-1.5 rounded-xl text-xs font-orbitron bg-cyberDark/80 text-slate-300 hover:text-white border border-cyberBorder/40 hover:border-cyberCyan transition">
+                        WEB DEV
+                    </button>
+                    <button onclick="filterStudents('design', this)" class="px-3.5 py-1.5 rounded-xl text-xs font-orbitron bg-cyberDark/80 text-slate-300 hover:text-white border border-cyberBorder/40 hover:border-cyberCyan transition">
+                        UI/UX DESIGN
+                    </button>
+                    <button onclick="filterStudents('corel', this)" class="px-3.5 py-1.5 rounded-xl text-xs font-orbitron bg-cyberDark/80 text-slate-300 hover:text-white border border-cyberBorder/40 hover:border-cyberCyan transition">
+                        COREL DRAW
+                    </button>
+                </div>
+            </div>
+
+            <!-- Dynamic Active Student Cards Grid -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4" id="studentDirectoryGrid">
+                <!-- Cards render dynamically via JavaScript -->
+            </div>
+        </div>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="max-w-7xl w-full mx-auto mt-12 pt-6 border-t border-cyberBorder/30 flex flex-col sm:flex-row justify-between items-center text-xs text-slate-500 gap-4 z-10">
+        <div class="flex items-center gap-2 font-mono">
+            <span class="font-orbitron font-bold text-cyberCyan">MZ ACADEMY</span> © 2026. ALL RIGHTS RESERVED.
+        </div>
+        <div class="flex items-center space-x-6 font-mono text-[11px]">
+            <a href="#" class="hover:text-cyberCyan transition">SYSTEM STATUS</a>
+            <a href="#" class="hover:text-cyberCyan transition">SECURITY PROTOCOLS</a>
+            <a href="#" class="hover:text-cyberCyan transition">STUDENT VERIFIER</a>
+        </div>
+    </footer>
+
+    <!-- JAVASCRIPT CONTROLLER & INTERACTION ENGINE -->
+    <script>
+        // 1. DYNAMIC COUNTER ANIMATION FOR 5,000+ ACTIVE STUDENTS
+        function animateCounter(targetNumber, duration) {
+            const counterElement = document.getElementById('activeCounter');
+            let start = 0;
+            const increment = targetNumber / (duration / 16);
+            
+            const timer = setInterval(() => {
+                start += increment;
+                if (start >= targetNumber) {
+                    counterElement.innerText = "5,000";
+                    clearInterval(timer);
+                } else {
+                    counterElement.innerText = Math.floor(start).toLocaleString();
+                }
+            }, 16);
+        }
+
+        // 2. ACTIVE STUDENT DIRECTORY DATA
+        const studentData = [
+            { id: 1, name: "Ahmad Raza", category: "web", role: "Full Stack Lab", flag: "🇵🇰 PK", img: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=150&q=80", tag: "HTML/Tailwind" },
+            { id: 2, name: "Sara Malik", category: "design", role: "UI/UX Practical", flag: "🇦🇪 UAE", img: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=150&q=80", tag: "Figma Studio" },
+            { id: 3, name: "Usman Ali", category: "corel", role: "CorelDRAW Pro", flag: "🇬🇧 UK", img: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=150&q=80", tag: "Vector Art" },
+            { id: 4, name: "Zainab Fatima", category: "web", role: "Frontend Dev", flag: "🇸🇦 KSA", img: "https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=150&q=80", tag: "React Lab" },
+            { id: 5, name: "Hamza Tariq", category: "design", role: "Brand Specialist", flag: "🇨🇦 CA", img: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=150&q=80", tag: "Logo Design" },
+            { id: 6, name: "Bilal Hassan", category: "corel", role: "Graphic Lab", flag: "🇵🇰 PK", img: "https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?auto=format&fit=crop&w=150&q=80", tag: "Illustration" },
+            { id: 7, name: "Ayesha Khan", category: "web", role: "Python & Web", flag: "🇺🇸 US", img: "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?auto=format&fit=crop&w=150&q=80", tag: "Django/API" },
+            { id: 8, name: "Omar Farooq", category: "design", role: "UI Prototype", flag: "🇶🇦 QA", img: "https://images.unsplash.com/photo-1501196354995-cbb51c65aaea?auto=format&fit=crop&w=150&q=80", tag: "Design System" }
+        ];
+
+        // 3. RENDER STUDENT DIRECTORY CARDS
+        function renderDirectory(students) {
+            const container = document.getElementById('studentDirectoryGrid');
+            container.innerHTML = '';
+
+            students.forEach(s => {
+                const card = document.createElement('div');
+                card.className = "bg-cyberDark/80 p-4 rounded-2xl border border-cyberBorder/30 flex items-center space-x-3.5 hover:border-cyberCyan/60 transition-all duration-300 group cursor-pointer hover:shadow-cyberGlow";
+                card.innerHTML = `
+                    <div class="relative">
+                        <img src="${s.img}" class="w-12 h-12 rounded-xl object-cover border border-cyberBorder/50 group-hover:border-cyberCyan transition" alt="${s.name}">
+                        <span class="absolute -bottom-1 -right-1 w-3 h-3 rounded-full bg-emerald-400 border-2 border-cyberDark"></span>
+                    </div>
+                    <div class="flex-1 min-w-0 font-mono">
+                        <div class="flex justify-between items-center">
+                            <h4 class="text-xs font-bold text-white truncate group-hover:text-cyberCyan transition">${s.name}</h4>
+                            <span class="text-[10px] text-slate-400">${s.flag}</span>
+                        </div>
+                        <p class="text-[11px] text-slate-400 truncate font-sans">${s.role}</p>
+                        <span class="inline-block mt-1 text-[9px] bg-cyberCyan/10 text-cyberCyan border border-cyberCyan/20 px-1.5 py-0.5 rounded font-orbitron uppercase">${s.tag}</span>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        // 4. CATEGORY FILTER LOGIC
+        function filterStudents(category, btn) {
+            // Update button styles
+            const buttons = document.querySelectorAll('#filterGroup button');
+            buttons.forEach(b => {
+                b.className = "px-3.5 py-1.5 rounded-xl text-xs font-orbitron bg-cyberDark/80 text-slate-300 hover:text-white border border-cyberBorder/40 hover:border-cyberCyan transition";
+            });
+            btn.className = "px-3.5 py-1.5 rounded-xl text-xs font-orbitron bg-cyberCyan text-cyberDark font-bold border border-cyberCyan transition shadow-cyberGlow";
+
+            if (category === 'all') {
+                renderDirectory(studentData);
+            } else {
+                const filtered = studentData.filter(s => s.category === category);
+                renderDirectory(filtered);
+            }
+        }
+
+        // 5. REAL-TIME ACTIVITY TICKER STREAM
+        const activityFeed = [
+            { user: "Ahmad R.", action: "completed HTML5 & CSS3 Module", time: "2s ago" },
+            { user: "Sara M.", action: "submitted Figma Wireframe Project", time: "5s ago" },
+            { user: "Usman A.", action: "joined Live Mentorship Session", time: "12s ago" },
+            { user: "Zainab F.", action: "passed JavaScript Quiz (100%)", time: "18s ago" },
+            { user: "Hamza T.", action: "downloaded CorelDRAW Vector Pack", time: "24s ago" },
+            { user: "Bilal H.", action: "uploaded UI Portfolio Project", time: "30s ago" }
+        ];
+
+        function initTicker() {
+            const tickerContainer = document.getElementById('tickerContainer');
+            tickerContainer.innerHTML = '';
+
+            activityFeed.forEach(item => {
+                const row = document.createElement('div');
+                row.className = "bg-cyberDark/50 p-2.5 rounded-xl border border-cyberBorder/20 flex items-center justify-between text-slate-300 hover:border-cyberCyan/40 transition";
+                row.innerHTML = `
+                    <div class="flex items-center space-x-2 truncate">
+                        <span class="w-1.5 h-1.5 rounded-full bg-cyberCyan"></span>
+                        <span class="font-bold text-white">${item.user}</span>
+                        <span class="text-slate-400 truncate">${item.action}</span>
+                    </div>
+                    <span class="text-[10px] text-cyberCyan font-mono">${item.time}</span>
+                `;
+                tickerContainer.appendChild(row);
+            });
+        }
+
+        // 6. CHART.JS INTERACTIVE ANALYTICS INTEGRATION
+        let analyticsChart;
+        function initChart() {
+            const ctx = document.getElementById('growthChart').getContext('2d');
+            
+            const gradientCyan = ctx.createLinearGradient(0, 0, 0, 300);
+            gradientCyan.addColorStop(0, 'rgba(0, 246, 255, 0.4)');
+            gradientCyan.addColorStop(1, 'rgba(0, 246, 255, 0.0)');
+
+            analyticsChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct'],
+                    datasets: [{
+                        label: 'Active Students',
+                        data: [2100, 2900, 3600, 4200, 4700, 5000],
+                        borderColor: '#00f6ff',
+                        borderWidth: 3,
+                        fill: true,
+                        backgroundColor: gradientCyan,
+                        tension: 0.4,
+                        pointBackgroundColor: '#00f6ff',
+                        pointBorderColor: '#070a12',
+                        pointBorderWidth: 2,
+                        pointRadius: 6,
+                        pointHoverRadius: 9
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: '#0c1222',
+                            titleColor: '#00f6ff',
+                            bodyColor: '#fff',
+                            borderColor: 'rgba(0, 246, 255, 0.4)',
+                            borderWidth: 1,
+                            padding: 12,
+                            displayColors: false,
+                            callbacks: {
+                                label: function(context) {
+                                    return 'Active Students: ' + context.parsed.y.toLocaleString();
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: { color: 'rgba(0, 246, 255, 0.08)' },
+                            ticks: { color: '#94a3b8', font: { family: 'Orbitron', size: 10 } }
+                        },
+                        y: {
+                            grid: { color: 'rgba(0, 246, 255, 0.08)' },
+                            ticks: { color: '#94a3b8', font: { family: 'Plus Jakarta Sans', size: 10 } }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Change chart time scope
+        function changeChartScope(scope) {
+            const b6m = document.getElementById('btn-6m');
+            const b30d = document.getElementById('btn-30d');
+            const b7d = document.getElementById('btn-7d');
+
+            b6m.className = "px-3 py-1 rounded-lg text-xs font-orbitron text-slate-400 hover:text-white transition-all";
+            b30d.className = "px-3 py-1 rounded-lg text-xs font-orbitron text-slate-400 hover:text-white transition-all";
+            b7d.className = "px-3 py-1 rounded-lg text-xs font-orbitron text-slate-400 hover:text-white transition-all";
+
+            if(scope === '6m') {
+                b6m.className = "px-3 py-1 rounded-lg text-xs font-orbitron text-cyberDark bg-cyberCyan font-bold transition-all";
+                analyticsChart.data.labels = ['May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct'];
+                analyticsChart.data.datasets[0].data = [2100, 2900, 3600, 4200, 4700, 5000];
+            } else if(scope === '30d') {
+                b30d.className = "px-3 py-1 rounded-lg text-xs font-orbitron text-cyberDark bg-cyberCyan font-bold transition-all";
+                analyticsChart.data.labels = ['Week 1', 'Week 2', 'Week 3', 'Week 4'];
+                analyticsChart.data.datasets[0].data = [4600, 4750, 4890, 5000];
+            } else {
+                b7d.className = "px-3 py-1 rounded-lg text-xs font-orbitron text-cyberDark bg-cyberCyan font-bold transition-all";
+                analyticsChart.data.labels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+                analyticsChart.data.datasets[0].data = [4910, 4930, 4950, 4970, 4985, 4995, 5000];
+            }
+            analyticsChart.update();
+        }
+
+        function triggerHoloPulse() {
+            animateCounter(5000, 1000);
+        }
+
+        // PAGE INITIALIZATION ON LOAD
+        window.onload = function() {
+            animateCounter(5000, 2000);
+            renderDirectory(studentData);
+            initTicker();
+            initChart();
+        };
+    </script>
+</body>
+</html>

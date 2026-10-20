@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> MZ Introduction to Cybersecurity - Cyber Academy</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-deep: #070b14;
+            --panel-bg: #0c1322;
+            --border-color: #1a2744;
+            --neon-cyan: #00f2fe;
+            --neon-green: #10b981;
+            --text-main: #f8fafc;
+            --text-dim: #94a3b8;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', sans-serif; }
+        body { background-color: var(--bg-deep); color: var(--text-main); min-height: 100vh; padding-bottom: 50px; }
+        
+        nav { display: flex; justify-content: space-between; align-items: center; padding: 20px 60px; border-bottom: 1px solid var(--border-color); background: var(--panel-bg); }
+        .logo { font-size: 1.3rem; font-weight: bold; color: #fff; }
+        .logo span { color: var(--neon-cyan); }
+        .back-btn { background: transparent; border: 1px solid var(--neon-cyan); color: var(--neon-cyan); padding: 8px 18px; border-radius: 6px; text-decoration: none; font-size: 0.85rem; transition: 0.3s; }
+        .back-btn:hover { background: rgba(0,242,254,0.1); }
+
+        .container { max-width: 900px; margin: 40px auto; padding: 0 20px; }
+        .content-box { background: var(--panel-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 40px; }
+        .content-box h1 { color: #fff; font-size: 2.2rem; margin-bottom: 15px; }
+        .content-box h1 span { color: var(--neon-cyan); }
+        .badge { display: inline-block; background: rgba(0,242,254,0.1); color: var(--neon-cyan); padding: 5px 12px; border-radius: 4px; font-size: 0.8rem; font-weight: 600; margin-bottom: 20px; }
+        
+        .section-title { color: var(--neon-cyan); font-size: 1.3rem; margin: 25px 0 10px 0; border-left: 3px solid var(--neon-cyan); padding-left: 10px; }
+        .content-box p { color: var(--text-dim); font-size: 0.95rem; line-height: 1.7; margin-bottom: 15px; }
+        .content-list { margin: 10px 0 20px 20px; display: flex; flex-direction: column; gap: 8px; color: var(--text-dim); }
+        .content-list li { font-size: 0.95rem; line-height: 1.6; }
+        .content-list li strong { color: #fff; }
+        
+        .enroll-btn { display: inline-block; background: var(--neon-green); color: #000; padding: 12px 25px; border-radius: 6px; text-decoration: none; font-weight: bold; margin-top: 30px; transition: 0.3s; }
+        .enroll-btn:hover { opacity: 0.9; box-shadow: 0 0 15px rgba(16,185,129,0.4); }
+    </style>
+</head>
+<body>
+
+    <nav>
+        <div class="logo">MZ Cyber <span>Academy</span> // Detail View</div>
+        <a href="courses.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i> Back to Courses</a>
+    </nav>
+
+    <div class="container">
+        <div class="content-box">
+            <span class="badge">Beginner • 4 Weeks Program</span>
+            <h1>Introduction to <span>Cybersecurity</span></h1>
+
+            <h3 class="section-title">1. Cybersecurity Kya Hai?</h3>
+            <p>Cybersecurity mukhtalif technologies, processes, aur controls ka aik aisa majmua hai jo computers, servers, mobile devices, electronic systems, networks, aur data ko unauthorized access, attacks, aur damage se bachata hai. Aam alfaz mein, digital dunya mein apke data aur systems ki hifazat karne ka naam cybersecurity hai.</p>
+
+            <h3 class="section-title">2. Cybersecurity Kyon Zaroori Hai?</h3>
+            <ul class="content-list">
+                <li><strong>Data Privacy:</strong> Personal aur confidential information (jaise bank details, passwords) ko hackers se mehfooz rakhna.</li>
+                <li><strong>Business Continuity:</strong> Companies aur organizations ko cyber attacks (jaise ransomware) se bachana taaki unka kaam bina kisi rukawat ke chalta rahe.</li>
+                <li><strong>Financial Protection:</strong> Online fraud, money theft, aur data breaches se hone wale arbon rupon ke nuqsan se bachao.</li>
+                <li><strong>Trust & Reputation:</strong> Clients aur users ka bharosa qaim rakhna ke unka data safe haathon mein hai.</li>
+            </ul>
+
+            <h3 class="section-title">3. Cyber Attacks ki Buniyadi Aqsam</h3>
+            <ul class="content-list">
+                <li><strong>Malware:</strong> Aise malicious softwares (jaise viruses, trojans, aur spyware) jo system ko nuksan pohanchate hain.</li>
+                <li><strong>Phishing:</strong> Fake emails ya messages ke zariye users ko dhoka de kar unke passwords ya personal info chura lena.</li>
+                <li><strong>Man-in-the-Middle (MitM) Attack:</strong> Jab do logon ke darmiyan hone wali communication ke beech mein koi hacker chup kar data parh ya badal le.</li>
+                <li><strong>Denial-of-Service (DoS) Attack:</strong> Kisi website ya server par itna ziyada traffic bhej kar usay crash kar dena taaki woh offline ho jaye.</li>
+            </ul>
+
+            <h3 class="section-title">4. Cybersecurity ke Buniyadi Usool (CIA Triad)</h3>
+            <ul class="content-list">
+                <li><strong>Confidentiality (Razdari):</strong> Data sirf unhi logon tak mehdood rahe jo iske haqdar hain.</li>
+                <li><strong>Integrity (Durusti):</strong> Data mein koi unauthorized tabdili ya tamper na kar sake.</li>
+                <li><strong>Availability (Dastyabi):</strong> Authorized users ko zaroorat ke waqt data aur system hamesha barwaqt dastayab ho.</li>
+            </ul>
+
+            <h3 class="section-title">5. Defense & Prevention Techniques</h3>
+            <ul class="content-list">
+                <li><strong>Strong Passwords & MFA:</strong> Mazboot passwords ka istemal aur Multi-Factor Authentication (MFA) enable karna.</li>
+                <li><strong>Firewalls & Encryption:</strong> Network ki monitoring ke liye firewalls aur data ko secure banane ke liye advanced encryption algorithms ka istemal.</li>
+                <li><strong>Regular Updates:</strong> Operating systems aur softwares ko waqt par update karna taaki purani security weaknesses khatam ho sakein.</li>
+                <li><strong>Employee / User Training:</strong> Logon ko cyber threats aur phishing emails ki pehchan ke baray mein agahi dena.</li>
+            </ul>
+
+            <a href="#" class="enroll-btn" onclick="alert('Enrolled in Introduction to Cybersecurity successfully!'); return false;"><i class="fa-solid fa-check-circle"></i> Enroll in this Course Now</a>
+        </div>
+    </div>
+
+</body>
+</html>

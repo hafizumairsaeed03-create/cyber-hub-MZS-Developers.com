@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cross-Site Scripting (XSS) Details - Cyber Academy</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+    <!-- NAVBAR -->
+    <nav class="navbar">
+        <div class="logo">Cyber Academy</div>
+        <ul class="nav-links">
+            <li><a href="home.html">Home</a></li>
+            <li><a href="services.html">Services</a></li>
+            <li><a href="ethical-hacking.html">Ethical Hacking</a></li>
+            <li><a href="web-pentesting.html">Web PenTesting</a></li>
+            <li><a href="home.html#contact">Contact</a></li>
+        </ul>
+        <div class="nav-btns">
+            <button class="btn-outline">Login</button>
+            <button class="btn-primary">Register</button>
+        </div>
+    </nav>
+
+    <!-- CLEAN TEXT & HEADINGS SECTION -->
+    <section class="section-container" style="margin-top: 100px; max-width: 900px;">
+        <span class="badge">VULNERABILITY DEEP DIVE</span>
+        <h1 style="font-size: 2.8rem; margin-top: 10px; color: #fff;">Cross-Site Scripting (XSS) Audit & Prevention</h1>
+        <p class="section-desc" style="font-size: 1.1rem; line-height: 1.7; color: #cbd5e1; margin-top: 15px;">
+            Cross-Site Scripting (XSS) happens when untrusted user inputs are executed as malicious JavaScript in the victim's browser. This allows attackers to steal session cookies, hijack user accounts, redirect users to phishing sites, or deface web pages.
+        </p>
+
+        <hr style="border: 0; height: 1px; background: #334155; margin: 40px 0;">
+
+        <!-- 1. TYPES OF XSS -->
+        <h2 style="color: #00f2fe; font-size: 1.8rem; margin-bottom: 15px;">1. Types of XSS Vulnerabilities We Test For</h2>
+        
+        <h3 style="color: #fff; font-size: 1.3rem; margin-top: 20px;">A. Reflected XSS (Non-Persistent)</h3>
+        <p style="color: #94a3b8; line-height: 1.6;">The injected script is reflected off the web server in an immediate response, such as search results or URL error parameters.</p>
+        <ul style="color: #cbd5e1; margin-left: 20px; line-height: 1.8;">
+            <li><strong>URL Parameter Manipulation:</strong> Injecting payloads inside HTTP GET parameters.</li>
+            <li><strong>Phishing Vectors:</strong> Crafting malicious links that trick victims into sending sensitive tokens.</li>
+        </ul>
+
+        <h3 style="color: #fff; font-size: 1.3rem; margin-top: 20px;">B. Stored XSS (Persistent)</h3>
+        <p style="color: #94a3b8; line-height: 1.6;">The malicious payload is stored permanently inside the target database, comment section, user profile, or message forum.</p>
+        <ul style="color: #cbd5e1; margin-left: 20px; line-height: 1.8;">
+            <li><strong>Database Payload Execution:</strong> Triggers automatically every time any user visits the compromised page.</li>
+            <li><strong>High Severity Impact:</strong> Can cause widespread session hijacking for active users and site administrators.</li>
+        </ul>
+
+        <h3 style="color: #fff; font-size: 1.3rem; margin-top: 20px;">C. DOM-Based XSS</h3>
+        <p style="color: #94a3b8; line-height: 1.6;">The vulnerability exists entirely in client-side code where JavaScript reads data from a source and passes it to an insecure sink.</p>
+        <ul style="color: #cbd5e1; margin-left: 20px; line-height: 1.8;">
+            <li><strong>Source to Sink Execution:</strong> Insecure processing using sinks like document.write or innerHTML.</li>
+            <li><strong>Bypassing Server Logs:</strong> The server may never see the payload if parsed entirely in the browser.</li>
+        </ul>
+
+        <hr style="border: 0; height: 1px; background: #334155; margin: 40px 0;">
+
+        <!-- 2. PREVENTION & REMEDIATION -->
+        <h2 style="color: #00f2fe; font-size: 1.8rem; margin-bottom: 15px;">2. Mitigation & Remediation Guidelines</h2>
+        <ul style="color: #cbd5e1; margin-left: 20px; line-height: 2;">
+            <li><strong>Context-Aware Output Encoding:</strong> Encode all user-supplied data before rendering it in HTML, JavaScript, CSS, or URL contexts.</li>
+            <li><strong>Content Security Policy (CSP):</strong> Enforce strict HTTP headers restricting inline script execution.</li>
+            <li><strong>HttpOnly & Secure Cookie Flags:</strong> Prevent malicious JavaScript from accessing sensitive session cookies.</li>
+            <li><strong>HTML Sanitization:</strong> Use trusted sanitization libraries when rendering rich-text content.</li>
+        </ul>
+
+        <hr style="border: 0; height: 1px; background: #334155; margin: 40px 0;">
+
+        <!-- 3. TESTING TOOLS -->
+        <h2 style="color: #00f2fe; font-size: 1.8rem; margin-bottom: 15px;">3. Security Audit Tooling</h2>
+        <p style="color: #cbd5e1; line-height: 1.7;">
+            We utilize advanced scanning and manual exploitation frameworks including Burp Suite Pro, XSStrike, Browser Developer Sinks Auditing, and custom polyglot payloads to ensure complete protection.
+        </p>
+
+        <!-- ACTION BUTTONS -->
+        <div style="margin-top: 50px; display: flex; align-items: center; gap: 20px;">
+            <a href="web-pentesting.html" class="btn-outline" style="text-decoration: none;">&larr; Back to Web PenTesting</a>
+            <a href="home.html#contact" class="btn-primary" style="text-decoration: none;">Request XSS Audit</a>
+        </div>
+    </section>
+
+</body>
+</html>

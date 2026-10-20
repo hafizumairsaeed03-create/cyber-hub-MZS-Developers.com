@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Server-Side Request Forgery (SSRF) - Cyber Academy</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+    <!-- NAVBAR -->
+    <nav class="navbar">
+        <div class="logo">Cyber Academy</div>
+        <ul class="nav-links">
+            <li><a href="home.html">Home</a></li>
+            <li><a href="services.html">Services</a></li>
+            <li><a href="ethical-hacking.html">Ethical Hacking</a></li>
+            <li><a href="web-pentesting.html">Web PenTesting</a></li>
+            <li><a href="home.html#contact">Contact</a></li>
+        </ul>
+        <div class="nav-btns">
+            <button class="btn-outline">Login</button>
+            <button class="btn-primary">Register</button>
+        </div>
+    </nav>
+
+    <!-- CLEAN TEXT & HEADINGS SECTION -->
+    <section class="section-container" style="margin-top: 100px; max-width: 900px;">
+        <span class="badge">VULNERABILITY DEEP DIVE</span>
+        <h1 style="font-size: 2.8rem; margin-top: 10px; color: #fff;">Server-Side Request Forgery (SSRF) Audit</h1>
+        <p class="section-desc" style="font-size: 1.1rem; line-height: 1.7; color: #cbd5e1; margin-top: 15px;">
+            Server-Side Request Forgery (SSRF) occurs when a web application fetches a remote resource without validating the user-supplied URL. Attackers can abuse this to force the web server to read or send data to internal, restricted resources.
+        </p>
+
+        <hr style="border: 0; height: 1px; background: #334155; margin: 40px 0;">
+
+        <!-- 1. SSRF VECTORS -->
+        <h2 style="color: #00f2fe; font-size: 1.8rem; margin-bottom: 15px;">1. Types of SSRF Attacks We Test For</h2>
+        
+        <h3 style="color: #fff; font-size: 1.3rem; margin-top: 20px;">A. In-Band / Basic SSRF</h3>
+        <p style="color: #94a3b8; line-height: 1.6;">The attacker sends requests to internal services and receives the server response directly back on the screen.</p>
+        <ul style="color: #cbd5e1; margin-left: 20px; line-height: 1.8;">
+            <li><strong>Internal Port Scanning:</strong> Mapping localhost services (`http://127.0.0.1:8080`, `http://localhost:6379`).</li>
+            <li><strong>Internal Service Access:</strong> Accessing admin panels or databases blocked by external firewalls.</li>
+        </ul>
+
+        <h3 style="color: #fff; font-size: 1.3rem; margin-top: 20px;">B. Cloud Instance Metadata Exfiltration</h3>
+        <p style="color: #94a3b8; line-height: 1.6;">Targeting cloud metadata services to extract sensitive IAM keys and access tokens.</p>
+        <ul style="color: #cbd5e1; margin-left: 20px; line-height: 1.8;">
+            <li><strong>AWS / GCP / Azure Metadata Extraction:</strong> Querying endpoints like `http://169.254.169.254/latest/meta-data/` to dump cloud access credentials.</li>
+        </ul>
+
+        <h3 style="color: #fff; font-size: 1.3rem; margin-top: 20px;">C. Blind SSRF</h3>
+        <p style="color: #94a3b8; line-height: 1.6;">The application triggers remote requests but does not return response data on screen.</p>
+        <ul style="color: #cbd5e1; margin-left: 20px; line-height: 1.8;">
+            <li><strong>Out-of-Band (OAST) Monitoring:</strong> Using Collaborator servers to detect hidden HTTP/DNS interactions triggered by backend requests.</li>
+        </ul>
+
+        <hr style="border: 0; height: 1px; background: #334155; margin: 40px 0;">
+
+        <!-- 2. PREVENTION GUIDELINES -->
+        <h2 style="color: #00f2fe; font-size: 1.8rem; margin-bottom: 15px;">2. Mitigation & Prevention Rules</h2>
+        <ul style="color: #cbd5e1; margin-left: 20px; line-height: 2;">
+            <li><strong>Allow-List Remote Resources:</strong> Restrict outgoing HTTP requests strictly to pre-approved domains and protocols.</li>
+            <li><strong>Block Loopback & Local Addresses:</strong> Reject requests directed to `127.0.0.1`, `localhost`, `10.0.0.0/8`, `192.168.0.0/16`, and `169.254.169.254`.</li>
+            <li><strong>Disable Unused URL Schemes:</strong> Allow only `http` and `https` protocols; disable `file://`, `gopher://`, `dict://`, and `ftp://`.</li>
+            <li><strong>IMDSv2 Enforcement:</strong> Upgrade cloud infrastructure to require session tokens for metadata service queries.</li>
+        </ul>
+
+        <hr style="border: 0; height: 1px; background: #334155; margin: 40px 0;">
+
+        <!-- 3. TESTING TOOLS -->
+        <h2 style="color: #00f2fe; font-size: 1.8rem; margin-bottom: 15px;">3. Audit Tools & Methodology</h2>
+        <p style="color: #cbd5e1; line-height: 1.7;">
+            We utilize <strong>Burp Collaborator</strong>, <strong>SSRFmap</strong>, <strong>Interactsh</strong>, and custom payload bypass techniques (IP encoding, DNS rebinding) to ensure thorough coverage.
+        </p>
+
+        <!-- ACTION BUTTONS -->
+        <div style="margin-top: 50px; display: flex; align-items: center; gap: 20px;">
+            <a href="web-pentesting.html" class="btn-outline" style="text-decoration: none;">&larr; Back to Web PenTesting</a>
+            <a href="home.html#contact" class="btn-primary" style="text-decoration: none;">Request SSRF Audit</a>
+        </div>
+    </section>
+
+</body>
+</html>

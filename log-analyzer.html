@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SIEM Security Log Analyzer - MZ Shield SOC</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome 6 Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js CDN for SIEM analytics -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        cyber: {
+                            black: '#030611',
+                            panel: '#091026',
+                            card: '#0e1838',
+                            cyan: '#00f2fe',
+                            blue: '#4facfe',
+                            pink: '#ff007a',
+                            emerald: '#00ff9d',
+                            red: '#ff2d55',
+                            amber: '#ffb300'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;700&family=Inter:wght@300;400;600;800;900&display=swap');
+
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            background-color: #030611;
+            color: #f1f5f9;
+            overflow-x: hidden;
+        }
+
+        .font-mono-code {
+            font-family: 'Fira Code', monospace;
+        }
+
+        /* Futuristic Glassmorphism Panels */
+        .glass-panel {
+            background: rgba(9, 16, 38, 0.75);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(0, 242, 254, 0.15);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+        }
+
+        .glass-card {
+            background: rgba(14, 24, 56, 0.65);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(79, 172, 254, 0.18);
+        }
+
+        .neon-border-cyan {
+            box-shadow: 0 0 15px -3px rgba(0, 242, 254, 0.3);
+            border-color: rgba(0, 242, 254, 0.4);
+        }
+
+        .neon-border-red {
+            box-shadow: 0 0 20px -2px rgba(255, 45, 85, 0.5);
+            border-color: rgba(255, 45, 85, 0.8);
+        }
+
+        /* Scanline Overlay */
+        .scanlines {
+            background: linear-gradient(
+                to bottom,
+                rgba(255,255,255,0),
+                rgba(255,255,255,0) 50%,
+                rgba(0, 242, 254, 0.03) 50%,
+                rgba(0, 242, 254, 0.03)
+            );
+            background-size: 100% 4px;
+        }
+
+        /* Animated Radar Sweep */
+        @keyframes radar-rotation {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        .radar-sweep {
+            animation: radar-rotation 3.5s linear infinite;
+            transform-origin: center center;
+        }
+
+        /* Pulsing Glow Effect */
+        @keyframes cyber-pulse {
+            0% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.4; transform: scale(1.3); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+        .ping-glow {
+            animation: cyber-pulse 1.8s ease-in-out infinite;
+        }
+
+        /* Threat Attack Siren Animation */
+        @keyframes attack-flash {
+            0%, 100% { background-color: rgba(255, 45, 85, 0.02); }
+            50% { background-color: rgba(255, 45, 85, 0.12); }
+        }
+        .attack-mode-active {
+            animation: attack-flash 1s ease-in-out infinite;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #030611;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #0e1838;
+            border-radius: 4px;
+            border: 1px solid rgba(0, 242, 254, 0.3);
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #00f2fe;
+        }
+    </style>
+</head>
+<body id="appBody" class="min-h-screen flex flex-col bg-cyber-black text-slate-100 scanlines">
+
+    <header class="sticky top-0 z-40 w-full glass-panel border-b border-cyber-cyan/20 px-4 lg:px-8 py-3">
+        <div class="max-w-[1700px] mx-auto flex items-center justify-between">
+            
+            <!-- MZ Brand Logo & SIEM System Title -->
+            <div class="flex items-center space-x-4">
+                <div class="relative group cursor-pointer" onclick="playCyberSound('click')">
+                    <div class="absolute -inset-0.5 bg-gradient-to-r from-cyber-cyan via-cyber-blue to-cyber-pink rounded-xl blur opacity-75 group-hover:opacity-100 transition duration-300"></div>
+                    <div class="relative bg-cyber-black px-3.5 py-1.5 rounded-xl flex items-center space-x-2.5 border border-cyber-cyan/40">
+                        <span class="text-2xl font-black tracking-widest bg-gradient-to-r from-cyber-cyan to-cyber-blue bg-clip-text text-transparent">MZ</span>
+                        <div class="h-4 w-[1px] bg-cyber-cyan/30"></div>
+                        <span class="text-xs font-mono-code tracking-wider font-bold text-cyber-cyan flex items-center gap-1.5">
+                            <i class="fa-solid fa-shield-cat text-cyber-emerald"></i> SOC SIEM
+                        </span>
+                    </div>
+                </div>
+
+                <div>
+                    <h1 class="text-base font-extrabold text-white tracking-wide flex items-center gap-2">
+                        SIEM Security Log Analyzer
+                        <span class="text-[10px] font-mono-code bg-cyber-blue/20 border border-cyber-blue/40 text-cyber-cyan px-2 py-0.5 rounded-full">LIVE TELEMETRY v5.0</span>
+                    </h1>
+                    <p class="text-xs text-slate-400 hidden sm:block">Autonomous AI Log Parsing, Threat Correlation & Forensic Response Engine</p>
+                </div>
+            </div>
+
+            <!-- Top SOC Telemetry Controls & Attack Simulation Toggle -->
+            <div class="flex items-center space-x-3">
+                
+                <!-- Audio Telemetry FX Button -->
+                <button id="audioToggleBtn" onclick="toggleAudioFx()" title="Toggle Web Audio Telemetry Effects" 
+                    class="flex items-center gap-2 bg-cyber-card hover:bg-slate-800 border border-slate-700/80 text-slate-300 hover:text-white text-xs px-3 py-1.5 rounded-xl font-medium transition">
+                    <i id="audioIcon" class="fa-solid fa-volume-xmark text-cyber-pink"></i>
+                    <span id="audioStatusText" class="hidden md:inline">Audio: Muted</span>
+                </button>
+
+                <!-- Live Log Pause/Play -->
+                <button id="pauseLogBtn" onclick="toggleLogStream()" 
+                    class="flex items-center gap-2 bg-cyber-card hover:bg-slate-800 border border-cyber-cyan/30 text-cyber-cyan text-xs px-3 py-1.5 rounded-xl font-mono-code transition">
+                    <i id="pauseIcon" class="fa-solid fa-pause"></i>
+                    <span id="pauseText" class="hidden md:inline">STREAM LIVE</span>
+                </button>
+
+                <!-- SIMULATE CYBER ATTACK BUTTON -->
+                <button onclick="triggerSimulatedAttack()" 
+                    class="relative group bg-gradient-to-r from-cyber-red via-rose-600 to-cyber-pink hover:opacity-90 text-white font-black text-xs px-4 py-2 rounded-xl shadow-lg shadow-cyber-red/30 transition transform hover:scale-105 flex items-center gap-2 border border-cyber-red/50">
+                    <i class="fa-solid fa-biohazard text-amber-300 animate-bounce"></i>
+                    <span>SIMULATE CYBER ATTACK</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+       
+        <!-- Top Decorative Ambient Glows -->
+        <div class="absolute -top-20 -right-20 w-44 h-44 bg-cyan-500/20 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="absolute -bottom-20 -left-20 w-44 h-44 bg-blue-600/20 rounded-full blur-3xl pointer-events-none"></div>
+
+        <!-- Aapka password manager wala baqi saara content yahan aayega -->
+
+    </div>
+</main>
+        <!-- Metrics Dashboard Summary Row -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            
+            <div class="glass-card p-4 rounded-2xl border-l-4 border-l-cyber-cyan relative overflow-hidden">
+                <div class="flex items-center justify-between text-xs text-slate-400 font-mono-code">
+                    <span>EVENT PROCESSING (EPS)</span>
+                    <i class="fa-solid fa-bolt text-cyber-cyan"></i>
+                </div>
+                <div class="text-2xl font-black text-white mt-2 font-mono-code" id="epsMetric">4,820 /s</div>
+                <div class="text-[10px] text-cyber-emerald mt-1 flex items-center gap-1 font-mono-code">
+                    <i class="fa-solid fa-arrow-trend-up"></i> +320 EPS Buffer Peak
+                </div>
+            </div>
+
+            <div class="glass-card p-4 rounded-2xl border-l-4 border-l-cyber-red relative overflow-hidden" id="cardActiveAlerts">
+                <div class="flex items-center justify-between text-xs text-slate-400 font-mono-code">
+                    <span>ACTIVE THREAT ALERTS</span>
+                    <i class="fa-solid fa-triangle-exclamation text-cyber-red"></i>
+                </div>
+                <div class="text-2xl font-black text-cyber-red mt-2 font-mono-code" id="activeAlertsMetric">14</div>
+                <div class="text-[10px] text-cyber-red mt-1 flex items-center gap-1 font-mono-code">
+                    <span class="w-2 h-2 rounded-full bg-cyber-red ping-glow"></span> 3 CRITICAL INCIDENTS
+                </div>
+            </div>
+
+            <div class="glass-card p-4 rounded-2xl border-l-4 border-l-cyber-amber relative overflow-hidden">
+                <div class="flex items-center justify-between text-xs text-slate-400 font-mono-code">
+                    <span>LOGS INGESTED TODAY</span>
+                    <i class="fa-solid fa-database text-cyber-amber"></i>
+                </div>
+                <div class="text-2xl font-black text-white mt-2 font-mono-code" id="totalLogsIngested">8,941,202</div>
+                <div class="text-[10px] text-slate-400 mt-1 font-mono-code">30-Day Retention Pool</div>
+            </div>
+
+            <div class="glass-card p-4 rounded-2xl border-l-4 border-l-cyber-emerald relative overflow-hidden">
+                <div class="flex items-center justify-between text-xs text-slate-400 font-mono-code">
+                    <span>AI AUTO-ISOLATED HOSTS</span>
+                    <i class="fa-solid fa-shield-halved text-cyber-emerald"></i>
+                </div>
+                <div class="text-2xl font-black text-cyber-emerald mt-2 font-mono-code" id="isolatedHostsMetric">8</div>
+                <div class="text-[10px] text-cyber-emerald mt-1 font-mono-code">MZ Zero-Trust Enforced</div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+            
+            <!-- Interactive Cyber Threat Radar & Particle Canvas -->
+            <div class="glass-panel p-5 rounded-3xl border border-cyber-cyan/20 flex flex-col justify-between">
+                <div>
+                    <div class="flex items-center justify-between mb-2">
+                        <h2 class="font-bold text-white text-sm flex items-center gap-2">
+                            <i class="fa-solid fa-radar text-cyber-cyan"></i>
+                            MZ SOC Threat Origin Radar
+                        </h2>
+                        <span class="text-[10px] font-mono-code text-cyber-emerald bg-cyber-emerald/10 border border-cyber-emerald/30 px-2 py-0.5 rounded">Real-Time Geo-Nodes</span>
+                    </div>
+                    <p class="text-xs text-slate-400 mb-3">Live correlation of anomalous IP routing and brute-force clusters</p>
+
+                    <!-- Radar Graphic Widget -->
+                    <div class="relative w-56 h-56 mx-auto my-2 rounded-full border-2 border-cyber-cyan/30 bg-cyber-black/90 flex items-center justify-center overflow-hidden shadow-inner shadow-cyber-cyan/30">
+                        <!-- Concentric Circles -->
+                        <div class="absolute inset-4 rounded-full border border-cyber-cyan/20"></div>
+                        <div class="absolute inset-12 rounded-full border border-cyber-cyan/20"></div>
+                        <div class="absolute inset-20 rounded-full border border-cyber-cyan/20"></div>
+                        
+                        <!-- Radar Grid Lines -->
+                        <div class="absolute w-full h-[1px] bg-cyber-cyan/20"></div>
+                        <div class="absolute h-full w-[1px] bg-cyber-cyan/20"></div>
+
+                        <!-- Radar Sweep Line -->
+                        <div class="absolute inset-0 radar-sweep">
+                            <div class="w-1/2 h-1/2 bg-gradient-to-br from-cyber-cyan/50 to-transparent origin-bottom-right rounded-tl-full"></div>
+                        </div>
+
+                        <!-- Radar Ping Points -->
+                        <div class="absolute top-10 left-12 w-2.5 h-2.5 bg-cyber-red rounded-full ping-glow"></div>
+                        <div class="absolute bottom-12 right-14 w-2 h-2 bg-cyber-amber rounded-full ping-glow"></div>
+                        <div class="absolute top-16 right-10 w-2.5 h-2.5 bg-cyber-red rounded-full ping-glow"></div>
+
+                        <!-- Center MZ Core Badge -->
+                        <div class="relative z-10 w-7 h-7 rounded-full bg-cyber-cyan border-2 border-white flex items-center justify-center shadow-lg shadow-cyber-cyan/60">
+                            <span class="text-[9px] font-black text-cyber-black">MZ</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-2 pt-3 border-t border-slate-800 text-xs font-mono-code flex items-center justify-between">
+                    <span class="text-slate-400">Target Vector:</span>
+                    <span class="text-cyber-red font-bold" id="radarVectorText">Auth/BruteForce SSH (22)</span>
+                </div>
+            </div>
+
+            <!-- Event Severity Distribution Chart -->
+            <div class="glass-panel p-5 rounded-3xl border border-cyber-cyan/20 flex flex-col justify-between">
+                <div>
+                    <div class="flex items-center justify-between mb-2">
+                        <h2 class="font-bold text-white text-sm flex items-center gap-2">
+                            <i class="fa-solid fa-chart-pie text-cyber-blue"></i>
+                            Severity Breakdown
+                        </h2>
+                        <span class="text-[10px] font-mono-code text-slate-400">Past 24 Hours</span>
+                    </div>
+                    <p class="text-xs text-slate-400 mb-2">SIEM Log Category & Threat Classification</p>
+                </div>
+                <div class="h-48 w-full flex items-center justify-center">
+                    <canvas id="severityChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Ingestion EPS Timeline Chart -->
+            <div class="glass-panel p-5 rounded-3xl border border-cyber-cyan/20 flex flex-col justify-between">
+                <div>
+                    <div class="flex items-center justify-between mb-2">
+                        <h2 class="font-bold text-white text-sm flex items-center gap-2">
+                            <i class="fa-solid fa-chart-line text-cyber-emerald"></i>
+                            Live EPS Timeline
+                        </h2>
+                        <span class="text-[10px] font-mono-code text-cyber-cyan">Buffering...</span>
+                    </div>
+                    <p class="text-xs text-slate-400 mb-2">Real-time log ingestion velocity spikes</p>
+                </div>
+                <div class="h-48 w-full">
+                    <canvas id="epsTimelineChart"></canvas>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="glass-panel p-5 rounded-3xl border border-cyber-cyan/20 space-y-4">
+            
+            <!-- Log Filter Toolbar -->
+            <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-slate-800 pb-4">
+                <div>
+                    <h2 class="font-bold text-white text-base flex items-center gap-2">
+                        <i class="fa-solid fa-terminal text-cyber-cyan"></i>
+                        Live SIEM Log Telemetry Console
+                    </h2>
+                    <p class="text-xs text-slate-400">Click any log entry to view full raw JSON payload, forensics, and execute immediate mitigation</p>
+                </div>
+
+                <!-- Interactive Filters -->
+                <div class="flex flex-wrap items-center gap-2.5 text-xs font-mono-code">
+                    <!-- Search Input -->
+                    <div class="relative">
+                        <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-slate-500"></i>
+                        <input type="text" id="logSearchInput" onkeyup="filterLogs()" placeholder="Search IP, event, user, hash..." 
+                            class="bg-cyber-black border border-slate-700/80 rounded-xl pl-8 pr-3 py-1.5 text-slate-200 focus:border-cyber-cyan focus:outline-none w-48 sm:w-64 transition">
+                    </div>
+
+                    <!-- Log Level Filter -->
+                    <select id="severityFilter" onchange="filterLogs()" class="bg-cyber-black border border-slate-700/80 rounded-xl px-3 py-1.5 text-slate-200 focus:border-cyber-cyan focus:outline-none transition">
+                        <option value="ALL">All Severities</option>
+                        <option value="CRITICAL">CRITICAL</option>
+                        <option value="HIGH">HIGH</option>
+                        <option value="MEDIUM">MEDIUM</option>
+                        <option value="INFO">INFO</option>
+                    </select>
+
+                    <!-- Log Source Filter -->
+                    <select id="sourceFilter" onchange="filterLogs()" class="bg-cyber-black border border-slate-700/80 rounded-xl px-3 py-1.5 text-slate-200 focus:border-cyber-cyan focus:outline-none transition">
+                        <option value="ALL">All Sources</option>
+                        <option value="Firewall">Firewall PaloAlto</option>
+                        <option value="Auth">Auth Keycloak/AD</option>
+                        <option value="Syslog">Linux Syslog</option>
+                        <option value="Cloud">AWS CloudTrail</option>
+                        <option value="Endpoint">EDR CrowdStrike</option>
+                    </select>
+
+                    <!-- Clear Filters -->
+                    <button onclick="resetLogFilters()" class="bg-cyber-card hover:bg-slate-800 text-slate-400 hover:text-white px-3 py-1.5 rounded-xl border border-slate-700 transition">
+                        Reset
+                    </button>
+                </div>
+            </div>
+
+            <!-- Interactive Log Table Stream -->
+            <div class="overflow-x-auto rounded-2xl border border-slate-800 bg-cyber-black/90">
+                <table class="w-full text-left text-xs font-mono-code">
+                    <thead class="bg-cyber-panel text-cyber-cyan border-b border-slate-800">
+                        <tr>
+                            <th class="p-3">TIMESTAMP</th>
+                            <th class="p-3">SEVERITY</th>
+                            <th class="p-3">SOURCE</th>
+                            <th class="p-3">EVENT ACTION</th>
+                            <th class="p-3">SOURCE IP</th>
+                            <th class="p-3">DESTINATION IP</th>
+                            <th class="p-3">RULE TRIGGER</th>
+                            <th class="p-3 text-right">ACTION</th>
+                        </tr>
+                    </thead>
+                    <tbody id="logTableBody" class="divide-y divide-slate-800/80 text-slate-300">
+                        <!-- Dynamic Logs Generated by JS -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </main>
+
+    <div id="forensicModal" class="hidden fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex items-center justify-center p-4">
+        <div class="glass-panel w-full max-w-3xl rounded-3xl border-2 border-cyber-cyan/40 p-6 space-y-5 relative shadow-2xl overflow-hidden max-h-[90vh] flex flex-col">
+            
+            <!-- Modal Header -->
+            <div class="flex items-center justify-between border-b border-slate-800 pb-4">
+                <div class="flex items-center space-x-3">
+                    <div class="p-2.5 rounded-xl bg-cyber-pink/20 border border-cyber-pink/40 text-cyber-pink" id="modalSeverityIcon">
+                        <i class="fa-solid fa-bug text-xl"></i>
+                    </div>
+                    <div>
+                        <h3 class="font-bold text-white text-base font-mono-code" id="modalEventTitle">CRITICAL: Brute-Force SSH Auth Failure</h3>
+                        <p class="text-xs text-slate-400 font-mono-code" id="modalEventID">LOG ID: MZ-SIEM-9920184</p>
+                    </div>
+                </div>
+                <button onclick="closeForensicModal()" class="text-slate-400 hover:text-white text-xl p-2 transition">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <!-- Modal Content Body -->
+            <div class="space-y-4 overflow-y-auto pr-2 flex-1">
+                
+                <!-- Metadata Grid -->
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs font-mono-code">
+                    <div class="p-2.5 bg-cyber-black rounded-xl border border-slate-800">
+                        <span class="text-slate-500 block text-[10px]">Source IP</span>
+                        <span class="text-cyber-cyan font-bold" id="modalSourceIP">185.220.101.45</span>
+                    </div>
+                    <div class="p-2.5 bg-cyber-black rounded-xl border border-slate-800">
+                        <span class="text-slate-500 block text-[10px]">Destination Host</span>
+                        <span class="text-white font-bold" id="modalDestIP">10.0.4.120:22</span>
+                    </div>
+                    <div class="p-2.5 bg-cyber-black rounded-xl border border-slate-800">
+                        <span class="text-slate-500 block text-[10px]">Log Source</span>
+                        <span class="text-cyber-amber font-bold" id="modalLogSource">Linux Syslog</span>
+                    </div>
+                    <div class="p-2.5 bg-cyber-black rounded-xl border border-slate-800">
+                        <span class="text-slate-500 block text-[10px]">Mitre Att&ck ID</span>
+                        <span class="text-cyber-pink font-bold" id="modalMitre">T1110 (Brute Force)</span>
+                    </div>
+                </div>
+
+                <!-- Raw JSON Telemetry Payload Inspector -->
+                <div>
+                    <span class="text-xs font-mono-code text-slate-400 mb-1.5 block">Raw Event Telemetry (JSON Payload):</span>
+                    <pre id="modalJsonPayload" class="bg-cyber-black border border-slate-800 p-4 rounded-2xl text-xs text-cyber-cyan font-mono-code overflow-x-auto whitespace-pre-wrap leading-relaxed max-h-48"></pre>
+                </div>
+            </div>
+
+            <!-- Modal Action Buttons (SOC Mitigation Controls) -->
+            <div class="pt-4 border-t border-slate-800 flex flex-wrap items-center justify-between gap-3">
+                <span class="text-xs font-mono-code text-slate-400">MZ Autonomous Playbook Controls:</span>
+                <div class="flex items-center space-x-2">
+                    <button onclick="executeMitigation('block_ip')" class="bg-cyber-red/20 hover:bg-cyber-red/40 text-cyber-red border border-cyber-red/50 text-xs px-3.5 py-2 rounded-xl font-mono-code font-bold transition">
+                        <i class="fa-solid fa-ban mr-1"></i> Block Source IP
+                    </button>
+                    <button onclick="executeMitigation('isolate_host')" class="bg-cyber-amber/20 hover:bg-cyber-amber/40 text-cyber-amber border border-cyber-amber/50 text-xs px-3.5 py-2 rounded-xl font-mono-code font-bold transition">
+                        <i class="fa-solid fa-plug-circle-xmark mr-1"></i> Isolate Target Host
+                    </button>
+                    <button onclick="closeForensicModal()" class="bg-slate-800 hover:bg-slate-700 text-white text-xs px-4 py-2 rounded-xl transition">
+                        Dismiss
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="glass-panel border-t border-slate-800 py-3 px-6 text-center text-xs text-slate-500 font-mono-code mt-6">
+        <div class="max-w-[1700px] mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
+            <span class="text-cyber-cyan font-bold">MZ SHIELD SIEM ANALYZER &copy; 2026 SOC ENGINE</span>
+            <span>Zero-Trust Log Parsing & Event Correlation</span>
+        </div>
+    </footer>
+
+    <script>
+        /* ==========================================================================
+           WEB AUDIO API SYNTHESIZER FOR FUTURISTIC CYBER AUDIO EFFECTS
+           ========================================================================== */
+        let audioCtx = null;
+        let isMuted = true;
+
+        function initAudio() {
+            if (!audioCtx) {
+                const AudioClass = window.AudioContext || window.webkitAudioContext;
+                if (AudioClass) audioCtx = new AudioClass();
+            }
+            if (audioCtx && audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }
+
+        function toggleAudioFx() {
+            initAudio();
+            isMuted = !isMuted;
+            const btn = document.getElementById('audioToggleBtn');
+            const icon = document.getElementById('audioIcon');
+            const text = document.getElementById('audioStatusText');
+
+            if (!isMuted) {
+                icon.className = "fa-solid fa-volume-high text-cyber-cyan";
+                text.innerText = "Audio: Live";
+                btn.classList.add("border-cyber-cyan/50", "bg-cyber-cyan/10");
+                playCyberSound('click');
+            } else {
+                icon.className = "fa-solid fa-volume-xmark text-cyber-pink";
+                text.innerText = "Audio: Muted";
+                btn.classList.remove("border-cyber-cyan/50", "bg-cyber-cyan/10");
+            }
+        }
+
+        function playCyberSound(type) {
+            if (isMuted || !audioCtx) return;
+
+            try {
+                const now = audioCtx.currentTime;
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                if (type === 'click') {
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(800, now);
+                    osc.frequency.exponentialRampToValueAtTime(200, now + 0.08);
+
+                    gain.gain.setValueAtTime(0.1, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
+
+                    osc.start(now);
+                    osc.stop(now + 0.08);
+
+                } else if (type === 'alert') {
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(500, now);
+                    osc.frequency.setValueAtTime(1000, now + 0.1);
+
+                    gain.gain.setValueAtTime(0.15, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
+
+                    osc.start(now);
+                    osc.stop(now + 0.25);
+
+                } else if (type === 'siren') {
+                    osc.type = 'square';
+                    osc.frequency.setValueAtTime(600, now);
+                    osc.frequency.linearRampToValueAtTime(1200, now + 0.3);
+
+                    gain.gain.setValueAtTime(0.2, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
+
+                    osc.start(now);
+                    osc.stop(now + 0.4);
+                }
+            } catch (err) {
+                console.error("Audio error:", err);
+            }
+        }
+
+
+        /* ==========================================================================
+           SIEM LOG DATA GENERATION ENGINE
+           ========================================================================== */
+        let isStreamPaused = false;
+        let activeLogs = [];
+        let totalLogsIngestedCount = 8941202;
+
+        const eventTemplates = [
+            { severity: 'CRITICAL', source: 'Auth', action: 'Failed SSH Login Brute-Force', rule: 'T1110 (Brute Force Attack)', mitre: 'T1110', dst: '10.0.4.120:22' },
+            { severity: 'HIGH', source: 'Firewall', action: 'Port Scan Sweep Detected', rule: 'T1046 (Network Service Discovery)', mitre: 'T1046', dst: '10.0.0.0/24:443' },
+            { severity: 'CRITICAL', source: 'Endpoint', action: 'Mimikatz LSASS Process Dump', rule: 'T1003 (OS Credential Dumping)', mitre: 'T1003', dst: 'WORKSTATION-89' },
+            { severity: 'MEDIUM', source: 'Cloud', action: 'IAM Policy Privilege Escalation', rule: 'T1078 (Valid Accounts)', mitre: 'T1078', dst: 'AWS IAM Role: Admin' },
+            { severity: 'INFO', source: 'Syslog', action: 'User Authenticated via MFA', rule: 'System Access Normal', mitre: 'N/A', dst: '10.0.1.15:8080' },
+            { severity: 'HIGH', source: 'Firewall', action: 'C2 Beaconing Domain Query', rule: 'T1071 (Application Layer Protocol)', mitre: 'T1071', dst: '185.220.101.45:443' }
+        ];
+
+        const sampleIPs = ['185.220.101.45', '103.251.167.22', '45.154.255.88', '194.26.29.112', '192.168.1.104', '172.16.0.45'];
+
+        function generateRandomLog() {
+            const template = eventTemplates[Math.floor(Math.random() * eventTemplates.length)];
+            const srcIp = sampleIPs[Math.floor(Math.random() * sampleIPs.length)];
+            const time = new Date().toISOString().split('T')[1].slice(0, 8);
+            const logId = 'MZ-LOG-' + Math.floor(100000 + Math.random() * 900000);
+
+            return {
+                id: logId,
+                timestamp: time,
+                severity: template.severity,
+                source: template.source,
+                action: template.action,
+                srcIp: srcIp,
+                dstIp: template.dst,
+                rule: template.rule,
+                mitre: template.mitre,
+                rawPayload: JSON.stringify({
+                    log_id: logId,
+                    timestamp: new Date().toISOString(),
+                    severity: template.severity,
+                    source_vendor: "MZ-Shield-SIEM-Collector",
+                    source_ip: srcIp,
+                    destination: template.dst,
+                    threat_indicator: template.action,
+                    mitre_attack_technique: template.mitre,
+                    hash_sha256: "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+                }, null, 2)
+            };
+        }
+
+        function renderLogsTable() {
+            const tbody = document.getElementById('logTableBody');
+            tbody.innerHTML = '';
+
+            activeLogs.forEach(log => {
+                let badgeClass = "bg-cyber-blue/20 text-cyber-blue border-cyber-blue/40";
+                if (log.severity === 'CRITICAL') badgeClass = "bg-cyber-red/20 text-cyber-red border-cyber-red/50 animate-pulse";
+                if (log.severity === 'HIGH') badgeClass = "bg-cyber-pink/20 text-cyber-pink border-cyber-pink/40";
+                if (log.severity === 'MEDIUM') badgeClass = "bg-cyber-amber/20 text-cyber-amber border-cyber-amber/40";
+
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-cyber-card/80 transition cursor-pointer font-mono-code";
+                tr.onclick = () => openForensicModal(log);
+
+                tr.innerHTML = `
+                    <td class="p-3 text-slate-400">${log.timestamp}</td>
+                    <td class="p-3">
+                        <span class="px-2 py-0.5 rounded text-[10px] font-bold border ${badgeClass}">${log.severity}</span>
+                    </td>
+                    <td class="p-3 text-cyber-cyan">${log.source}</td>
+                    <td class="p-3 text-white font-bold">${log.action}</td>
+                    <td class="p-3 text-slate-300">${log.srcIp}</td>
+                    <td class="p-3 text-slate-400">${log.dstIp}</td>
+                    <td class="p-3 text-slate-400 text-[11px]">${log.rule}</td>
+                    <td class="p-3 text-right">
+                        <button class="bg-cyber-card hover:bg-cyber-cyan/20 text-cyber-cyan px-2.5 py-1 rounded-lg border border-cyber-cyan/30 text-[10px] transition">
+                            Inspect
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function toggleLogStream() {
+            playCyberSound('click');
+            isStreamPaused = !isStreamPaused;
+            const btn = document.getElementById('pauseLogBtn');
+            const icon = document.getElementById('pauseIcon');
+            const text = document.getElementById('pauseText');
+
+            if (isStreamPaused) {
+                icon.className = "fa-solid fa-play text-cyber-emerald";
+                text.innerText = "RESUME STREAM";
+                btn.classList.add("border-cyber-emerald/40");
+            } else {
+                icon.className = "fa-solid fa-pause text-cyber-cyan";
+                text.innerText = "STREAM LIVE";
+                btn.classList.remove("border-cyber-emerald/40");
+            }
+        }
+
+        function filterLogs() {
+            const query = document.getElementById('logSearchInput').value.toLowerCase();
+            const sevFilter = document.getElementById('severityFilter').value;
+            const srcFilter = document.getElementById('sourceFilter').value;
+
+            const rows = document.querySelectorAll('#logTableBody tr');
+
+            activeLogs.forEach((log, index) => {
+                if (!rows[index]) return;
+
+                const matchQuery = log.srcIp.toLowerCase().includes(query) ||
+                                   log.action.toLowerCase().includes(query) ||
+                                   log.id.toLowerCase().includes(query);
+
+                const matchSev = (sevFilter === 'ALL') || (log.severity === sevFilter);
+                const matchSrc = (srcFilter === 'ALL') || (log.source === srcFilter);
+
+                if (matchQuery && matchSev && matchSrc) {
+                    rows[index].style.display = '';
+                } else {
+                    rows[index].style.display = 'none';
+                }
+            });
+        }
+
+        function resetLogFilters() {
+            playCyberSound('click');
+            document.getElementById('logSearchInput').value = '';
+            document.getElementById('severityFilter').value = 'ALL';
+            document.getElementById('sourceFilter').value = 'ALL';
+            filterLogs();
+        }
+
+
+        /* ==========================================================================
+           FORENSIC MODAL & PLAYBOOK ACTIONS
+           ========================================================================== */
+        function openForensicModal(log) {
+            playCyberSound('click');
+            document.getElementById('modalEventTitle').innerText = `${log.severity}: ${log.action}`;
+            document.getElementById('modalEventID').innerText = `LOG ID: ${log.id}`;
+            document.getElementById('modalSourceIP').innerText = log.srcIp;
+            document.getElementById('modalDestIP').innerText = log.dstIp;
+            document.getElementById('modalLogSource').innerText = log.source;
+            document.getElementById('modalMitre').innerText = log.mitre;
+            document.getElementById('modalJsonPayload').innerText = log.rawPayload;
+
+            document.getElementById('forensicModal').classList.remove('hidden');
+        }
+
+        function closeForensicModal() {
+            playCyberSound('click');
+            document.getElementById('forensicModal').classList.add('hidden');
+        }
+
+        function executeMitigation(type) {
+            playCyberSound('alert');
+            if (type === 'block_ip') {
+                alert("MZ SIEM Playbook Triggered: Source IP successfully blocked on Palo Alto Firewall & Cloudflare Gateway.");
+            } else if (type === 'isolate_host') {
+                alert("MZ Zero-Trust Enforced: Target Host interface isolated via CrowdStrike EDR Agent.");
+                let current = parseInt(document.getElementById('isolatedHostsMetric').innerText);
+                document.getElementById('isolatedHostsMetric').innerText = current + 1;
+            }
+            closeForensicModal();
+        }
+
+        /* SIMULATE CYBER ATTACK MODE */
+        function triggerSimulatedAttack() {
+            initAudio();
+            playCyberSound('siren');
+
+            const appBody = document.getElementById('appBody');
+            appBody.classList.add('attack-mode-active');
+
+            // Inject 5 Critical Logs Immediately
+            for (let i = 0; i < 5; i++) {
+                const attackLog = {
+                    id: 'MZ-ATTACK-' + Math.floor(1000 + Math.random() * 9000),
+                    timestamp: new Date().toISOString().split('T')[1].slice(0, 8),
+                    severity: 'CRITICAL',
+                    source: 'Endpoint',
+                    action: 'Ransomware Mass File Encryption Activity',
+                    srcIp: '185.220.101.99',
+                    dstIp: 'DC-PRIMARY-01',
+                    rule: 'T1486 (Data Encrypted for Impact)',
+                    mitre: 'T1486',
+                    rawPayload: JSON.stringify({ alert: "CRITICAL RANSOMWARE ENCRYPTION DETECTED", vector: "UNC2452 SpearPhishing" }, null, 2)
+                };
+                activeLogs.unshift(attackLog);
+            }
+
+            renderLogsTable();
+
+            // Update Alert metric
+            let alertVal = parseInt(document.getElementById('activeAlertsMetric').innerText);
+            document.getElementById('activeAlertsMetric').innerText = alertVal + 5;
+
+            setTimeout(() => {
+                appBody.classList.remove('attack-mode-active');
+            }, 3500);
+        }
+
+
+        /* ==========================================================================
+           CHARTS & TIMELINE INITIALIZATION
+           ========================================================================== */
+        let severityChart, epsTimelineChart;
+
+        function initCharts() {
+            // Doughnut Severity Chart
+            const ctx1 = document.getElementById('severityChart').getContext('2d');
+            severityChart = new Chart(ctx1, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Critical', 'High', 'Medium', 'Info'],
+                    datasets: [{
+                        data: [15, 25, 35, 25],
+                        backgroundColor: ['#ff2d55', '#ff007a', '#ffb300', '#00f2fe'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { position: 'right', labels: { color: '#94a3b8', font: { family: 'Fira Code', size: 10 } } } }
+                }
+            });
+
+            // EPS Line Chart
+            const ctx2 = document.getElementById('epsTimelineChart').getContext('2d');
+            epsTimelineChart = new Chart(ctx2, {
+                type: 'line',
+                data: {
+                    labels: ['10m ago', '8m ago', '6m ago', '4m ago', '2m ago', 'Now'],
+                    datasets: [{
+                        label: 'Events / Sec (EPS)',
+                        data: [3200, 4100, 3900, 4820, 5100, 4820],
+                        borderColor: '#00f2fe',
+                        backgroundColor: 'rgba(0, 242, 254, 0.1)',
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: { ticks: { color: '#64748b', font: { family: 'Fira Code', size: 9 } } },
+                        y: { ticks: { color: '#64748b', font: { family: 'Fira Code', size: 9 } } }
+                    },
+                    plugins: { legend: { display: false } }
+                }
+            });
+        }
+
+
+        /* ==========================================================================
+           INITIALIZATION & STREAM INTERVALS
+           ========================================================================== */
+        window.onload = function() {
+            // Seed initial logs
+            for (let i = 0; i < 10; i++) {
+                activeLogs.push(generateRandomLog());
+            }
+            renderLogsTable();
+            initCharts();
+
+            // Periodic Live Stream Generator
+            setInterval(() => {
+                if (!isStreamPaused) {
+                    activeLogs.unshift(generateRandomLog());
+                    if (activeLogs.length > 20) activeLogs.pop();
+                    renderLogsTable();
+
+                    // Update ingestion counter
+                    totalLogsIngestedCount += Math.floor(10 + Math.random() * 25);
+                    document.getElementById('totalLogsIngested').innerText = totalLogsIngestedCount.toLocaleString();
+                }
+            }, 1800);
+        };
+    </script>
+</body>
+</html>

@@ -1,0 +1,1496 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MZ Student Login & Learning Portal</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            cyberDark: '#030712',
+            cyberCard: '#050b14',
+            cyberCardHover: '#0b172a',
+            neonCyan: '#00f2fe',
+            neonBlue: '#0088cc',
+            neonPurple: '#a855f7',
+            neonGreen: '#10b981',
+            neonAmber: '#f59e0b'
+          },
+          animation: {
+            'glow-pulse': 'glowPulse 2.5s infinite ease-in-out',
+            'laser-scan': 'laserScan 2s linear infinite',
+            'float-subtle': 'floatSubtle 4s ease-in-out infinite',
+            'radar-spin': 'radarSpin 4s linear infinite',
+          },
+          keyframes: {
+            glowPulse: {
+              '0%, 100%': { boxShadow: '0 0 15px rgba(0, 242, 254, 0.3), inset 0 0 10px rgba(0, 136, 204, 0.2)' },
+              '50%': { boxShadow: '0 0 35px rgba(0, 242, 254, 0.7), inset 0 0 20px rgba(0, 242, 254, 0.4)' },
+            },
+            laserScan: {
+              '0%': { top: '0%' },
+              '50%': { top: '100%' },
+              '100%': { top: '0%' }
+            },
+            floatSubtle: {
+              '0%, 100%': { transform: 'translateY(0px)' },
+              '50%': { transform: 'translateY(-6px)' }
+            },
+            radarSpin: {
+              '0%': { transform: 'rotate(0deg)' },
+              '100%': { transform: 'rotate(360deg)' }
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Google Fonts & FontAwesome -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;800;900&family=Rajdhani:wght@500;600;700&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    body {
+      font-family: 'Rajdhani', sans-serif;
+      background-color: #030712;
+      color: #f8fafc;
+      overflow-x: hidden;
+    }
+
+    .font-orbitron { font-family: 'Orbitron', sans-serif; }
+    .font-mono-code { font-family: 'Space Mono', monospace; }
+
+    /* Custom Cyber Scrollbars */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #030712;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #0088cc;
+      border-radius: 3px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #00f2fe;
+    }
+
+    /* Glassmorphic Cyber Border Style */
+    .cyber-glass-card {
+      background: rgba(5, 11, 20, 0.88);
+      backdrop-filter: blur(16px);
+      border: 1px solid rgba(0, 242, 254, 0.35);
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.7), inset 0 0 15px rgba(0, 242, 254, 0.08);
+    }
+
+    .cyber-glass-glow {
+      background: rgba(5, 11, 20, 0.92);
+      backdrop-filter: blur(20px);
+      border: 1px solid #00f2fe;
+      box-shadow: 0 0 25px rgba(0, 242, 254, 0.35), inset 0 0 20px rgba(0, 136, 204, 0.15);
+    }
+
+    /* Glowing Text Effects */
+    .glow-text-cyan {
+      text-shadow: 0 0 10px rgba(0, 242, 254, 0.8), 0 0 20px rgba(0, 242, 254, 0.4);
+    }
+    .glow-text-purple {
+      text-shadow: 0 0 10px rgba(168, 85, 247, 0.8), 0 0 20px rgba(168, 85, 247, 0.4);
+    }
+
+    /* Grid pattern background overlay */
+    .bg-grid-cyber {
+      background-image: linear-gradient(to right, rgba(0, 242, 254, 0.05) 1px, transparent 1px),
+                        linear-gradient(to bottom, rgba(0, 242, 254, 0.05) 1px, transparent 1px);
+      background-size: 32px 32px;
+    }
+
+    /* Holographic scanline effect */
+    .scanlines {
+      position: relative;
+      overflow: hidden;
+    }
+    .scanlines::before {
+      content: " ";
+      display: block;
+      position: absolute;
+      top: 0; left: 0; bottom: 0; right: 0;
+      background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.35) 50%);
+      background-size: 100% 4px;
+      z-index: 10;
+      pointer-events: none;
+      opacity: 0.6;
+    }
+
+    /* Dynamic Laser Beam for Scan Simulation */
+    .laser-beam {
+      position: absolute;
+      left: 0;
+      width: 100%;
+      height: 3px;
+      background: linear-gradient(90deg, transparent, #00f2fe, #ffffff, #00f2fe, transparent);
+      box-shadow: 0 0 15px #00f2fe, 0 0 30px #00f2fe;
+      z-index: 25;
+      pointer-events: none;
+      opacity: 0;
+    }
+
+    .laser-active {
+      animation: laserSweep 1.8s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+      opacity: 1;
+    }
+
+    @keyframes laserSweep {
+      0% { top: 0%; }
+      50% { top: 100%; }
+      100% { top: 0%; }
+    }
+
+    /* Tab active indicator transition */
+    .tab-btn {
+      transition: all 0.25s ease;
+    }
+    .tab-btn.active {
+      background: linear-gradient(90deg, rgba(0, 242, 254, 0.2), rgba(0, 136, 204, 0.3));
+      border-color: #00f2fe;
+      color: #00f2fe;
+      box-shadow: 0 0 15px rgba(0, 242, 254, 0.25);
+    }
+  </style>
+</head>
+
+<body class="min-h-screen bg-cyberDark text-slate-100 bg-grid-cyber flex flex-col justify-between selection:bg-neonCyan selection:text-black">
+
+  <header class="w-full border-b border-cyan-900/40 bg-cyberDark/90 backdrop-blur-md sticky top-0 z-50 px-4 lg:px-8 py-3">
+<!-- Page Main Title Section -->
+<div class="w-full max-w-[1450px] mx-auto px-4 lg:px-8 pt-6 pb-2">
+    <div class="cyber-glass-glow rounded-2xl p-5 md:p-6 relative overflow-hidden">
+        <!-- Ambient Glows -->
+        <div class="absolute -top-10 -right-10 w-32 h-32 bg-cyan-500/10 rounded-full blur-2xl pointer-events-none"></div>
+        
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+                <div class="flex items-center space-x-2 mb-2">
+                    <span class="px-3 py-0.5 bg-cyan-950/80 border border-cyan-500/40 rounded-full text-cyan-300 text-xs font-orbitron tracking-wider flex items-center space-x-1.5">
+                        <i class="fa-solid fa-cubes text-cyan-400"></i>
+                        <span>Web App Portal</span>
+                    </span>
+                    <span class="px-2.5 py-0.5 bg-emerald-950/60 border border-emerald-500/40 rounded-full text-emerald-400 text-[10px] font-orbitron tracking-widest flex items-center space-x-1.5">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                        <span>SYSTEM ACTIVE</span>
+                    </span>
+                </div>
+                <h1 class="text-2xl md:text-3xl font-black font-orbitron tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-white via-cyan-200 to-cyan-400">
+                    Student Login & Learning Portal
+                </h1>
+                <p class="text-slate-300 text-xs md:text-sm font-medium mt-1 flex items-center space-x-2">
+                    <i class="fa-solid fa-user-shield text-cyan-400"></i>
+                    <span>Secure student authentication, course dashboard, and grade tracking system.</span>
+                </p>
+            </div>
+
+            <!-- Glowing MZ Logo -->
+            <div class="group relative cursor-pointer self-start md:self-center" onclick="triggerPortalEasterEgg()">
+                <div class="absolute -inset-1 bg-gradient-to-r from-neonCyan to-neonBlue rounded-xl blur opacity-40 group-hover:opacity-100 transition duration-300"></div>
+                <div class="relative w-12 h-12 bg-gradient-to-br from-slate-900 to-cyan-950 border border-cyan-500/80 rounded-xl flex items-center justify-center shadow-[0_0_15px_rgba(0,242,254,0.3)]">
+                    <span class="font-orbitron font-black text-base text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-blue-500">MZ</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+  </header>
+ 
+
+       
+
+      <!-- Navigation Tabs Bar -->
+      <div class="flex flex-wrap gap-2 mb-6 border-b border-cyan-900/40 pb-3">
+        <button onclick="switchTab('dashboard')" id="tab-dashboard" class="tab-btn active px-4 py-2 rounded-xl border border-cyan-900/60 bg-slate-900/60 text-xs sm:text-sm font-bold font-mono-code flex items-center space-x-2">
+          <i class="fa-solid fa-graduation-cap text-cyan-400"></i>
+          <span>Course Dashboard</span>
+        </button>
+
+        <button onclick="switchTab('idcard')" id="tab-idcard" class="tab-btn px-4 py-2 rounded-xl border border-cyan-900/60 bg-slate-900/60 text-xs sm:text-sm font-bold font-mono-code flex items-center space-x-2">
+          <i class="fa-solid fa-id-card text-emerald-400"></i>
+          <span>Student ID & Auth</span>
+        </button>
+
+        <button onclick="switchTab('grades')" id="tab-grades" class="tab-btn px-4 py-2 rounded-xl border border-cyan-900/60 bg-slate-900/60 text-xs sm:text-sm font-bold font-mono-code flex items-center space-x-2">
+          <i class="fa-solid fa-chart-line text-purple-400"></i>
+          <span>Grade Analytics & GPA</span>
+        </button>
+
+        <button onclick="switchTab('lab')" id="tab-lab" class="tab-btn px-4 py-2 rounded-xl border border-cyan-900/60 bg-slate-900/60 text-xs sm:text-sm font-bold font-mono-code flex items-center space-x-2">
+          <i class="fa-solid fa-terminal text-amber-400"></i>
+          <span>Interactive Cyber Lab</span>
+        </button>
+      </div>
+
+      <!-- TAB 1: COURSE DASHBOARD -->
+      <div id="content-dashboard" class="tab-content space-y-6">
+        
+        <!-- Live Holographic Canvas Screen / Visualizer Header -->
+        <div class="relative w-full rounded-xl overflow-hidden border border-cyan-500/40 bg-slate-950/90 shadow-2xl scanlines group">
+          
+          <!-- Laser Scan Line Effect -->
+          <div id="laserBeam" class="laser-beam"></div>
+
+          <!-- Top Status Indicators on Visualizer Screen -->
+          <div class="absolute top-3 left-3 right-3 z-30 flex items-center justify-between pointer-events-none">
+            <div class="flex items-center space-x-2 bg-slate-900/80 backdrop-blur-md px-3 py-1 rounded-full border border-cyan-800/50">
+              <i class="fa-solid fa-microchip text-cyan-400 text-xs"></i>
+              <span class="text-[11px] font-mono-code text-cyan-300 uppercase tracking-wider">HOLOGRAPHIC LEARNING STREAM</span>
+            </div>
+
+            <!-- Pulsing LIVE Status Badge -->
+            <div class="flex items-center space-x-2 bg-red-950/90 backdrop-blur-md px-3 py-1 rounded-full border border-red-500/60 shadow-lg shadow-red-950">
+              <span class="w-2 h-2 rounded-full bg-red-500 animate-ping"></span>
+              <span class="text-xs font-black font-mono-code text-red-200 tracking-widest">LIVE LECTURE</span>
+            </div>
+          </div>
+
+          <!-- Bottom Visualizer Controls & Parameters -->
+          <div class="absolute bottom-3 left-3 right-3 z-30 flex items-center justify-between pointer-events-none">
+            <div class="text-[11px] font-mono-code text-slate-400 bg-slate-900/80 backdrop-blur-md px-2.5 py-1 rounded border border-slate-800">
+              STREAM: <span id="streamFreq" class="text-cyan-400">1080p @ 60 FPS</span>
+            </div>
+            <div class="text-[11px] font-mono-code text-slate-400 bg-slate-900/80 backdrop-blur-md px-2.5 py-1 rounded border border-slate-800">
+              STATION: <span class="text-emerald-400">MZ-ACADEMIA-01</span>
+            </div>
+          </div>
+
+          <!-- Interactive HTML5 Canvas Stream Visualizer -->
+          <canvas id="learningCanvas" class="w-full h-56 md:h-72 block cursor-crosshair"></canvas>
+        </div>
+
+        <!-- Visualizer Mode Controls & Actions -->
+        <div class="flex flex-wrap items-center justify-between gap-3 bg-slate-950/60 p-3 rounded-xl border border-cyan-900/40">
+          <div class="flex items-center space-x-2">
+            <span class="text-xs font-mono-code text-slate-400">Hologram Render Mode:</span>
+            <button onclick="cycleCanvasMode()" class="px-3 py-1.5 rounded-lg bg-slate-900 border border-cyan-700 hover:bg-cyan-950 text-cyan-300 text-xs font-mono-code flex items-center space-x-1.5 transition">
+              <i class="fa-solid fa-wave-square text-cyan-400"></i>
+              <span id="canvasModeLabel">AUDIO & NEURAL MESH</span>
+            </button>
+          </div>
+
+          <div class="flex items-center space-x-2">
+            <button onclick="simulateLecturePulse()" class="px-3.5 py-1.5 rounded-lg bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-bold text-xs font-mono-code transition flex items-center space-x-1">
+              <i class="fa-solid fa-bolt text-amber-300"></i>
+              <span>Pulse Sync Lecture</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Course Cards Grid -->
+        <div>
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-lg font-orbitron font-bold text-white flex items-center gap-2">
+              <i class="fa-solid fa-book-bookmark text-cyan-400"></i>
+              <span>Enrolled Cyber Courses</span>
+            </h3>
+            <span class="text-xs font-mono-code text-slate-400">4 Active Enrolled</span>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            
+            <!-- Course 1: Cyber Security -->
+            <div class="p-4 rounded-xl bg-slate-900/80 border border-cyan-900/60 hover:border-cyan-400/80 transition group relative overflow-hidden">
+              <div class="flex items-start justify-between mb-2">
+                <div>
+                  <span class="px-2 py-0.5 rounded text-[10px] font-mono-code bg-cyan-950 text-cyan-400 border border-cyan-800">CS-501</span>
+                  <h4 class="font-orbitron font-bold text-white text-base mt-1 group-hover:text-neonCyan transition">Advanced Cyber Security & Threat Vectors</h4>
+                </div>
+                <div class="w-10 h-10 rounded-lg bg-cyan-950/80 border border-cyan-500/40 flex items-center justify-center text-cyan-400 font-bold text-lg">
+                  <i class="fa-solid fa-shield-virus"></i>
+                </div>
+              </div>
+              
+              <p class="text-xs text-slate-400 mb-3">Quantum encryption breakdown, zero-day mitigation, and biometric verification architecture.</p>
+
+              <!-- Progress Bar -->
+              <div class="space-y-1 mb-3">
+                <div class="flex justify-between text-[11px] font-mono-code">
+                  <span class="text-slate-400">Progress</span>
+                  <span class="text-cyan-400 font-bold">88%</span>
+                </div>
+                <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
+                  <div class="bg-gradient-to-r from-cyan-500 to-blue-500 h-full w-[88%] rounded-full shadow-sm shadow-cyan-500"></div>
+                </div>
+              </div>
+
+              <div class="flex items-center justify-between text-xs pt-2 border-t border-slate-800">
+                <span class="text-slate-400 font-mono-code"><i class="fa-solid fa-user-tie text-cyan-400 mr-1"></i>Dr. Vance</span>
+                <button onclick="launchCourseModule('CS-501')" class="px-3 py-1 rounded bg-cyan-950 hover:bg-cyan-800 text-cyan-300 font-bold font-mono-code border border-cyan-600/50 transition">
+                  Enter Hub
+                </button>
+              </div>
+            </div>
+
+            <!-- Course 2: AI & Quantum Computing -->
+            <div class="p-4 rounded-xl bg-slate-900/80 border border-cyan-900/60 hover:border-purple-400/80 transition group relative overflow-hidden">
+              <div class="flex items-start justify-between mb-2">
+                <div>
+                  <span class="px-2 py-0.5 rounded text-[10px] font-mono-code bg-purple-950 text-purple-400 border border-purple-800">AI-702</span>
+                  <h4 class="font-orbitron font-bold text-white text-base mt-1 group-hover:text-purple-300 transition">AI & Quantum Neural Networks</h4>
+                </div>
+                <div class="w-10 h-10 rounded-lg bg-purple-950/80 border border-purple-500/40 flex items-center justify-center text-purple-400 font-bold text-lg">
+                  <i class="fa-solid fa-brain"></i>
+                </div>
+              </div>
+              
+              <p class="text-xs text-slate-400 mb-3">Qubit state manipulation, deep neural synthesis, and autonomous learning models.</p>
+
+              <!-- Progress Bar -->
+              <div class="space-y-1 mb-3">
+                <div class="flex justify-between text-[11px] font-mono-code">
+                  <span class="text-slate-400">Progress</span>
+                  <span class="text-purple-400 font-bold">94%</span>
+                </div>
+                <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
+                  <div class="bg-gradient-to-r from-purple-500 to-cyan-400 h-full w-[94%] rounded-full shadow-sm shadow-purple-500"></div>
+                </div>
+              </div>
+
+              <div class="flex items-center justify-between text-xs pt-2 border-t border-slate-800">
+                <span class="text-slate-400 font-mono-code"><i class="fa-solid fa-user-tie text-purple-400 mr-1"></i>Prof. K. Nova</span>
+                <button onclick="launchCourseModule('AI-702')" class="px-3 py-1 rounded bg-purple-950 hover:bg-purple-800 text-purple-300 font-bold font-mono-code border border-purple-600/50 transition">
+                  Enter Hub
+                </button>
+              </div>
+            </div>
+
+            <!-- Course 3: Data Structures -->
+            <div class="p-4 rounded-xl bg-slate-900/80 border border-cyan-900/60 hover:border-emerald-400/80 transition group relative overflow-hidden">
+              <div class="flex items-start justify-between mb-2">
+                <div>
+                  <span class="px-2 py-0.5 rounded text-[10px] font-mono-code bg-emerald-950 text-emerald-400 border border-emerald-800">DS-304</span>
+                  <h4 class="font-orbitron font-bold text-white text-base mt-1 group-hover:text-emerald-300 transition">High-Scale Data Structures & Graphs</h4>
+                </div>
+                <div class="w-10 h-10 rounded-lg bg-emerald-950/80 border border-emerald-500/40 flex items-center justify-center text-emerald-400 font-bold text-lg">
+                  <i class="fa-solid fa-diagram-project"></i>
+                </div>
+              </div>
+              
+              <p class="text-xs text-slate-400 mb-3">Distributed B-Trees, graph traversal optimization, and real-time buffer management.</p>
+
+              <!-- Progress Bar -->
+              <div class="space-y-1 mb-3">
+                <div class="flex justify-between text-[11px] font-mono-code">
+                  <span class="text-slate-400">Progress</span>
+                  <span class="text-emerald-400 font-bold">76%</span>
+                </div>
+                <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
+                  <div class="bg-gradient-to-r from-emerald-500 to-teal-400 h-full w-[76%] rounded-full shadow-sm shadow-emerald-500"></div>
+                </div>
+              </div>
+
+              <div class="flex items-center justify-between text-xs pt-2 border-t border-slate-800">
+                <span class="text-slate-400 font-mono-code"><i class="fa-solid fa-user-tie text-emerald-400 mr-1"></i>Dr. Aris</span>
+                <button onclick="launchCourseModule('DS-304')" class="px-3 py-1 rounded bg-emerald-950 hover:bg-emerald-800 text-emerald-300 font-bold font-mono-code border border-emerald-600/50 transition">
+                  Enter Hub
+                </button>
+              </div>
+            </div>
+
+            <!-- Course 4: Blockchain & Cryptography -->
+            <div class="p-4 rounded-xl bg-slate-900/80 border border-cyan-900/60 hover:border-amber-400/80 transition group relative overflow-hidden">
+              <div class="flex items-start justify-between mb-2">
+                <div>
+                  <span class="px-2 py-0.5 rounded text-[10px] font-mono-code bg-amber-950 text-amber-400 border border-amber-800">BC-602</span>
+                  <h4 class="font-orbitron font-bold text-white text-base mt-1 group-hover:text-amber-300 transition">Autonomous Blockchain Systems</h4>
+                </div>
+                <div class="w-10 h-10 rounded-lg bg-amber-950/80 border border-amber-500/40 flex items-center justify-center text-amber-400 font-bold text-lg">
+                  <i class="fa-solid fa-link"></i>
+                </div>
+              </div>
+              
+              <p class="text-xs text-slate-400 mb-3">Zero-knowledge proof verification, consensus protocols, and decentralized ledgers.</p>
+
+              <!-- Progress Bar -->
+              <div class="space-y-1 mb-3">
+                <div class="flex justify-between text-[11px] font-mono-code">
+                  <span class="text-slate-400">Progress</span>
+                  <span class="text-amber-400 font-bold">82%</span>
+                </div>
+                <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
+                  <div class="bg-gradient-to-r from-amber-500 to-orange-400 h-full w-[82%] rounded-full shadow-sm shadow-amber-500"></div>
+                </div>
+              </div>
+
+              <div class="flex items-center justify-between text-xs pt-2 border-t border-slate-800">
+                <span class="text-slate-400 font-mono-code"><i class="fa-solid fa-user-tie text-amber-400 mr-1"></i>Prof. E. Ray</span>
+                <button onclick="launchCourseModule('BC-602')" class="px-3 py-1 rounded bg-amber-950 hover:bg-amber-800 text-amber-300 font-bold font-mono-code border border-amber-600/50 transition">
+                  Enter Hub
+                </button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+
+      <!-- TAB 2: STUDENT ID & BIOMETRIC AUTH -->
+      <div id="content-idcard" class="tab-content hidden space-y-6">
+        
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+          
+          <!-- Holographic Interactive Student ID Card Preview (Left Side) -->
+          <div class="lg:col-span-5 flex flex-col items-center">
+            
+            <div id="studentIdCardVisual" class="w-full max-w-sm cyber-glass-glow rounded-2xl p-5 relative overflow-hidden transition-transform duration-500 hover:scale-[1.02] shadow-2xl border border-cyan-400/60">
+              
+              <!-- Top Card Header -->
+              <div class="flex justify-between items-center border-b border-cyan-900/60 pb-3 mb-4">
+                <div class="flex items-center space-x-2">
+                  <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-cyan-500 to-blue-700 flex items-center justify-center font-orbitron font-black text-white text-sm">
+                    MZ
+                  </div>
+                  <div>
+                    <h5 class="font-orbitron font-bold text-xs text-white tracking-widest">MZ ACADEMY</h5>
+                    <p class="text-[9px] text-cyan-400 font-mono-code uppercase">Verified Student ID</p>
+                  </div>
+                </div>
+                <div class="text-right">
+                  <span class="px-2 py-0.5 rounded bg-emerald-950 text-emerald-400 text-[9px] font-mono-code border border-emerald-500/40">
+                    ● ACTIVE
+                  </span>
+                </div>
+              </div>
+
+              <!-- Student Profile Avatar & Biometric Stamp -->
+              <div class="flex items-center space-x-4 mb-4">
+                <div class="relative group">
+                  <div class="w-20 h-20 rounded-xl bg-slate-900 border-2 border-cyan-400 overflow-hidden relative flex items-center justify-center shadow-lg">
+                    <i id="avatarIcon" class="fa-solid fa-user-astronaut text-4xl text-cyan-300"></i>
+                    <!-- Scanning line overlay on avatar -->
+                    <div class="absolute inset-0 bg-gradient-to-b from-transparent via-cyan-400/30 to-transparent animate-laser-scan pointer-events-none"></div>
+                  </div>
+                  <span class="absolute -bottom-1 -right-1 bg-cyan-950 text-cyan-400 border border-cyan-500 p-1 rounded-md text-[9px]">
+                    <i class="fa-solid fa-qrcode"></i>
+                  </span>
+                </div>
+
+                <div class="space-y-1">
+                  <h4 id="cardStudentName" class="font-orbitron font-black text-white text-lg tracking-wide">ALEX V. MERCER</h4>
+                  <p id="cardStudentMajor" class="text-xs text-cyan-300 font-mono-code">Major: Quantum Cybernetics</p>
+                  <p class="text-[11px] text-slate-400 font-mono-code">ID: <strong id="cardStudentId" class="text-slate-200">MZ-2026-9042</strong></p>
+                  <p class="text-[11px] text-slate-400 font-mono-code">CLEARANCE: <span class="text-emerald-400 font-bold">LEVEL-4</span></p>
+                </div>
+              </div>
+
+              <!-- Card Details Grid -->
+              <div class="grid grid-cols-2 gap-2 bg-slate-950/80 p-3 rounded-xl border border-cyan-900/50 text-[11px] font-mono-code mb-4">
+                <div>
+                  <span class="text-slate-500 block">SEMESTER</span>
+                  <span class="text-slate-200 font-bold">Year 3 / Term II</span>
+                </div>
+                <div>
+                  <span class="text-slate-500 block">GPA STATUS</span>
+                  <span id="cardGpaDisplay" class="text-emerald-400 font-bold">3.92 / 4.00</span>
+                </div>
+                <div>
+                  <span class="text-slate-500 block">BIOMETRIC LOG</span>
+                  <span class="text-cyan-400">RETINA MATCHED</span>
+                </div>
+                <div>
+                  <span class="text-slate-500 block">ENCRYPTION</span>
+                  <span class="text-purple-400">AES-256 REALTIME</span>
+                </div>
+              </div>
+
+              <!-- Barcode Hologram Representation -->
+              <div class="w-full h-8 bg-slate-900 rounded border border-cyan-900/60 flex items-center justify-between px-3">
+                <div class="flex space-x-1 h-4 items-center">
+                  <span class="w-1 bg-cyan-400 h-full"></span>
+                  <span class="w-0.5 bg-cyan-400 h-full"></span>
+                  <span class="w-1.5 bg-cyan-400 h-full"></span>
+                  <span class="w-0.5 bg-cyan-400 h-full"></span>
+                  <span class="w-2 bg-cyan-400 h-full"></span>
+                  <span class="w-1 bg-cyan-400 h-full"></span>
+                  <span class="w-0.5 bg-cyan-400 h-full"></span>
+                  <span class="w-1.5 bg-cyan-400 h-full"></span>
+                </div>
+                <span class="text-[9px] font-mono-code text-cyan-400">SCAN TO AUTHENTICATE</span>
+              </div>
+
+            </div>
+
+            <button onclick="downloadStudentIdBadge()" class="mt-4 px-4 py-2 rounded-xl bg-slate-900 border border-cyan-700 hover:bg-cyan-950 text-cyan-300 font-mono-code text-xs font-bold transition flex items-center space-x-2">
+              <i class="fa-solid fa-download text-cyan-400"></i>
+              <span>Export Encrypted ID Badge</span>
+            </button>
+
+          </div>
+
+          <!-- Student Profile Login & Biometric Scanner (Right Side) -->
+          <div class="lg:col-span-7 cyber-glass-card rounded-2xl p-5 md:p-6 border border-cyan-900/60 space-y-4">
+            
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+              <div class="flex items-center space-x-2">
+                <i class="fa-solid fa-fingerprint text-neonCyan text-xl"></i>
+                <div>
+                  <h3 class="font-orbitron font-bold text-white text-base">Student Authentication Terminal</h3>
+                  <p class="text-xs text-slate-400">Update credentials & perform biometric scanning verification</p>
+                </div>
+              </div>
+              <span class="px-2.5 py-1 bg-cyan-950 text-cyan-400 rounded text-xs font-mono-code border border-cyan-800">
+                MZ-AUTH-GATE
+              </span>
+            </div>
+
+            <!-- Profile Selection Switcher -->
+            <div>
+              <label class="block text-xs font-mono-code text-cyan-400 mb-1">LOAD PRESET STUDENT PROFILE</label>
+              <div class="grid grid-cols-3 gap-2">
+                <button onclick="loadStudentProfile('alex')" class="p-2.5 rounded-lg bg-slate-900 border border-cyan-700 hover:bg-cyan-950 text-left transition">
+                  <div class="font-orbitron font-bold text-xs text-white">Alex Mercer</div>
+                  <div class="text-[10px] text-cyan-400 font-mono-code">3.92 GPA</div>
+                </button>
+                <button onclick="loadStudentProfile('sora')" class="p-2.5 rounded-lg bg-slate-900 border border-slate-800 hover:border-purple-500 text-left transition">
+                  <div class="font-orbitron font-bold text-xs text-white">Sora Takahashi</div>
+                  <div class="text-[10px] text-purple-400 font-mono-code">3.88 GPA</div>
+                </button>
+                <button onclick="loadStudentProfile('elena')" class="p-2.5 rounded-lg bg-slate-900 border border-slate-800 hover:border-emerald-500 text-left transition">
+                  <div class="font-orbitron font-bold text-xs text-white">Elena Rostova</div>
+                  <div class="text-[10px] text-emerald-400 font-mono-code">3.96 GPA</div>
+                </button>
+              </div>
+            </div>
+
+            <!-- Login Credentials Form -->
+            <form onsubmit="handleStudentAuthSubmit(event)" class="space-y-3">
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label class="block text-xs font-mono-code text-cyan-400 mb-1">FULL STUDENT NAME</label>
+                  <input type="text" id="inputStudentName" required value="Alex V. Mercer" class="w-full bg-slate-950 border border-cyan-800/80 rounded-lg px-3 py-2 text-white text-xs font-mono-code focus:outline-none focus:border-neonCyan">
+                </div>
+                <div>
+                  <label class="block text-xs font-mono-code text-cyan-400 mb-1">MAJOR FIELD OF STUDY</label>
+                  <input type="text" id="inputStudentMajor" required value="Quantum Cybernetics" class="w-full bg-slate-950 border border-cyan-800/80 rounded-lg px-3 py-2 text-white text-xs font-mono-code focus:outline-none focus:border-neonCyan">
+                </div>
+              </div>
+
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label class="block text-xs font-mono-code text-cyan-400 mb-1">STUDENT ID NUMBER</label>
+                  <input type="text" id="inputStudentId" required value="MZ-2026-9042" class="w-full bg-slate-950 border border-cyan-800/80 rounded-lg px-3 py-2 text-white text-xs font-mono-code focus:outline-none focus:border-neonCyan">
+                </div>
+                <div>
+                  <label class="block text-xs font-mono-code text-cyan-400 mb-1">QUANTUM CLEARANCE PASSCODE</label>
+                  <input type="password" value="••••••••••••" class="w-full bg-slate-950 border border-cyan-800/80 rounded-lg px-3 py-2 text-white text-xs font-mono-code focus:outline-none focus:border-neonCyan">
+                </div>
+              </div>
+
+              <!-- Biometric Trigger Button -->
+              <button type="submit" class="w-full py-3 rounded-xl bg-gradient-to-r from-cyan-600 via-blue-600 to-purple-600 hover:from-cyan-500 hover:to-purple-500 text-white font-bold font-orbitron text-xs tracking-wider uppercase transition shadow-lg shadow-cyan-950 flex items-center justify-center space-x-2 border border-cyan-300/30">
+                <i class="fa-solid fa-radar text-amber-300 animate-pulse"></i>
+                <span>Authenticate Credentials & Trigger Retinal Scan</span>
+              </button>
+            </form>
+
+            <!-- Authentication Status Console Output -->
+            <div class="p-3 rounded-xl bg-slate-950 border border-cyan-900/50 font-mono-code text-xs space-y-1">
+              <div class="text-slate-500 flex justify-between">
+                <span>SYSTEM LOG:</span>
+                <span id="authTimestamp" class="text-cyan-400">00:00:00</span>
+              </div>
+              <div id="authConsoleStatus" class="text-emerald-400">
+                > SESSION INITIALIZED. WAITING FOR BIOMETRIC SCANNER TRIGGER...
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- TAB 3: GRADE ANALYTICS & GPA CALCULATOR -->
+      <div id="content-grades" class="tab-content hidden space-y-6">
+        
+        <!-- Summary Stat Cards -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          
+          <div class="p-4 rounded-xl bg-slate-900/80 border border-cyan-900/50 hover:border-cyan-500/50 transition">
+            <div class="flex items-center justify-between text-xs text-slate-400 font-mono-code mb-1">
+              <span>CUMULATIVE GPA</span>
+              <i class="fa-solid fa-award text-cyan-400"></i>
+            </div>
+            <div class="text-3xl font-black font-orbitron text-white tracking-tight glow-text-cyan">
+              <span id="gpaScoreDisplay">3.92</span> <span class="text-xs font-normal text-slate-400">/ 4.00</span>
+            </div>
+            <div class="text-[11px] text-emerald-400 font-mono-code mt-1 flex items-center space-x-1">
+              <i class="fa-solid fa-caret-up"></i>
+              <span>Top 2% Academic Honor Roll</span>
+            </div>
+          </div>
+
+          <div class="p-4 rounded-xl bg-slate-900/80 border border-cyan-900/50 hover:border-purple-500/50 transition">
+            <div class="flex items-center justify-between text-xs text-slate-400 font-mono-code mb-1">
+              <span>CREDITS COMPLETED</span>
+              <i class="fa-solid fa-book-open text-purple-400"></i>
+            </div>
+            <div class="text-3xl font-black font-orbitron text-purple-300 tracking-tight">
+              86 <span class="text-xs font-normal text-slate-400">/ 120 Units</span>
+            </div>
+            <div class="text-[11px] text-purple-400 font-mono-code mt-1">
+              On track for Graduation 2027
+            </div>
+          </div>
+
+          <div class="p-4 rounded-xl bg-slate-900/80 border border-cyan-900/50 hover:border-emerald-500/50 transition">
+            <div class="flex items-center justify-between text-xs text-slate-400 font-mono-code mb-1">
+              <span>LAB & EXAM RATIO</span>
+              <i class="fa-solid fa-flask text-emerald-400"></i>
+            </div>
+            <div class="text-3xl font-black font-orbitron text-emerald-400 tracking-tight">
+              96.4%
+            </div>
+            <div class="text-[11px] text-slate-400 font-mono-code mt-1">
+              18/18 Labs Submitted
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Grade Analytics Interactive Canvas Chart -->
+        <div class="p-4 md:p-5 rounded-2xl bg-slate-950/80 border border-cyan-900/60 space-y-3">
+          <div class="flex items-center justify-between">
+            <div>
+              <h3 class="text-base font-orbitron font-bold text-white flex items-center gap-2">
+                <i class="fa-solid fa-chart-area text-cyan-400"></i>
+                <span>Semester GPA Progression Analytics</span>
+              </h3>
+              <p class="text-xs text-slate-400">Historical performance trend over past 4 academic terms</p>
+            </div>
+            <button onclick="refreshGradeChart()" class="px-3 py-1 rounded bg-slate-900 border border-cyan-700 text-cyan-300 text-xs font-mono-code hover:bg-cyan-950 transition">
+              <i class="fa-solid fa-rotate-right mr-1"></i>Redraw
+            </button>
+          </div>
+
+          <!-- HTML5 Grade Chart Canvas -->
+          <div class="w-full rounded-xl bg-slate-900/90 border border-slate-800 p-2 overflow-hidden">
+            <canvas id="gradeChartCanvas" class="w-full h-48 block"></canvas>
+          </div>
+        </div>
+
+        <!-- Dynamic GPA Interactive Predictor Calculator -->
+        <div class="cyber-glass-card rounded-2xl p-5 border border-cyan-900/60 space-y-4">
+          <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+            <div class="flex items-center space-x-2">
+              <i class="fa-solid fa-calculator text-amber-400 text-lg"></i>
+              <h3 class="font-orbitron font-bold text-white text-base">Interactive GPA Predictor Calculator</h3>
+            </div>
+            <span class="text-xs font-mono-code text-cyan-400">LIVE ADJUSTER</span>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4" id="gpaCalcCoursesContainer">
+            <!-- Dynamically populated course grade dropdowns -->
+          </div>
+
+          <div class="p-3 rounded-xl bg-slate-950 border border-cyan-800/80 flex items-center justify-between">
+            <span class="text-xs font-mono-code text-slate-300">ESTIMATED TARGET SEMESTER GPA:</span>
+            <span id="calculatedGpaValue" class="text-xl font-orbitron font-black text-neonCyan">3.92</span>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- TAB 4: INTERACTIVE CYBER LAB -->
+      <div id="content-lab" class="tab-content hidden space-y-4">
+        
+        <div class="cyber-glass-card rounded-2xl p-5 border border-cyan-900/60 space-y-4">
+          <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+            <div class="flex items-center space-x-2">
+              <i class="fa-solid fa-terminal text-emerald-400 text-lg"></i>
+              <div>
+                <h3 class="font-orbitron font-bold text-white text-base">Interactive Student Cyber Lab Terminal</h3>
+                <p class="text-xs text-slate-400">Execute commands to test neural algorithms, check server ping, and unlock XP</p>
+              </div>
+            </div>
+            <div class="text-xs font-mono-code text-emerald-400">
+              XP: <span id="studentXpScore" class="font-bold">1,450</span> PTS
+            </div>
+          </div>
+
+          <!-- Virtual Terminal Screen -->
+          <div class="bg-black/90 rounded-xl p-4 font-mono-code text-xs text-emerald-400 border border-emerald-900/50 h-56 overflow-y-auto space-y-1 scanlines" id="terminalOutput">
+            <div>[MZ-ACADEMIA LAB V4.2] Initializing Virtual Shell...</div>
+            <div>Type <span class="text-cyan-300">'help'</span> for available academic lab commands.</div>
+            <div>--------------------------------------------------</div>
+          </div>
+
+          <!-- Terminal Input Row -->
+          <form onsubmit="handleTerminalSubmit(event)" class="flex items-center gap-2">
+            <span class="text-cyan-400 font-mono-code text-xs font-bold">$</span>
+            <input type="text" id="terminalInput" placeholder="Type 'help', 'scan', 'grades', 'compile', 'clear'..." class="flex-grow bg-slate-950 border border-cyan-800 rounded-lg px-3 py-2 text-xs font-mono-code text-emerald-300 focus:outline-none focus:border-neonCyan">
+            <button type="submit" class="px-4 py-2 rounded-lg bg-emerald-950 border border-emerald-600 text-emerald-300 hover:bg-emerald-800 text-xs font-mono-code font-bold transition">
+              EXECUTE
+            </button>
+          </form>
+        </div>
+
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Biometric Scanner Modal Dialog -->
+  <div id="biometricModal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center p-4 hidden opacity-0 transition-opacity duration-300">
+    <div id="biometricModalCard" class="cyber-glass-glow w-full max-w-md rounded-2xl p-6 border border-cyan-400/60 relative shadow-2xl transform scale-95 transition-transform duration-300">
+      
+      <button onclick="closeBiometricScanModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white text-lg">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+
+      <div class="text-center space-y-4">
+        <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-cyan-950 border-2 border-cyan-400 text-neonCyan text-2xl relative">
+          <i class="fa-solid fa-eye animate-pulse"></i>
+          <div class="absolute inset-0 rounded-full border-2 border-cyan-400 animate-radar-spin border-t-transparent"></div>
+        </div>
+
+        <div>
+          <h3 class="font-orbitron font-bold text-lg text-white">Retinal Biometric Scanning</h3>
+          <p class="text-xs text-slate-400">Align student eye with optical sensor beam</p>
+        </div>
+
+        <!-- Holographic Scanner Canvas inside modal -->
+        <div class="relative w-full h-32 rounded-xl bg-slate-950 border border-cyan-800 overflow-hidden flex items-center justify-center scanlines">
+          <canvas id="modalScanCanvas" class="w-full h-full block"></canvas>
+          <div id="modalScanLaser" class="laser-beam laser-active"></div>
+        </div>
+
+        <div id="modalScanStatusText" class="text-xs font-mono-code text-cyan-400 animate-pulse">
+          INITIALIZING OPTICAL SCANNER...
+        </div>
+
+        <button onclick="executeModalScanProcess()" class="w-full py-2.5 rounded-xl bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-bold text-xs uppercase font-mono-code transition">
+          Confirm Biometric Identity
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <footer class="w-full border-t border-cyan-900/30 py-4 px-4 text-center text-xs font-mono-code text-slate-500">
+    <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
+      <div>© 2026 MZ DIGITAL ACADEMIC PORTAL. ALL RIGHTS RESERVED.</div>
+      <div class="flex items-center space-x-4">
+        <span class="hover:text-cyan-400 cursor-pointer">ACADEMIC DOCS</span>
+        <span class="hover:text-cyan-400 cursor-pointer">CAMPUS MESH NODE</span>
+        <span class="hover:text-cyan-400 cursor-pointer">ENCRYPTION PROTOCOL</span>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    /* ===================================================================
+       GLOBAL STATE & APPLICATION VARS
+       =================================================================== */
+    let currentTab = 'dashboard';
+    let isAudioEnabled = false;
+    let audioCtx = null;
+    let analyserNode = null;
+    let audioDataArray = null;
+
+    // Canvas render states
+    let animFrameId = null;
+    let canvasModeIndex = 0; // 0: Audio & Neural Mesh, 1: Holographic Waves, 2: Matrix Stream
+    const canvasModes = ['AUDIO & NEURAL MESH', 'HOLOGRAPHIC WAVES', 'MATRIX DATA STREAM'];
+
+    // Student profile state
+    let activeStudent = {
+      name: 'ALEX V. MERCER',
+      major: 'Quantum Cybernetics',
+      id: 'MZ-2026-9042',
+      gpa: 3.92,
+      xp: 1450,
+      courses: [
+        { code: 'CS-501', title: 'Advanced Cyber Security', grade: 'A', credits: 4 },
+        { code: 'AI-702', title: 'AI & Quantum Neural Networks', grade: 'A', credits: 4 },
+        { code: 'DS-304', title: 'High-Scale Data Structures', grade: 'A-', credits: 3 },
+        { code: 'BC-602', title: 'Autonomous Blockchain', grade: 'B+', credits: 3 }
+      ]
+    };
+
+    // Ambient Drone sound state
+    let isDroneActive = false;
+    let droneOsc1 = null, droneOsc2 = null, droneGain = null;
+
+    /* ===================================================================
+       INITIALIZATION & EVENT LISTENERS
+       =================================================================== */
+    window.addEventListener('DOMContentLoaded', () => {
+      setupLearningCanvas();
+      setupGradeChartCanvas();
+      populateGpaCalculator();
+      startTelemetryTicker();
+      requestAnimationFrame(renderLearningCanvasLoop);
+    });
+
+    window.addEventListener('resize', () => {
+      setupLearningCanvas();
+      setupGradeChartCanvas();
+    });
+
+    /* ===================================================================
+       TAB NAVIGATION CONTROLLER
+       =================================================================== */
+    function switchTab(tabId) {
+      playBeepSound(650, 0.06, 'sine');
+      
+      // Update Tab Button Styles
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+      const activeBtn = document.getElementById(`tab-${tabId}`);
+      if (activeBtn) activeBtn.classList.add('active');
+
+      // Hide all contents
+      document.querySelectorAll('.tab-content').forEach(content => content.classList.add('hidden'));
+      const activeContent = document.getElementById(`content-${tabId}`);
+      if (activeContent) activeContent.classList.remove('hidden');
+
+      currentTab = tabId;
+
+      if (tabId === 'grades') {
+        setTimeout(setupGradeChartCanvas, 50);
+      }
+    }
+
+    /* ===================================================================
+       WEB AUDIO API SYNTHESIZER (NO EXTERNAL AUDIO FILES)
+       =================================================================== */
+    function initAudioContext() {
+      if (!audioCtx) {
+        const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+        audioCtx = new AudioContextClass();
+
+        analyserNode = audioCtx.createAnalyser();
+        analyserNode.fftSize = 64;
+        audioDataArray = new Uint8Array(analyserNode.frequencyBinCount);
+      }
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+    }
+
+    function toggleAudioSystem() {
+      initAudioContext();
+      isAudioEnabled = !isAudioEnabled;
+
+      const icon = document.getElementById('soundIcon');
+      const text = document.getElementById('soundStatusText');
+      const miniBars = document.getElementById('miniAudioBars');
+
+      if (isAudioEnabled) {
+        icon.className = 'fa-solid fa-volume-high text-neonCyan';
+        text.innerText = 'AUDIO: LIVE';
+        text.className = 'text-neonCyan font-bold';
+        miniBars.classList.remove('opacity-40');
+        playBeepSound(880, 0.1, 'sine');
+      } else {
+        icon.className = 'fa-solid fa-volume-xmark text-slate-400';
+        text.innerText = 'AUDIO: OFF';
+        text.className = '';
+        miniBars.classList.add('opacity-40');
+        if (isDroneActive) toggleStudyAmbientDrone();
+      }
+    }
+
+    function playBeepSound(freq = 600, duration = 0.08, type = 'sine') {
+      if (!isAudioEnabled || !audioCtx) return;
+      try {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+
+        gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
+
+        osc.connect(gain);
+        if (analyserNode) gain.connect(analyserNode);
+        else gain.connect(audioCtx.destination);
+
+        osc.start();
+        osc.stop(audioCtx.currentTime + duration);
+      } catch (e) {}
+    }
+
+    function playScanSound() {
+      if (!isAudioEnabled || !audioCtx) return;
+      try {
+        const now = audioCtx.currentTime;
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(400, now);
+        osc.frequency.exponentialRampToValueAtTime(1400, now + 0.4);
+
+        gain.gain.setValueAtTime(0.1, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
+
+        osc.connect(gain);
+        if (analyserNode) gain.connect(analyserNode);
+        else gain.connect(audioCtx.destination);
+
+        osc.start();
+        osc.stop(now + 0.4);
+      } catch (e) {}
+    }
+
+    function toggleStudyAmbientDrone() {
+      initAudioContext();
+      if (!isAudioEnabled) toggleAudioSystem();
+
+      const btnLabel = document.getElementById('droneBtnLabel');
+      const btn = document.getElementById('ambientDroneBtn');
+
+      if (!isDroneActive) {
+        try {
+          droneOsc1 = audioCtx.createOscillator();
+          droneOsc2 = audioCtx.createOscillator();
+          droneGain = audioCtx.createGain();
+
+          const filter = audioCtx.createBiquadFilter();
+          filter.type = 'lowpass';
+          filter.frequency.setValueAtTime(240, audioCtx.currentTime);
+
+          droneOsc1.type = 'sine';
+          droneOsc1.frequency.setValueAtTime(130.81, audioCtx.currentTime); // C3 note
+
+          droneOsc2.type = 'triangle';
+          droneOsc2.frequency.setValueAtTime(131.2, audioCtx.currentTime); // Slight detune
+
+          droneGain.gain.setValueAtTime(0.03, audioCtx.currentTime);
+
+          droneOsc1.connect(filter);
+          droneOsc2.connect(filter);
+          filter.connect(droneGain);
+
+          if (analyserNode) {
+            droneGain.connect(analyserNode);
+            analyserNode.connect(audioCtx.destination);
+          } else {
+            droneGain.connect(audioCtx.destination);
+          }
+
+          droneOsc1.start();
+          droneOsc2.start();
+          isDroneActive = true;
+
+          btnLabel.innerText = 'HUM: ON';
+          btn.classList.add('border-purple-400', 'bg-purple-900/60');
+        } catch (e) {}
+      } else {
+        if (droneGain && audioCtx) {
+          droneGain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + 0.3);
+          setTimeout(() => {
+            if (droneOsc1) { droneOsc1.stop(); droneOsc1 = null; }
+            if (droneOsc2) { droneOsc2.stop(); droneOsc2 = null; }
+          }, 300);
+        }
+        isDroneActive = false;
+        btnLabel.innerText = 'STUDY HUM';
+        btn.classList.remove('border-purple-400', 'bg-purple-900/60');
+      }
+    }
+
+    /* ===================================================================
+       CANVAS VISUALIZER ENGINE
+       =================================================================== */
+    let learningCanvas, mainCtx;
+    let wavePhase = 0;
+    const meshParticles = Array.from({ length: 35 }, () => ({
+      x: Math.random() * 800,
+      y: Math.random() * 300,
+      vx: (Math.random() - 0.5) * 1.2,
+      vy: (Math.random() - 0.5) * 1.2,
+      size: Math.random() * 2.5 + 1
+    }));
+
+    function setupLearningCanvas() {
+      learningCanvas = document.getElementById('learningCanvas');
+      if (!learningCanvas) return;
+      mainCtx = learningCanvas.getContext('2d');
+
+      const rect = learningCanvas.getBoundingClientRect();
+      learningCanvas.width = rect.width * (window.devicePixelRatio || 1);
+      learningCanvas.height = rect.height * (window.devicePixelRatio || 1);
+      mainCtx.scale(window.devicePixelRatio || 1, window.devicePixelRatio || 1);
+    }
+
+    function cycleCanvasMode() {
+      playBeepSound(750, 0.05, 'triangle');
+      canvasModeIndex = (canvasModeIndex + 1) % canvasModes.length;
+      document.getElementById('canvasModeLabel').innerText = canvasModes[canvasModeIndex];
+    }
+
+    function simulateLecturePulse() {
+      playScanSound();
+      wavePhase += 3.0;
+      const laser = document.getElementById('laserBeam');
+      if (laser) {
+        laser.classList.add('laser-active');
+        setTimeout(() => laser.classList.remove('laser-active'), 1800);
+      }
+    }
+
+    function renderLearningCanvasLoop() {
+      if (!learningCanvas || !mainCtx) return;
+
+      const w = learningCanvas.getBoundingClientRect().width;
+      const h = learningCanvas.getBoundingClientRect().height;
+
+      // Dark futuristic clear
+      mainCtx.fillStyle = 'rgba(3, 7, 18, 0.28)';
+      mainCtx.fillRect(0, 0, w, h);
+
+      // Render Grid lines
+      mainCtx.save();
+      mainCtx.strokeStyle = 'rgba(0, 242, 254, 0.06)';
+      mainCtx.lineWidth = 1;
+      for (let x = 0; x < w; x += 30) {
+        mainCtx.beginPath(); mainCtx.moveTo(x, 0); mainCtx.lineTo(x, h); mainCtx.stroke();
+      }
+      for (let y = 0; y < h; y += 30) {
+        mainCtx.beginPath(); mainCtx.moveTo(0, y); mainCtx.lineTo(w, y); mainCtx.stroke();
+      }
+      mainCtx.restore();
+
+      // Read audio spectrum if available
+      if (analyserNode && isAudioEnabled) {
+        analyserNode.getByteFrequencyData(audioDataArray);
+      }
+
+      // Render Active Canvas Mode
+      if (canvasModeIndex === 0) {
+        drawAudioNeuralMesh(w, h);
+      } else if (canvasModeIndex === 1) {
+        drawHolographicWaves(w, h);
+      } else {
+        drawMatrixStream(w, h);
+      }
+
+      wavePhase += 0.035;
+      requestAnimationFrame(renderLearningCanvasLoop);
+    }
+
+    function drawAudioNeuralMesh(w, h) {
+      mainCtx.save();
+      
+      // Update and draw floating particles with connecting lines
+      meshParticles.forEach((p, i) => {
+        p.x += p.vx;
+        p.y += p.vy;
+
+        if (p.x < 0 || p.x > w) p.vx *= -1;
+        if (p.y < 0 || p.y > h) p.vy *= -1;
+
+        mainCtx.beginPath();
+        mainCtx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        mainCtx.fillStyle = i % 2 === 0 ? '#00f2fe' : '#a855f7';
+        mainCtx.shadowColor = mainCtx.fillStyle;
+        mainCtx.shadowBlur = 8;
+        mainCtx.fill();
+
+        // Connect nearby particles
+        for (let j = i + 1; j < meshParticles.length; j++) {
+          const p2 = meshParticles[j];
+          const dist = Math.hypot(p.x - p2.x, p.y - p2.y);
+          if (dist < 100) {
+            mainCtx.beginPath();
+            mainCtx.moveTo(p.x, p.y);
+            mainCtx.lineTo(p2.x, p2.y);
+            mainCtx.strokeStyle = `rgba(0, 242, 254, ${1 - dist / 100})`;
+            mainCtx.lineWidth = 0.8;
+            mainCtx.stroke();
+          }
+        }
+      });
+
+      mainCtx.restore();
+    }
+
+    function drawHolographicWaves(w, h) {
+      mainCtx.save();
+      const centerY = h / 2;
+
+      mainCtx.beginPath();
+      mainCtx.lineWidth = 3;
+      mainCtx.strokeStyle = '#00f2fe';
+      mainCtx.shadowColor = '#00f2fe';
+      mainCtx.shadowBlur = 10;
+
+      for (let x = 0; x <= w; x += 6) {
+        const audioVal = (audioDataArray && audioDataArray[Math.floor(x / w * 16)]) ? audioDataArray[Math.floor(x / w * 16)] * 0.2 : 0;
+        const y = centerY + Math.sin(x * 0.02 + wavePhase) * (20 + audioVal) + Math.cos(x * 0.01 - wavePhase) * 12;
+        if (x === 0) mainCtx.moveTo(x, y);
+        else mainCtx.lineTo(x, y);
+      }
+      mainCtx.stroke();
+
+      mainCtx.restore();
+    }
+
+    function drawMatrixStream(w, h) {
+      mainCtx.save();
+      mainCtx.font = '11px Space Mono, monospace';
+      mainCtx.fillStyle = '#10b981';
+
+      const cols = Math.floor(w / 20);
+      for (let i = 0; i < cols; i++) {
+        const char = String.fromCharCode(0x30A0 + Math.floor(Math.random() * 96));
+        const x = i * 20;
+        const y = ((Math.sin(i + wavePhase * 2) + 1) / 2) * h;
+        mainCtx.fillText(char, x, y);
+      }
+      mainCtx.restore();
+    }
+
+    /* ===================================================================
+       GRADE ANALYTICS CANVAS CHART
+       =================================================================== */
+    function setupGradeChartCanvas() {
+      const chartCanvas = document.getElementById('gradeChartCanvas');
+      if (!chartCanvas) return;
+      const ctx = chartCanvas.getContext('2d');
+
+      const rect = chartCanvas.getBoundingClientRect();
+      chartCanvas.width = rect.width * (window.devicePixelRatio || 1);
+      chartCanvas.height = rect.height * (window.devicePixelRatio || 1);
+      ctx.scale(window.devicePixelRatio || 1, window.devicePixelRatio || 1);
+
+      const w = rect.width;
+      const h = rect.height;
+
+      ctx.clearRect(0, 0, w, h);
+
+      // Data Points (GPA per semester)
+      const semData = [
+        { label: 'Term I', gpa: 3.80 },
+        { label: 'Term II', gpa: 3.88 },
+        { label: 'Term III', gpa: 3.90 },
+        { label: 'Term IV', gpa: 3.92 }
+      ];
+
+      const padding = 35;
+      const graphW = w - padding * 2;
+      const graphH = h - padding * 2;
+
+      // Draw Grid Lines
+      ctx.strokeStyle = 'rgba(255, 255, 255, 0.08)';
+      ctx.lineWidth = 1;
+
+      for (let i = 0; i <= 4; i++) {
+        const y = padding + (graphH / 4) * i;
+        ctx.beginPath();
+        ctx.moveTo(padding, y);
+        ctx.lineTo(w - padding, y);
+        ctx.stroke();
+
+        ctx.fillStyle = '#64748b';
+        ctx.font = '10px Space Mono, monospace';
+        const val = (4.0 - (i * 0.25)).toFixed(2);
+        ctx.fillText(val, 5, y + 3);
+      }
+
+      // Draw Line Graph
+      ctx.beginPath();
+      ctx.strokeStyle = '#00f2fe';
+      ctx.lineWidth = 3;
+      ctx.shadowColor = '#00f2fe';
+      ctx.shadowBlur = 10;
+
+      const points = [];
+      semData.forEach((d, idx) => {
+        const x = padding + (graphW / (semData.length - 1)) * idx;
+        const normY = (4.0 - d.gpa) / 1.0; // scale from 3.0 to 4.0
+        const y = padding + normY * graphH;
+        points.push({ x, y, label: d.label, gpa: d.gpa });
+
+        if (idx === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      });
+      ctx.stroke();
+
+      // Draw Point Nodes
+      points.forEach(p => {
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, 5, 0, Math.PI * 2);
+        ctx.fillStyle = '#10b981';
+        ctx.fill();
+
+        ctx.fillStyle = '#f8fafc';
+        ctx.font = 'bold 11px Orbitron, sans-serif';
+        ctx.fillText(p.gpa.toFixed(2), p.x - 12, p.y - 10);
+
+        ctx.fillStyle = '#94a3b8';
+        ctx.font = '10px Space Mono, monospace';
+        ctx.fillText(p.label, p.x - 18, h - 8);
+      });
+    }
+
+    function refreshGradeChart() {
+      playBeepSound(800, 0.08, 'sine');
+      setupGradeChartCanvas();
+    }
+
+    /* ===================================================================
+       GPA CALCULATOR LOGIC
+       =================================================================== */
+    const gradePointsMap = { 'A': 4.0, 'A-': 3.7, 'B+': 3.3, 'B': 3.0, 'B-': 2.7 };
+
+    function populateGpaCalculator() {
+      const container = document.getElementById('gpaCalcCoursesContainer');
+      if (!container) return;
+
+      container.innerHTML = activeStudent.courses.map((c, idx) => `
+        <div class="p-3 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-between">
+          <div>
+            <div class="font-orbitron font-bold text-xs text-white">${c.code}: ${c.title}</div>
+            <div class="text-[10px] text-slate-400 font-mono-code">${c.credits} Credits</div>
+          </div>
+          <select onchange="recalculateTargetGpa()" id="gpaSelect-${idx}" class="bg-slate-950 border border-cyan-800 rounded px-2 py-1 text-xs font-mono-code text-cyan-300 focus:outline-none">
+            <option value="A" ${c.grade === 'A' ? 'selected' : ''}>A (4.0)</option>
+            <option value="A-" ${c.grade === 'A-' ? 'selected' : ''}>A- (3.7)</option>
+            <option value="B+" ${c.grade === 'B+' ? 'selected' : ''}>B+ (3.3)</option>
+            <option value="B" ${c.grade === 'B' ? 'selected' : ''}>B (3.0)</option>
+          </select>
+        </div>
+      `).join('');
+
+      recalculateTargetGpa();
+    }
+
+    function recalculateTargetGpa() {
+      let totalPts = 0;
+      let totalCredits = 0;
+
+      activeStudent.courses.forEach((c, idx) => {
+        const sel = document.getElementById(`gpaSelect-${idx}`);
+        const gradeKey = sel ? sel.value : c.grade;
+        const pts = gradePointsMap[gradeKey] || 4.0;
+        totalPts += pts * c.credits;
+        totalCredits += c.credits;
+      });
+
+      const calcResult = (totalPts / totalCredits).toFixed(2);
+      const valEl = document.getElementById('calculatedGpaValue');
+      if (valEl) valEl.innerText = calcResult;
+    }
+
+    /* ===================================================================
+       STUDENT AUTHENTICATION & PROFILE SWITCHER
+       =================================================================== */
+    const presetProfiles = {
+      alex: {
+        name: 'ALEX V. MERCER',
+        major: 'Quantum Cybernetics',
+        id: 'MZ-2026-9042',
+        gpa: '3.92 / 4.00',
+        icon: 'fa-user-astronaut'
+      },
+      sora: {
+        name: 'SORA TAKAHASHI',
+        major: 'Neural AI Architecture',
+        id: 'MZ-2026-1180',
+        gpa: '3.88 / 4.00',
+        icon: 'fa-user-ninja'
+      },
+      elena: {
+        name: 'ELENA ROSTOVA',
+        major: 'Autonomous Cryptography',
+        id: 'MZ-2026-7721',
+        gpa: '3.96 / 4.00',
+        icon: 'fa-user-gear'
+      }
+    };
+
+    function loadStudentProfile(key) {
+      playBeepSound(700, 0.08, 'triangle');
+      const p = presetProfiles[key];
+      if (!p) return;
+
+      document.getElementById('inputStudentName').value = p.name;
+      document.getElementById('inputStudentMajor').value = p.major;
+      document.getElementById('inputStudentId').value = p.id;
+
+      updateCardDisplay(p.name, p.major, p.id, p.gpa, p.icon);
+    }
+
+    function updateCardDisplay(name, major, id, gpa, icon) {
+      document.getElementById('cardStudentName').innerText = name;
+      document.getElementById('cardStudentMajor').innerText = `Major: ${major}`;
+      document.getElementById('cardStudentId').innerText = id;
+      document.getElementById('cardGpaDisplay').innerText = gpa;
+      if (icon) {
+        document.getElementById('avatarIcon').className = `fa-solid ${icon} text-4xl text-cyan-300`;
+      }
+    }
+
+    function handleStudentAuthSubmit(e) {
+      e.preventDefault();
+      playScanSound();
+
+      const name = document.getElementById('inputStudentName').value;
+      const major = document.getElementById('inputStudentMajor').value;
+      const id = document.getElementById('inputStudentId').value;
+
+      updateCardDisplay(name, major, id, '3.92 / 4.00');
+
+      const consoleLog = document.getElementById('authConsoleStatus');
+      consoleLog.innerText = `> VERIFYING RETINA SCAN & CREDENTIALS FOR ${id}...`;
+      consoleLog.className = 'text-amber-400 animate-pulse';
+
+      setTimeout(() => {
+        consoleLog.innerText = `> SUCCESS: BIOMETRIC AUTHENTICATION GRANTED FOR [${name.toUpperCase()}]. CLEARANCE LEVEL-4.`;
+        consoleLog.className = 'text-emerald-400 font-bold';
+        playBeepSound(950, 0.15, 'sine');
+      }, 1500);
+    }
+
+    /* ===================================================================
+       BIOMETRIC SCAN MODAL
+       =================================================================== */
+    function triggerBiometricScanModal() {
+      playBeepSound(600, 0.08, 'sine');
+      const modal = document.getElementById('biometricModal');
+      const card = document.getElementById('biometricModalCard');
+
+      modal.classList.remove('hidden');
+      setTimeout(() => {
+        modal.classList.remove('opacity-0');
+        card.classList.remove('scale-95');
+      }, 10);
+    }
+
+    function closeBiometricScanModal() {
+      playBeepSound(400, 0.05, 'sine');
+      const modal = document.getElementById('biometricModal');
+      const card = document.getElementById('biometricModalCard');
+
+      modal.classList.add('opacity-0');
+      card.classList.add('scale-95');
+      setTimeout(() => {
+        modal.classList.add('hidden');
+      }, 300);
+    }
+
+    function executeModalScanProcess() {
+      playScanSound();
+      const txt = document.getElementById('modalScanStatusText');
+      txt.innerText = 'SCANNING RETINAL PATTERN... 100% MATCH!';
+      txt.className = 'text-xs font-mono-code text-emerald-400 font-bold';
+
+      setTimeout(() => {
+        closeBiometricScanModal();
+        switchTab('dashboard');
+      }, 1200);
+    }
+
+    /* ===================================================================
+       CYBER LAB TERMINAL LOGIC
+       =================================================================== */
+    function handleTerminalSubmit(e) {
+      e.preventDefault();
+      const inputEl = document.getElementById('terminalInput');
+      const cmd = inputEl.value.trim().toLowerCase();
+      if (!cmd) return;
+
+      playBeepSound(800, 0.04, 'square');
+      const output = document.getElementById('terminalOutput');
+
+      const userLine = document.createElement('div');
+      userLine.innerHTML = `<span class="text-cyan-400">$ ${cmd}</span>`;
+      output.appendChild(userLine);
+
+      const respLine = document.createElement('div');
+
+      switch(cmd) {
+        case 'help':
+          respLine.innerText = 'Commands: help, scan, gpa, compile, ping, clear';
+          break;
+        case 'scan':
+          respLine.innerText = '> RETINA SENSORS ACTIVE. ALL NODES VERIFIED SECURE.';
+          break;
+        case 'gpa':
+          respLine.innerText = '> CURRENT CUMULATIVE GPA: 3.92 (HONOR ROLL ACCELERATED)';
+          break;
+        case 'compile':
+          activeStudent.xp += 50;
+          document.getElementById('studentXpScore').innerText = activeStudent.xp.toLocaleString();
+          respLine.innerText = '> NEURAL NET LAB COMPILED SUCCESSFULLY! (+50 XP EARNED)';
+          respLine.className = 'text-amber-300 font-bold';
+          break;
+        case 'ping':
+          respLine.innerText = '> PING MZ-ACADEMIA-SERVER [127.0.0.1]: 8ms LATENCY.';
+          break;
+        case 'clear':
+          output.innerHTML = '<div>[MZ-ACADEMIA LAB V4.2] Terminal Cleared.</div>';
+          inputEl.value = '';
+          return;
+        default:
+          respLine.innerText = `> Unknown command: '${cmd}'. Type 'help' for options.`;
+          respLine.className = 'text-red-400';
+      }
+
+      output.appendChild(respLine);
+      output.scrollTop = output.scrollHeight;
+      inputEl.value = '';
+    }
+
+    /* ===================================================================
+       MISC UTILITIES & TELEMETRY
+       =================================================================== */
+    function triggerMzLogoEffect() {
+      playScanSound();
+      wavePhase += 1.5;
+      alertNotification('MZ Quantum Academic Link Synchronized.');
+    }
+
+    function alertNotification(msg) {
+      // Toast overlay inside app instead of window alert
+      const toast = document.createElement('div');
+      toast.className = 'fixed bottom-5 right-5 z-50 px-4 py-2.5 rounded-xl bg-slate-900 border border-cyan-400 text-neonCyan font-mono-code text-xs shadow-2xl transition-all duration-300';
+      toast.innerHTML = `<i class="fa-solid fa-bell mr-2"></i>${msg}`;
+      document.body.appendChild(toast);
+      setTimeout(() => toast.remove(), 2500);
+    }
+
+    function launchCourseModule(code) {
+      playBeepSound(700, 0.08, 'sine');
+      alertNotification(`Connecting to Live Holographic Studio for ${code}...`);
+    }
+
+    function downloadStudentIdBadge() {
+      playBeepSound(900, 0.1, 'sine');
+      alertNotification('Student ID Encrypted Token generated & exported!');
+    }
+
+    function startTelemetryTicker() {
+      setInterval(() => {
+        const latency = Math.floor(Math.random() * 5) + 6;
+        const latEl = document.getElementById('hubLatency');
+        if (latEl) latEl.innerText = latency + 'ms';
+
+        const tsEl = document.getElementById('authTimestamp');
+        if (tsEl) tsEl.innerText = new Date().toLocaleTimeString('en-US', { hour12: false });
+      }, 3000);
+    }
+  </script>
+</body>
+</html>

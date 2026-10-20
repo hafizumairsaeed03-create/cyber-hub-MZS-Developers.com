@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSRF & API Flaws - Cyber Academy</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+
+    <!-- NAVBAR -->
+    <nav class="navbar">
+        <div class="logo">Cyber Academy</div>
+        <ul class="nav-links">
+            <li><a href="home.html">Home</a></li>
+            <li><a href="services.html">Services</a></li>
+            <li><a href="ethical-hacking.html">Ethical Hacking</a></li>
+            <li><a href="web-pentesting.html">Web PenTesting</a></li>
+            <li><a href="home.html#contact">Contact</a></li>
+        </ul>
+        <div class="nav-btns">
+            <button class="btn-outline">Login</button>
+            <button class="btn-primary">Register</button>
+        </div>
+    </nav>
+
+    <!-- CLEAN TEXT & HEADINGS SECTION -->
+    <section class="section-container" style="margin-top: 100px; max-width: 900px;">
+        <span class="badge">VULNERABILITY DEEP DIVE</span>
+        <h1 style="font-size: 2.8rem; margin-top: 10px; color: #fff;">CSRF & API Vulnerability Audit</h1>
+        <p class="section-desc" style="font-size: 1.1rem; line-height: 1.7; color: #cbd5e1; margin-top: 15px;">
+            Cross-Site Request Forgery (CSRF) forces end users to execute unwanted actions on web applications in which they are currently authenticated. Coupled with API security flaws, attackers can bypass security controls and alter sensitive data seamlessly.
+        </p>
+
+        <hr style="border: 0; height: 1px; background: #334155; margin: 40px 0;">
+
+        <!-- 1. CSRF & API VECTORS -->
+        <h2 style="color: #00f2fe; font-size: 1.8rem; margin-bottom: 15px;">1. Key CSRF & API Vectors We Test</h2>
+        
+        <h3 style="color: #fff; font-size: 1.3rem; margin-top: 20px;">A. Cross-Site Request Forgery (CSRF)</h3>
+        <p style="color: #94a3b8; line-height: 1.6;">Auditing state-changing POST/PUT requests for anti-CSRF token verification.</p>
+        <ul style="color: #cbd5e1; margin-left: 20px; line-height: 1.8;">
+            <li><strong>Missing CSRF Tokens:</strong> Executing actions (email/password change) without anti-forgery tokens.</li>
+            <li><strong>Token Validation Bypasses:</strong> Testing empty tokens, duplicate tokens, or static tokens across different user sessions.</li>
+        </ul>
+
+        <h3 style="color: #fff; font-size: 1.3rem; margin-top: 20px;">B. REST & GraphQL API Flaws</h3>
+        <p style="color: #94a3b8; line-height: 1.6;">Inspecting modern API endpoints for authorization and data exposure bugs.</p>
+        <ul style="color: #cbd5e1; margin-left: 20px; line-height: 1.8;">
+            <li><strong>Broken Object Level Authorization (BOLA):</strong> Testing access to private API objects via modified JSON payloads.</li>
+            <li><strong>Mass Assignment:</strong> Injecting administrative parameters (e.g., `"is_admin": true`) in user update endpoints.</li>
+        </ul>
+
+        <h3 style="color: #fff; font-size: 1.3rem; margin-top: 20px;">C. Insecure CORS & JWT Implementation</h3>
+        <ul style="color: #cbd5e1; margin-left: 20px; line-height: 1.8;">
+            <li><strong>JWT Token Vulnerabilities:</strong> Testing 'none' algorithm bypasses, weak HMAC secret keys, and missing expiry checks.</li>
+        </ul>
+
+        <hr style="border: 0; height: 1px; background: #334155; margin: 40px 0;">
+
+        <!-- 2. MITIGATION GUIDELINES -->
+        <h2 style="color: #00f2fe; font-size: 1.8rem; margin-bottom: 15px;">2. Mitigation & Hardening Rules</h2>
+        <ul style="color: #cbd5e1; margin-left: 20px; line-height: 2;">
+            <li><strong>Anti-CSRF Tokens:</strong> Use unique, cryptographically secure synchronizer tokens for state-changing requests.</li>
+            <li><strong>SameSite Cookie Attribute:</strong> Set `SameSite=Strict` or `SameSite=Lax` on all session management cookies.</li>
+            <li><strong>Strict API Authorization:</strong> Implement object-level and function-level access control on every single API route.</li>
+            <li><strong>JSON Schema Validation:</strong> Validate incoming request bodies against strict schemas to prevent mass assignment.</li>
+        </ul>
+
+        <hr style="border: 0; height: 1px; background: #334155; margin: 40px 0;">
+
+        <!-- 3. TOOLS USED -->
+        <h2 style="color: #00f2fe; font-size: 1.8rem; margin-bottom: 15px;">3. Audit Tools & Methodology</h2>
+        <p style="color: #cbd5e1; line-height: 1.7;">
+            We use <strong>Burp Suite CSRF Generator</strong>, <strong>Postman API Security Testing</strong>, <strong>Kiterunner</strong> for API endpoint discovery, and <strong>jwt_tool</strong> for token manipulation assessments.
+        </p>
+
+        <!-- ACTION BUTTONS -->
+        <div style="margin-top: 50px; display: flex; align-items: center; gap: 20px;">
+            <a href="web-pentesting.html" class="btn-outline" style="text-decoration: none;">&larr; Back to Web PenTesting</a>
+            <a href="home.html#contact" class="btn-primary" style="text-decoration: none;">Request API Audit</a>
+        </div>
+    </section>
+
+</body>
+</html>

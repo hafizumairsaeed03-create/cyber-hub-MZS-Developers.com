@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MZ Real-Time Cyber Threat Dashboard - MZ Cyber Sentinel</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        cyberdark: '#080c14',
+                        carddark: '#0d1527',
+                        borderdark: '#1e293b',
+                        neonblue: '#00f2fe',
+                        neonpurple: '#7928ca'
+                    }
+                }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #080c14;
+            color: #f1f5f9;
+            overflow-x: hidden;
+        }
+        .mono-font {
+            font-family: 'JetBrains Mono', monospace;
+        }
+        /* Custom scrollbar for log streams */
+        ::-webkit-scrollbar {
+            width: 5px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #080c14;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1e293b;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #00f2fe;
+        }
+        .grid-bg {
+            background-image: 
+                linear-gradient(to right, rgba(0, 242, 254, 0.05) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(0, 242, 254, 0.05) 1px, transparent 1px);
+            background-size: 30px 30px;
+        }
+    </style>
+</head>
+<body class="min-h-screen grid-bg flex flex-col">
+
+    <header class="border-b border-borderdark bg-carddark/80 backdrop-blur-md sticky top-0 z-50 px-4 sm:px-6 py-3 flex items-center justify-between">
+        <div class="flex items-center gap-3">
+            <!-- MZ Logo SVG -->
+            <div class="relative flex items-center justify-center bg-gradient-to-br from-cyan-500/20 to-purple-600/20 border border-cyan-500/40 rounded-xl p-2 shadow-[0_0_15px_rgba(0,242,254,0.3)]">
+                <svg class="w-8 h-8 text-cyan-400" viewBox="0 0 100 100" fill="none" stroke="currentColor" stroke-width="6">
+                    <path d="M15 80V25L45 65L75 25V80" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M70 70H90M80 60V80" stroke-linecap="round"/>
+                    <circle cx="45" cy="45" r="3" fill="#00f2fe"/>
+                    <circle cx="20" cy="50" r="2" fill="#7928ca"/>
+                </svg>
+            </div>
+            <div>
+                <h1 class="font-bold tracking-wider text-base sm:text-lg bg-gradient-to-r from-cyan-400 via-blue-400 to-purple-400 bg-clip-text text-transparent">MZ Cyber Sentinel</h1>
+                <p class="text-xs text-slate-400">Advanced Threat Intelligence</p>
+            </div>
+        </div>
+        <div class="flex items-center gap-4">
+            <div class="hidden md:flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/30 px-3 py-1.5 rounded-full text-xs text-emerald-400">
+                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+                <span>Defense Grid Active</span>
+            </div>
+            <div class="text-xs text-slate-400 mono-font bg-slate-900/80 px-3 py-1.5 rounded border border-slate-800">
+                <i class="fa-solid fa-clock mr-1 text-cyan-400"></i> <span id="utc-clock">00:00:00 UTC</span>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-1 p-3 sm:p-6 grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-6">
+        
+        <!-- Left Column: Analytics & Control Panels -->
+        <div class="lg:col-span-4 flex flex-col gap-4 sm:gap-6">
+            
+            <!-- Main Title Card matching reference style -->
+            <div class="bg-carddark/90 border border-borderdark rounded-2xl p-5 shadow-xl relative overflow-hidden group">
+                <div class="absolute -right-10 -bottom-10 w-32 h-32 bg-cyan-500/10 rounded-full blur-2xl group-hover:bg-cyan-500/20 transition-all duration-500"></div>
+                <div class="inline-block bg-cyan-500/10 text-cyan-400 text-xs font-semibold px-3 py-1 rounded-full border border-cyan-500/20 mb-3 uppercase tracking-wider">
+                    Analytics
+                </div>
+                <h2 class="text-xl sm:text-2xl font-bold text-white mb-2 tracking-tight">Real-Time Cyber Threat Dashboard</h2>
+                <p class="text-xs sm:text-sm text-slate-400 leading-relaxed mb-4">
+                    Live map visualizing global cyber attacks, IP blacklists, and incoming anomaly streams across secure nodes.
+                </p>
+                <div class="grid grid-cols-2 gap-3 pt-3 border-t border-slate-800/80 text-xs">
+                    <div>
+                        <span class="text-slate-500 block">Active Attacks</span>
+                        <span class="text-cyan-400 font-bold mono-font text-base" id="stat-attacks">1,482/s</span>
+                    </div>
+                    <div>
+                        <span class="text-slate-500 block">Blocked IPs</span>
+                        <span class="text-purple-400 font-bold mono-font text-base" id="stat-ips">89,240</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Attack Types Breakdown Card -->
+            <div class="bg-carddark/90 border border-borderdark rounded-2xl p-5 shadow-xl flex-1 flex flex-col justify-between">
+                <div>
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-sm font-semibold text-slate-200 uppercase tracking-wider flex items-center gap-2">
+                            <i class="fa-solid fa-chart-pie text-cyan-400"></i> Attack Vector Breakdown
+                        </h3>
+                        <span class="text-xs text-slate-500 mono-font">LIVE</span>
+                    </div>
+                    
+                    <div class="space-y-3">
+                        <div>
+                            <div class="flex justify-between text-xs mb-1">
+                                <span class="text-slate-300">DDoS Volumetric</span>
+                                <span class="text-cyan-400 font-bold">45%</span>
+                            </div>
+                            <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
+                                <div class="bg-gradient-to-r from-cyan-500 to-blue-500 h-full rounded-full transition-all duration-1000" style="width: 45%;"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between text-xs mb-1">
+                                <span class="text-slate-300">Malware Payload</span>
+                                <span class="text-purple-400 font-bold">30%</span>
+                            </div>
+                            <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
+                                <div class="bg-gradient-to-r from-purple-500 to-pink-500 h-full rounded-full transition-all duration-1000" style="width: 30%;"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between text-xs mb-1">
+                                <span class="text-slate-300">Phishing & Credential Stuffing</span>
+                                <span class="text-amber-400 font-bold">25%</span>
+                            </div>
+                            <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
+                                <div class="bg-gradient-to-r from-amber-500 to-orange-500 h-full rounded-full transition-all duration-1000" style="width: 25%;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-6 pt-4 border-t border-slate-800/80 flex items-center justify-between text-xs text-slate-400">
+                    <span>Sentinel Guard Protocol</span>
+                    <span class="text-emerald-400 font-semibold flex items-center gap-1"><i class="fa-solid fa-shield-halved"></i> Optimal</span>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Right Column: Interactive Globe Simulation & Threat Stream Log -->
+        <div class="lg:col-span-8 grid grid-cols-1 xl:grid-cols-12 gap-4 sm:gap-6">
+            
+            <!-- Live Globe Simulation Canvas Box -->
+            <div class="xl:col-span-8 bg-carddark/90 border border-borderdark rounded-2xl p-4 shadow-xl flex flex-col relative overflow-hidden min-h-[350px] lg:min-h-[450px]">
+                <div class="flex items-center justify-between mb-2 z-10">
+                    <div class="flex items-center gap-2">
+                        <span class="w-2.5 h-2.5 rounded-full bg-cyan-400 animate-pulse"></span>
+                        <h3 class="text-xs sm:text-sm font-semibold tracking-wider text-slate-200">Global Threat Matrix</h3>
+                    </div>
+                    <div class="flex gap-2 text-xs">
+                        <button onclick="toggleSpeed()" id="speed-btn" class="bg-slate-800 hover:bg-slate-700 text-cyan-400 px-2.5 py-1 rounded border border-slate-700 transition">Speed: 1x</button>
+                    </div>
+                </div>
+
+                <!-- Canvas container for 3D Globe representation -->
+                <div class="flex-1 relative w-full h-full flex items-center justify-center cursor-grab active:cursor-grabbing">
+                    <canvas id="globeCanvas" class="w-full h-full absolute inset-0"></canvas>
+                    <div class="absolute bottom-3 left-3 bg-black/40 backdrop-blur-md px-3 py-1.5 rounded-lg border border-white/5 text-[10px] sm:text-xs text-slate-300 pointer-events-none">
+                        <i class="fa-solid fa-earth-americas text-cyan-400 mr-1"></i> Interactive Holographic Node Projection
+                    </div>
+                </div>
+            </div>
+
+            <!-- Threat Events Stream Sidebar -->
+            <div class="xl:col-span-4 bg-carddark/90 border border-borderdark rounded-2xl p-4 shadow-xl flex flex-col h-[350px] xl:h-auto">
+                <div class="flex items-center justify-between pb-3 border-b border-slate-800 mb-3">
+                    <h3 class="text-xs sm:text-sm font-semibold text-slate-200 uppercase tracking-wider flex items-center gap-2">
+                        <i class="fa-solid fa-terminal text-cyan-400"></i> Threat Events
+                    </h3>
+                    <span class="text-[10px] bg-red-500/20 text-red-400 px-2 py-0.5 rounded border border-red-500/30 animate-pulse">LIVE FEED</span>
+                </div>
+
+                <!-- Scrollable Log Container -->
+                <div id="log-container" class="flex-1 overflow-y-auto space-y-2 pr-1 mono-font text-[11px] sm:text-xs">
+                    <!-- Dynamic logs injected via JS -->
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+
+    <script>
+        // UTC Clock Updater
+        function updateClock() {
+            const now = new Date();
+            document.getElementById('utc-clock').textContent = now.toUTCString().slice(17, 25) + ' UTC';
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
+
+        // Canvas 3D-like Glowing Globe & Attack Arcs Simulation
+        const canvas = document.getElementById('globeCanvas');
+        const ctx = canvas.getContext('2d');
+
+        let width, height;
+        let rotationAngle = 0;
+        let rotationSpeed = 0.005;
+
+        function resizeCanvas() {
+            const rect = canvas.parentElement.getBoundingClientRect();
+            canvas.width = rect.width * window.devicePixelRatio;
+            canvas.height = rect.height * window.devicePixelRatio;
+            ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+            width = rect.width;
+            height = rect.height;
+        }
+
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        // Node cities simulation
+        const cities = [
+            { name: "New York", lat: 40.7128, lon: -74.0060, x: 0, y: 0 },
+            { name: "Frankfurt", lat: 50.1109, lon: 8.6821, x: 0, y: 0 },
+            { name: "Tokyo", lat: 35.6762, lon: 139.6503, x: 0, y: 0 },
+            { name: "Sydney", lat: -33.8688, lon: 151.2093, x: 0, y: 0 },
+            { name: "São Paulo", lat: -23.5505, lon: -46.6333, x: 0, y: 0 },
+            { name: "London", lat: 51.5074, lon: -0.1278, x: 0, y: 0 },
+            { name: "Singapore", lat: 1.3521, lon: 103.8198, x: 0, y: 0 }
+        ];
+
+        // Active Attack Arcs
+        let attacks = [];
+
+        function spawnAttack() {
+            const source = cities[Math.floor(Math.random() * cities.length)];
+            let target = cities[Math.floor(Math.random() * cities.length)];
+            while (target === source) {
+                target = cities[Math.floor(Math.random() * cities.length)];
+            }
+            attacks.push({
+                source,
+                target,
+                progress: 0,
+                speed: 0.015 + Math.random() * 0.02,
+                color: Math.random() > 0.5 ? '#00f2fe' : '#7928ca'
+            });
+            if (attacks.length > 12) attacks.shift();
+        }
+
+        setInterval(spawnAttack, 800);
+
+        // Interactive mouse drag to rotate globe faster
+        let isDragging = false;
+        let startX = 0;
+
+        canvas.addEventListener('mousedown', (e) => {
+            isDragging = true;
+            startX = e.clientX;
+        });
+
+        window.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
+            const deltaX = e.clientX - startX;
+            rotationAngle += deltaX * 0.005;
+            startX = e.clientX;
+        });
+
+        window.addEventListener('mouseup', () => {
+            isDragging = false;
+        });
+
+        // Touch support for mobile
+        canvas.addEventListener('touchstart', (e) => {
+            isDragging = true;
+            startX = e.touches[0].clientX;
+        });
+
+        window.addEventListener('touchmove', (e) => {
+            if (!isDragging) return;
+            const deltaX = e.touches[0].clientX - startX;
+            rotationAngle += deltaX * 0.005;
+            startX = e.touches[0].clientX;
+        });
+
+        window.addEventListener('touchend', () => {
+            isDragging = false;
+        });
+
+        function toggleSpeed() {
+            if (rotationSpeed === 0.005) {
+                rotationSpeed = 0.015;
+                document.getElementById('speed-btn').textContent = "Speed: 3x";
+            } else if (rotationSpeed === 0.015) {
+                rotationSpeed = 0.0;
+                document.getElementById('speed-btn').textContent = "Speed: Paused";
+            } else {
+                rotationSpeed = 0.005;
+                document.getElementById('speed-btn').textContent = "Speed: 1x";
+            }
+        }
+
+        // Render loop
+        function drawGlobe() {
+            ctx.clearRect(0, 0, width, height);
+
+            const centerX = width / 2;
+            const centerY = height / 2;
+            const radius = Math.min(width, height) * 0.36;
+
+            if (!isDragging) {
+                rotationAngle += rotationSpeed;
+            }
+
+            // Outer Atmospheric Glow
+            const gradientGlow = ctx.createRadialGradient(centerX, centerY, radius * 0.8, centerX, centerY, radius * 1.3);
+            gradientGlow.addColorStop(0, 'rgba(0, 242, 254, 0.15)');
+            gradientGlow.addColorStop(1, 'transparent');
+            ctx.fillStyle = gradientGlow;
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, radius * 1.3, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Globe Body Base
+            const globeGrad = ctx.createRadialGradient(centerX - radius * 0.3, centerY - radius * 0.3, radius * 0.1, centerX, centerY, radius);
+            globeGrad.addColorStop(0, '#0f172a');
+            globeGrad.addColorStop(1, '#050b14');
+            ctx.fillStyle = globeGrad;
+            ctx.beginPath();
+            ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.strokeStyle = 'rgba(0, 242, 254, 0.4)';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            // Latitude & Longitude grid lines
+            ctx.strokeStyle = 'rgba(0, 242, 254, 0.12)';
+            ctx.lineWidth = 1;
+            
+            // Draw rotating longitude lines
+            for (let i = 0; i < 6; i++) {
+                let angle = rotationAngle + (i * Math.PI / 3);
+                ctx.beginPath();
+                ctx.ellipse(centerX, centerY, radius * Math.abs(Math.cos(angle)), radius, 0, 0, Math.PI * 2);
+                ctx.stroke();
+            }
+
+            // Draw latitude lines
+            for (let lat = -60; lat <= 60; lat += 30) {
+                let latRadius = radius * Math.cos(lat * Math.PI / 180);
+                let yOffset = centerY + (radius * (lat / 90) * 0.7);
+                ctx.beginPath();
+                ctx.ellipse(centerX, yOffset, latRadius, latRadius * 0.25, 0, 0, Math.PI * 2);
+                ctx.stroke();
+            }
+
+            // Project Cities
+            const projectedCities = cities.map(city => {
+                const lonRad = (city.lon * Math.PI / 180) + rotationAngle;
+                const latRad = city.lat * Math.PI / 180;
+                
+                // 3D rotation projection math
+                const x3d = radius * Math.cos(latRad) * Math.sin(lonRad);
+                const y3d = radius * Math.sin(latRad);
+                const z3d = radius * Math.cos(latRad) * Math.cos(lonRad);
+
+                return {
+                    name: city.name,
+                    x: centerX + x3d,
+                    y: centerY - y3d,
+                    z: z3d
+                };
+            });
+
+            // Draw Attack Arcs
+            attacks.forEach(atk => {
+                const s = projectedCities.find(c => c.name === atk.source.name);
+                const t = projectedCities.find(c => c.name === atk.target.name);
+
+                if (s && t && s.z > -radius * 0.2 && t.z > -radius * 0.2) {
+                    atk.progress += atk.speed;
+                    if (atk.progress > 1) atk.progress = 1;
+
+                    // Quadratic curve for arc height
+                    const midX = (s.x + t.x) / 2;
+                    const midY = (s.y + t.y) / 2 - 50;
+
+                    ctx.beginPath();
+                    ctx.moveTo(s.x, s.y);
+                    ctx.quadraticCurveTo(midX, midY, t.x, t.y);
+                    ctx.strokeStyle = atk.color;
+                    ctx.lineWidth = 1.5;
+                    ctx.setLineDash([4, 4]);
+                    ctx.stroke();
+                    ctx.setLineDash([]);
+
+                    // Moving pulse particle along arc
+                    const curX = (1 - atk.progress) * (1 - atk.progress) * s.x + 2 * (1 - atk.progress) * atk.progress * midX + atk.progress * atk.progress * t.x;
+                    const curY = (1 - atk.progress) * (1 - atk.progress) * s.y + 2 * (1 - atk.progress) * atk.progress * midY + atk.progress * atk.progress * t.y;
+
+                    ctx.fillStyle = '#ffffff';
+                    ctx.beginPath();
+                    ctx.arc(curX, curY, 3, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            });
+
+            // Draw City Nodes
+            projectedCities.forEach(city => {
+                if (city.z > -radius * 0.3) {
+                    const alpha = Math.max(0.3, (city.z + radius) / (2 * radius));
+                    ctx.fillStyle = `rgba(0, 242, 254, ${alpha})`;
+                    ctx.beginPath();
+                    ctx.arc(city.x, city.y, 4, 0, Math.PI * 2);
+                    ctx.fill();
+
+                    // Pulse ring
+                    ctx.strokeStyle = `rgba(0, 242, 254, ${alpha * 0.6})`;
+                    ctx.lineWidth = 1;
+                    ctx.beginPath();
+                    ctx.arc(city.x, city.y, 8, 0, Math.PI * 2);
+                    ctx.stroke();
+
+                    // Label
+                    ctx.fillStyle = `rgba(241, 245, 249, ${alpha})`;
+                    ctx.font = '10px JetBrains Mono';
+                    ctx.fillText(city.name, city.x + 10, city.y + 3);
+                }
+            });
+
+            requestAnimationFrame(drawGlobe);
+        }
+
+        requestAnimationFrame(drawGlobe);
+
+        // Live Threat Log Stream Generator
+        const logContainer = document.getElementById('log-container');
+        const attackTypes = ['MALWARE_ATTACK', 'DDoS_VOLUMETRIC', 'SQL_INJECTION', 'BRUTE_FORCE', 'IP_BLACKLIST_UPDATE', 'ZERO_DAY_PROBE'];
+        const sourceIPs = ['192.168.1.1', '45.33.22.11', '10.0.0.5', '185.220.101.5', '178.62.204.1', '140.82.112.4', '198.51.100.42'];
+        const destinations = ['Frankfurt-Node-01', 'Tokyo-Core-04', 'NewYork-Gateway-02', 'London-Sentinel-09', 'Singapore-Edge-03'];
+
+        function addLogEntry() {
+            const type = attackTypes[Math.floor(Math.random() * attackTypes.length)];
+            const ip = sourceIPs[Math.floor(Math.random() * sourceIPs.length)];
+            const dest = destinations[Math.floor(Math.random() * destinations.length)];
+            const timeStr = new Date().toUTCString().slice(17, 25);
+
+            const div = document.createElement('div');
+            div.className = "p-2 rounded bg-slate-900/60 border border-slate-800/80 flex flex-col gap-1 transition-all hover:bg-slate-800/50";
+            
+            let colorClass = "text-cyan-400";
+            if(type.includes('DDoS')) colorClass = "text-purple-400";
+            if(type.includes('MALWARE')) colorClass = "text-red-400";
+            if(type.includes('BLACKLIST')) colorClass = "text-emerald-400";
+
+            div.innerHTML = `
+                <div class="flex items-center justify-between">
+                    <span class="${colorClass} font-bold">[${type}]</span>
+                    <span class="text-slate-500 text-[10px]">${timeStr}</span>
+                </div>
+                <div class="text-slate-300 flex justify-between">
+                    <span>IP: <span class="text-slate-100">${ip}</span></span>
+                    <span class="text-slate-400">-> ${dest}</span>
+                </div>
+            `;
+
+            logContainer.prepend(div);
+            if (logContainer.children.length > 30) {
+                logContainer.removeChild(logContainer.lastChild);
+            }
+        }
+
+        // Initial logs
+        for(let i=0; i<6; i++) {
+            addLogEntry();
+        }
+
+        setInterval(addLogEntry, 1400);
+    </script>
+</body>
+</html>

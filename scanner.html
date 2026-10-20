@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MZ CYBER-SCAN ULTRA // Modern Threat Intelligence</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --bg-dark: #030712;
+            --panel-bg: rgba(15, 23, 42, 0.75);
+            --border-glow: rgba(0, 240, 255, 0.3);
+            --cyan: #00f0ff;
+            --green: #00ff88;
+            --red: #ff0055;
+            --amber: #ffaa00;
+            --purple: #a855f7;
+            --text-main: #f8fafc;
+            --text-muted: #64748b;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            min-height: 100vh;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        #canvas-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .app-wrapper {
+            position: relative;
+            z-index: 1;
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        header {
+            background: var(--panel-bg);
+            border: 1px solid var(--border-glow);
+            border-radius: 16px;
+            padding: 16px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            backdrop-filter: blur(12px);
+            box-shadow: 0 0 30px rgba(0, 240, 255, 0.1);
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .brand-icon {
+            width: 42px;
+            height: 42px;
+            background: linear-gradient(135deg, var(--cyan), var(--purple));
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            color: #000;
+            box-shadow: 0 0 20px var(--cyan);
+            animation: pulse-glow 2s infinite ease-in-out;
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% { box-shadow: 0 0 15px var(--cyan); }
+            50% { box-shadow: 0 0 30px var(--cyan), 0 0 10px var(--purple); }
+        }
+
+        .brand-text h1 {
+            font-size: 18px;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            background: linear-gradient(90deg, #fff, var(--cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .brand-text p {
+            font-size: 10px;
+            color: var(--cyan);
+            letter-spacing: 3px;
+        }
+
+        .status-badge {
+            background: rgba(0, 255, 136, 0.1);
+            border: 1px solid var(--green);
+            color: var(--green);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--green);
+            box-shadow: 0 0 10px var(--green);
+            animation: blink 1s infinite alternate;
+        }
+
+        @keyframes blink { 100% { opacity: 0.3; } }
+
+        .search-container {
+            background: var(--panel-bg);
+            border: 1px solid var(--border-glow);
+            border-radius: 16px;
+            padding: 16px;
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            backdrop-filter: blur(12px);
+        }
+
+        .search-box {
+            flex: 1;
+            position: relative;
+        }
+
+        .search-box input {
+            width: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--border-glow);
+            border-radius: 10px;
+            padding: 14px 18px 14px 44px;
+            color: #fff;
+            font-size: 14px;
+            outline: none;
+            transition: 0.3s;
+        }
+
+        .search-box input:focus {
+            border-color: var(--cyan);
+            box-shadow: 0 0 20px rgba(0, 240, 255, 0.3);
+        }
+
+        .search-box i {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--cyan);
+        }
+
+        .btn-scan {
+            background: linear-gradient(90deg, var(--cyan), #0077ff);
+            color: #000;
+            border: none;
+            padding: 14px 28px;
+            border-radius: 10px;
+            font-weight: 800;
+            font-size: 13px;
+            cursor: pointer;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            box-shadow: 0 0 20px rgba(0, 240, 255, 0.4);
+            transition: 0.3s;
+        }
+
+        .btn-scan:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 30px var(--cyan);
+        }
+
+        .grid-dashboard {
+            display: grid;
+            grid-template-columns: 320px 1fr 380px;
+            gap: 20px;
+        }
+
+        .panel {
+            background: var(--panel-bg);
+            border: 1px solid var(--border-glow);
+            border-radius: 16px;
+            padding: 20px;
+            backdrop-filter: blur(12px);
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+            padding-bottom: 10px;
+        }
+
+        .panel-header h3 {
+            font-size: 13px;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            color: var(--cyan);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .radar-box {
+            width: 100%;
+            height: 220px;
+            background: rgba(0, 0, 0, 0.6);
+            border-radius: 12px;
+            border: 1px solid var(--border-glow);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .radar-sweep {
+            position: absolute;
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            border: 1px solid rgba(0, 240, 255, 0.2);
+            background: conic-gradient(from 0deg, rgba(0, 240, 255, 0.4), transparent 60deg, transparent 360deg);
+            animation: spin 3s linear infinite;
+        }
+
+        .radar-circle-1, .radar-circle-2 {
+            position: absolute;
+            border-radius: 50%;
+            border: 1px dashed rgba(0, 240, 255, 0.3);
+            pointer-events: none;
+        }
+
+        .radar-circle-1 { width: 140px; height: 140px; }
+        .radar-circle-2 { width: 80px; height: 80px; }
+
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+
+        .pipeline-step {
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: 0.3s;
+        }
+
+        .pipeline-step.active {
+            border-color: var(--cyan);
+            box-shadow: 0 0 15px rgba(0, 240, 255, 0.2);
+        }
+
+        .pipeline-step.done {
+            border-color: var(--green);
+        }
+
+        .step-info h4 { font-size: 13px; color: #fff; }
+        .step-info p { font-size: 11px; color: var(--text-muted); }
+
+        .metric-cards {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+        }
+
+        .metric-card {
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            padding: 12px;
+            text-align: center;
+        }
+
+        .metric-card h4 { font-size: 20px; color: #fff; }
+        .metric-card p { font-size: 10px; color: var(--text-muted); text-transform: uppercase; }
+
+        .vuln-item {
+            background: rgba(0, 0, 0, 0.4);
+            border-left: 4px solid var(--red);
+            border-radius: 8px;
+            padding: 14px;
+            margin-bottom: 10px;
+            transition: 0.3s;
+        }
+
+        .vuln-item:hover {
+            transform: translateX(4px);
+            background: rgba(255, 0, 85, 0.05);
+        }
+
+        .vuln-item.medium { border-left-color: var(--amber); }
+        .vuln-item.low { border-left-color: var(--cyan); }
+
+        .vuln-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
+        }
+
+        .vuln-title { font-weight: 700; font-size: 13px; color: #fff; }
+
+        .badge-severity {
+            font-size: 9px;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-weight: 800;
+            text-transform: uppercase;
+        }
+
+        .sev-high { background: rgba(255, 0, 85, 0.2); color: var(--red); border: 1px solid var(--red); }
+        .sev-med { background: rgba(255, 170, 0, 0.2); color: var(--amber); border: 1px solid var(--amber); }
+
+        .terminal-box {
+            background: #02040a;
+            border: 1px solid rgba(0, 240, 255, 0.2);
+            border-radius: 10px;
+            padding: 14px;
+            height: 280px;
+            overflow-y: auto;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 11px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .log-line { display: flex; gap: 8px; }
+        .log-time { color: var(--text-muted); }
+        .log-msg { color: var(--cyan); }
+        .log-msg.warn { color: var(--amber); }
+        .log-msg.error { color: var(--red); }
+
+        @media (max-width: 1200px) {
+            .grid-dashboard { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <main class="w-full min-h-screen flex flex-col justify-start py-4 px-3 lg:px-6 relative">
+    
+    <!-- Background Canvas Layer -->
+    <div class="absolute inset-0 z-0">
+        <canvas id="canvas-bg" class="w-full h-full opacity-50"></canvas>
+    </div>
+
+    <!-- Full Screen Cyber Glass Wrapper -->
+    <div class="w-full cyber-glass-glow rounded-2xl p-4 md:p-6 relative overflow-hidden z-10">
+        
+        <!-- Top Decorative Ambient Glows -->
+        <div class="absolute -top-20 -right-20 w-44 h-44 bg-cyan-500/20 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="absolute -bottom-20 -left-20 w-44 h-44 bg-blue-600/20 rounded-full blur-3xl pointer-events-none"></div>
+
+        <!-- App Wrapper Content -->
+        <div class="app-wrapper" style="max-width: 100%; margin: 0; padding: 0; background: transparent; box-shadow: none; border: none;">
+            
+            <header>
+                <div class="brand">
+                    <div class="brand-icon"><i class="fa-solid fa-shield-halved"></i></div>
+                    <div class="brand-text">
+                        <h1>MZ CyberScan Ultra</h1>
+                        <p>REALTIME THREAT INTELLIGENCE</p>
+                    </div>
+                </div>
+                <div class="status-badge">
+                    <div class="dot"></div>
+                    SYSTEM ONLINE
+                </div>
+            </header>
+
+            <div class="search-container">
+                <div class="search-box">
+                    <i class="fa-solid fa-globe"></i>
+                    <input type="text" id="targetUrl" value="https://...">
+                </div>
+                <button class="btn-scan" onclick="startScan()">
+                    <i class="fa-solid fa-bolt"></i>
+                    LAUNCH SCAN
+                </button>
+            </div>
+
+            <div class="grid-dashboard">
+                <!-- Left Side: Radar & Pipeline -->
+                <div class="panel">
+                    <div class="panel-header">
+                        <h3><i class="fa-solid fa-radar"></i> Live Radar</h3>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</main>
+                <div class="radar-box">
+                    <div class="radar-sweep"></div>
+                    <div class="radar-circle-1"></div>
+                    <div class="radar-circle-2"></div>
+                    <i class="fa-solid fa-crosshairs" style="color: var(--cyan); font-size: 24px; z-index: 2;"></i>
+                </div>
+
+                <div class="panel-header">
+                    <h3><i class="fa-solid fa-list-check"></i> Audit Pipeline</h3>
+                </div>
+                <div class="pipeline-step active" id="step1">
+                    <div class="step-info">
+                        <h4>1. Reconnaissance</h4>
+                        <p>DNS & Header Fingerprinting</p>
+                    </div>
+                    <i class="fa-solid fa-spinner fa-spin" style="color: var(--cyan);" id="icon1"></i>
+                </div>
+                <div class="pipeline-step" id="step2">
+                    <div class="step-info">
+                        <h4>2. Endpoint Crawl</h4>
+                        <p>URL Parameter Mapping</p>
+                    </div>
+                    <i class="fa-solid fa-circle-notch" style="color: var(--text-muted);" id="icon2"></i>
+                </div>
+                <div class="pipeline-step" id="step3">
+                    <div class="step-info">
+                        <h4>3. Vulnerability Fuzzing</h4>
+                        <p>SQLi & XSS Payload Injection</p>
+                    </div>
+                    <i class="fa-solid fa-circle-notch" style="color: var(--text-muted);" id="icon3"></i>
+                </div>
+            </div>
+
+            <!-- Middle: Live Vulnerability Findings -->
+            <div class="panel">
+                <div class="panel-header">
+                    <h3><i class="fa-solid fa-bug"></i> Detected Vulnerabilities</h3>
+                    <span style="font-size: 11px; color: var(--text-muted);" id="vulnCounter">3 Issues Found</span>
+                </div>
+
+                <div class="metric-cards">
+                    <div class="metric-card">
+                        <h4 style="color: var(--red);" id="countHigh">1</h4>
+                        <p>High</p>
+                    </div>
+                    <div class="metric-card">
+                        <h4 style="color: var(--amber);" id="countMed">1</h4>
+                        <p>Medium</p>
+                    </div>
+                    <div class="metric-card">
+                        <h4 style="color: var(--cyan);" id="countLow">1</h4>
+                        <p>Low</p>
+                    </div>
+                </div>
+
+                <div id="vulnList">
+                    <div class="vuln-item">
+                        <div class="vuln-header">
+                            <span class="vuln-title">SQL Injection (Auth Bypass)</span>
+                            <span class="badge-severity sev-high">High</span>
+                        </div>
+                        <p style="font-size: 11px; color: var(--text-muted);">Param <code>?user=</code> is vulnerable to Boolean-based blind SQLi.</p>
+                    </div>
+
+                    <div class="vuln-item medium">
+                        <div class="vuln-header">
+                            <span class="vuln-title">Reflected XSS</span>
+                            <span class="badge-severity sev-med">Medium</span>
+                        </div>
+                        <p style="font-size: 11px; color: var(--text-muted);">Search bar fails to sanitize <code>&lt;script&gt;</code> tags in output.</p>
+                    </div>
+
+                    <div class="vuln-item low">
+                        <div class="vuln-header">
+                            <span class="vuln-title">Missing CSP Header</span>
+                            <span class="badge-severity sev-low">Low</span>
+                        </div>
+                        <p style="font-size: 11px; color: var(--text-muted);">Content-Security-Policy header is missing on server response.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Side: Terminal Logs -->
+            <div class="panel">
+                <div class="panel-header">
+                    <h3><i class="fa-solid fa-terminal"></i> Terminal Stream</h3>
+                </div>
+                <div class="terminal-box" id="terminalLog">
+                    <div class="log-line"><span class="log-time">[00:01]</span> <span class="log-msg">Scanner ready. Enter target URL...</span></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Canvas Particle Background
+        const canvas = document.getElementById('canvas-bg');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        for (let i = 0; i < 60; i++) {
+            particles.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                vx: (Math.random() - 0.5) * 0.8,
+                vy: (Math.random() - 0.5) * 0.8,
+                radius: Math.random() * 2 + 1
+            });
+        }
+
+        function animateBg() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = '#00f0ff';
+            ctx.strokeStyle = 'rgba(0, 240, 255, 0.05)';
+
+            particles.forEach((p, index) => {
+                p.x += p.vx;
+                p.y += p.vy;
+
+                if (p.x < 0 || p.x > canvas.width) p.vx *= -1;
+                if (p.y < 0 || p.y > canvas.height) p.vy *= -1;
+
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                ctx.fill();
+
+                for (let j = index + 1; j < particles.length; j++) {
+                    const p2 = particles[j];
+                    const dist = Math.hypot(p.x - p2.x, p.y - p2.y);
+                    if (dist < 120) {
+                        ctx.beginPath();
+                        ctx.moveTo(p.x, p.y);
+                        ctx.lineTo(p2.x, p2.y);
+                        ctx.stroke();
+                    }
+                }
+            });
+            requestAnimationFrame(animateBg);
+        }
+        animateBg();
+
+        // Scan Controller
+        function appendLog(msg, type = 'normal') {
+            const terminal = document.getElementById('terminalLog');
+            const time = new Date().toLocaleTimeString().split(' ')[0];
+            const div = document.createElement('div');
+            div.className = 'log-line';
+            div.innerHTML = `<span class="log-time">[${time}]</span> <span class="log-msg ${type}">${msg}</span>`;
+            terminal.appendChild(div);
+            terminal.scrollTop = terminal.scrollHeight;
+        }
+
+        function startScan() {
+            const url = document.getElementById('targetUrl').value;
+            appendLog(`Initiating deep scan on ${url}...`, 'normal');
+
+            // Reset Pipeline Visuals
+            document.getElementById('step1').className = 'pipeline-step active';
+            document.getElementById('icon1').className = 'fa-solid fa-spinner fa-spin';
+            
+            setTimeout(() => {
+                appendLog(`[RECON] Target IP resolved: 192.168.1.45`, 'normal');
+                document.getElementById('step1').className = 'pipeline-step done';
+                document.getElementById('icon1').className = 'fa-solid fa-check';
+                document.getElementById('icon1').style.color = 'var(--green)';
+
+                document.getElementById('step2').className = 'pipeline-step active';
+                document.getElementById('icon2').className = 'fa-solid fa-spinner fa-spin';
+                document.getElementById('icon2').style.color = 'var(--cyan)';
+            }, 1200);
+
+            setTimeout(() => {
+                appendLog(`[CRAWL] Discovered 14 parameters across 4 endpoints`, 'warn');
+                document.getElementById('step2').className = 'pipeline-step done';
+                document.getElementById('icon2').className = 'fa-solid fa-check';
+                document.getElementById('icon2').style.color = 'var(--green)';
+
+                document.getElementById('step3').className = 'pipeline-step active';
+                document.getElementById('icon3').className = 'fa-solid fa-spinner fa-spin';
+                document.getElementById('icon3').style.color = 'var(--cyan)';
+            }, 2400);
+
+            setTimeout(() => {
+                appendLog(`[FUZZ] High risk anomaly found in ?user= payload`, 'error');
+                document.getElementById('step3').className = 'pipeline-step done';
+                document.getElementById('icon3').className = 'fa-solid fa-check';
+                document.getElementById('icon3').style.color = 'var(--green)';
+                appendLog(`Scan Completed Successfully!`, 'normal');
+            }, 3600);
+        }
+    </script>
+</body>
+</html>

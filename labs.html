@@ -1,0 +1,1350 @@
+<!DOCTYPE html>
+<html lang="en" class="dark h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MZ Academy - Modern 24/7 Interactive Practical Studio</title>
+    
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        cyberDark: '#030712',
+                        cyberNavy: '#0b1329',
+                        cyberCard: 'rgba(15, 23, 42, 0.75)',
+                        cyberBorder: 'rgba(0, 246, 255, 0.25)',
+                        cyberCyan: '#00f6ff',
+                        cyberPurple: '#b026ff',
+                        cyberGreen: '#10b981',
+                        cyberPink: '#ff007f',
+                        cyberAmber: '#f59e0b'
+                    },
+                    boxShadow: {
+                        cyberGlow: '0 0 25px rgba(0, 246, 255, 0.4)',
+                        neonBorder: '0 0 15px rgba(0, 246, 255, 0.35), inset 0 0 15px rgba(0, 246, 255, 0.08)',
+                        purpleGlow: '0 0 25px rgba(176, 38, 255, 0.4)',
+                        cardDepth: '0 20px 50px rgba(0, 0, 0, 0.9), 0 0 30px rgba(0, 246, 255, 0.12)'
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;600;700;900&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Fira+Code:wght@400;500;600&display=swap');
+
+        html, body {
+            height: 100%;
+            width: 100%;
+            margin: 0;
+            padding: 0;
+            background-color: #030712;
+            color: #f1f5f9;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            overflow-x: hidden;
+        }
+
+        .font-orbitron { font-family: 'Orbitron', sans-serif; }
+        .font-mono-code { font-family: 'Fira Code', monospace; }
+
+        .cyber-grid-bg {
+            background-image: 
+                radial-gradient(circle at 50% 0%, rgba(0, 246, 255, 0.15), transparent 50%),
+                radial-gradient(circle at 90% 80%, rgba(176, 38, 255, 0.12), transparent 45%),
+                linear-gradient(to right, rgba(0, 246, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(0, 246, 255, 0.03) 1px, transparent 1px);
+            background-size: 100% 100%, 100% 100%, 32px 32px, 32px 32px;
+        }
+
+        .glass-panel {
+            background: rgba(11, 19, 41, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(0, 246, 255, 0.2);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .glass-panel:hover {
+            border-color: rgba(0, 246, 255, 0.5);
+            box-shadow: 0 0 30px rgba(0, 246, 255, 0.25);
+        }
+
+        .neon-text-cyan {
+            color: #00f6ff;
+            text-shadow: 0 0 10px rgba(0, 246, 255, 0.8), 0 0 20px rgba(0, 246, 255, 0.4);
+        }
+
+        .neon-text-purple {
+            color: #b026ff;
+            text-shadow: 0 0 10px rgba(176, 38, 255, 0.8), 0 0 20px rgba(176, 38, 255, 0.4);
+        }
+
+        .scanline {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, rgba(0, 246, 255, 0.9), transparent);
+            animation: scan 6s linear infinite;
+            pointer-events: none;
+            opacity: 0.7;
+        }
+
+        @keyframes scan {
+            0% { top: 0%; }
+            100% { top: 100%; }
+        }
+
+        .online-ping {
+            position: relative;
+        }
+        .online-ping::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            border-radius: 50%;
+            background-color: #10b981;
+            animation: ping 1.8s cubic-bezier(0, 0, 0.2, 1) infinite;
+            opacity: 0.75;
+        }
+
+        @keyframes ping {
+            75%, 100% { transform: scale(2.4); opacity: 0; }
+        }
+
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #030712; }
+        ::-webkit-scrollbar-thumb { background: rgba(0, 246, 255, 0.35); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #00f6ff; }
+    </style>
+</head>
+<body class="cyber-grid-bg relative w-full min-h-screen flex flex-col justify-between p-3 sm:p-5 lg:p-7 antialiased selection:bg-cyberCyan selection:text-cyberDark">
+
+    <!-- Glowing Background Lights -->
+    <div class="fixed top-0 left-1/4 w-[500px] h-[500px] bg-cyberCyan/10 rounded-full blur-[150px] pointer-events-none"></div>
+    <div class="fixed bottom-0 right-1/4 w-[500px] h-[500px] bg-cyberPurple/10 rounded-full blur-[150px] pointer-events-none"></div>
+
+    <!-- Notification Toast Container -->
+    <div id="toastContainer" class="fixed top-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+    <header class="w-full max-w-[1600px] mx-auto flex flex-col lg:flex-row items-center justify-between pb-5 mb-6 border-b border-cyberBorder/40 gap-4 z-10">
+        
+        <!-- Logo & Title -->
+        <div class="flex items-center space-x-4">
+            <div class="relative group cursor-pointer" onclick="playSound('click'); switchMainTab('web-sandbox')">
+                <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-cyberNavy via-cyberDark to-[#0c1222] border-2 border-cyberCyan/80 flex items-center justify-center shadow-cyberGlow transition-all duration-300 group-hover:scale-105">
+                    <span class="font-orbitron text-2xl font-black tracking-wider neon-text-cyan">MZ</span>
+                </div>
+                <span class="absolute -bottom-1 -right-1 flex h-3.5 w-3.5">
+                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyberCyan opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-3.5 w-3.5 bg-cyberCyan"></span>
+                </span>
+            </div>
+            <div>
+                <div class="flex items-center gap-2.5">
+                    <h1 class="font-orbitron text-2xl font-bold tracking-wide text-white">MZ ACADEMY</h1>
+                    <span class="bg-cyberCyan/15 text-cyberCyan text-[11px] font-orbitron px-2.5 py-0.5 rounded-full border border-cyberCyan/40 font-semibold tracking-wider flex items-center gap-1.5">
+                        <i class="fa-solid fa-play text-amber-400 animate-pulse"></i> 24/7 PRACTICAL STUDIO
+                    </span>
+                </div>
+                <p class="text-xs text-slate-400 mt-0.5">Interactive Web IDE • Hardware IoT Bench • Corel Vector Studio</p>
+            </div>
+        </div>
+
+        <!-- Practical Navigation Tabs -->
+        <div class="flex items-center bg-cyberDark/90 p-1.5 rounded-2xl border border-cyberBorder/40 gap-1 overflow-x-auto max-w-full shadow-inner">
+            <button onclick="playSound('click'); switchMainTab('web-sandbox')" id="tabBtn-web-sandbox" class="px-4 py-2 rounded-xl text-xs font-orbitron font-bold text-cyberDark bg-cyberCyan transition flex items-center gap-2 shadow-cyberGlow whitespace-nowrap">
+                <i class="fa-solid fa-code text-sm"></i> Web Dev IDE
+            </button>
+            <button onclick="playSound('click'); switchMainTab('hardware-sandbox')" id="tabBtn-hardware-sandbox" class="px-4 py-2 rounded-xl text-xs font-orbitron font-bold text-slate-300 hover:text-white transition flex items-center gap-2 whitespace-nowrap">
+                <i class="fa-solid fa-microchip text-cyberPurple text-sm"></i> IoT Hardware Lab
+            </button>
+            <button onclick="playSound('click'); switchMainTab('vector-sandbox')" id="tabBtn-vector-sandbox" class="px-4 py-2 rounded-xl text-xs font-orbitron font-bold text-slate-300 hover:text-white transition flex items-center gap-2 whitespace-nowrap">
+                <i class="fa-solid fa-pen-nib text-cyberAmber text-sm"></i> Corel Vector Bench
+            </button>
+            <button onclick="playSound('click'); switchMainTab('workstations')" id="tabBtn-workstations" class="px-4 py-2 rounded-xl text-xs font-orbitron font-bold text-slate-300 hover:text-white transition flex items-center gap-2 whitespace-nowrap">
+                <i class="fa-solid fa-desktop text-emerald-400 text-sm"></i> Workstations (34)
+            </button>
+        </div>
+
+        <!-- User Practical Level & Controls -->
+        <div class="flex items-center gap-3 text-xs font-mono">
+            <div class="glass-panel px-3.5 py-1.5 rounded-xl flex items-center space-x-2">
+                <i class="fa-solid fa-trophy text-amber-400"></i>
+                <span class="text-slate-300 font-bold">XP: <span id="userXp" class="text-cyberCyan">240</span> / 500</span>
+            </div>
+            <button onclick="toggleAudio()" id="audioToggleBtn" class="glass-panel p-2 rounded-xl text-cyberCyan hover:text-white transition" title="Toggle Sound Effects">
+                <i class="fa-solid fa-volume-high text-sm"></i>
+            </button>
+            <div class="glass-panel px-3.5 py-1.5 rounded-xl flex items-center space-x-2">
+                <i class="fa-solid fa-clock text-cyberCyan"></i>
+                <span id="liveClock" class="text-white font-bold">00:00:00 UTC</span>
+            </div>
+        </div>
+    </header>
+
+<main class="w-full px-4 sm:px-8 py-8 z-10 relative"></main>     
+        <!-- TOP STAT CARDS -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+            
+            <!-- CARD 1: 24/7 PRACTICAL ENGINE -->
+            <div class="glass-panel rounded-2xl p-5 relative overflow-hidden flex flex-col justify-between shadow-cardDepth">
+                <div class="scanline"></div>
+                <div class="flex justify-between items-center mb-2">
+                    <span class="text-[11px] font-orbitron text-cyberCyan bg-cyberCyan/10 border border-cyberCyan/30 px-2.5 py-0.5 rounded-full uppercase tracking-wider font-semibold flex items-center gap-1.5">
+                        <i class="fa-solid fa-bolt text-amber-400"></i> Live Practical Engine
+                    </span>
+                    <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 online-ping"></span>
+                </div>
+
+                <div class="my-2 flex items-baseline justify-between">
+                    <div>
+                        <h2 class="font-orbitron text-4xl sm:text-5xl font-black neon-text-cyan tracking-wider italic">
+                            24/7
+                        </h2>
+                        <p class="font-orbitron text-xs font-bold text-slate-300 tracking-widest mt-1 uppercase">
+                            ONLINE PRACTICAL LAB
+                        </p>
+                    </div>
+                    <div class="text-right font-mono text-xs">
+                        <span class="text-emerald-400 font-bold block text-sm">34 / 50 Desks</span>
+                        <span class="text-slate-400">Live Active Desks</span>
+                    </div>
+                </div>
+
+                <div class="pt-3 border-t border-cyberBorder/30 flex items-center justify-between text-xs font-mono text-slate-400">
+                    <span>Practical Lab Execution: <strong class="text-emerald-400">ACTIVE</strong></span>
+                    <button onclick="playSound('click'); switchMainTab('workstations')" class="text-cyberCyan hover:underline font-orbitron text-[11px] flex items-center gap-1">
+                        View Grid <i class="fa-solid fa-arrow-right text-[10px]"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- CARD 2: ACTIVE STUDENTS -->
+            <div class="glass-panel rounded-2xl p-5 relative overflow-hidden flex flex-col justify-between shadow-cardDepth">
+                <div class="flex justify-between items-center mb-2">
+                    <span class="text-[11px] font-orbitron text-cyberPurple bg-cyberPurple/10 border border-cyberPurple/30 px-2.5 py-0.5 rounded-full uppercase tracking-wider font-semibold flex items-center gap-1.5">
+                        <i class="fa-solid fa-user-graduate"></i> Enrolled Learners
+                    </span>
+                    <span class="text-[11px] font-mono text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-500/30">+100% Hands-On</span>
+                </div>
+
+                <div class="my-2 flex items-baseline gap-1">
+                    <span id="activeCounter" class="font-orbitron text-4xl sm:text-5xl font-black text-white tracking-tight">
+                        100
+                    </span>
+                    <span class="font-orbitron text-3xl font-black text-cyberCyan">+</span>
+                    <span class="font-orbitron text-xs font-bold text-slate-300 tracking-wider ml-2 uppercase">
+                        ACTIVE STUDENTS
+                    </span>
+                </div>
+
+                <div class="pt-3 border-t border-cyberBorder/30 flex items-center justify-between text-xs font-mono text-slate-400">
+                    <span>Practical Project Submissions</span>
+                    <span class="text-cyberCyan font-bold">100% Verified</span>
+                </div>
+            </div>
+
+            <!-- CARD 3: HARDWARE LOAD METRICS -->
+            <div class="glass-panel rounded-2xl p-5 relative overflow-hidden flex flex-col justify-between shadow-cardDepth">
+                <div class="flex justify-between items-center mb-2">
+                    <span class="text-[11px] font-orbitron text-emerald-400 bg-emerald-500/10 border border-emerald-500/30 px-2.5 py-0.5 rounded-full uppercase tracking-wider font-semibold flex items-center gap-1.5">
+                        <i class="fa-solid fa-server"></i> Hardware Cluster Load
+                    </span>
+                    <span class="text-[11px] font-mono text-slate-400">Ping: 10ms</span>
+                </div>
+
+                <div class="space-y-2 font-mono my-1">
+                    <div>
+                        <div class="flex justify-between text-[11px] text-slate-300 mb-0.5">
+                            <span>Web Compiler CPU Node</span>
+                            <span class="text-cyberCyan font-bold" id="cpuLoadText">32%</span>
+                        </div>
+                        <div class="w-full bg-cyberDark rounded-full h-1.5 border border-cyberBorder/40">
+                            <div id="cpuBar" class="bg-gradient-to-r from-cyberCyan to-blue-500 h-1.5 rounded-full transition-all duration-500" style="width: 32%"></div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="flex justify-between text-[11px] text-slate-300 mb-0.5">
+                            <span>IoT & Vector GPU Render</span>
+                            <span class="text-cyberPurple font-bold" id="gpuLoadText">48%</span>
+                        </div>
+                        <div class="w-full bg-cyberDark rounded-full h-1.5 border border-cyberBorder/40">
+                            <div id="gpuBar" class="bg-gradient-to-r from-cyberPurple to-pink-500 h-1.5 rounded-full transition-all duration-500" style="width: 48%"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="pt-2 border-t border-cyberBorder/30 flex items-center justify-between text-xs font-mono text-slate-400">
+                    <span>Cluster Node: <strong class="text-emerald-400">OPTIMAL</strong></span>
+                    <button onclick="playSound('click'); randomizeHardwareLoad()" class="text-cyberCyan hover:underline font-orbitron text-[11px]">Test Load</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="workspaceContainer" class="w-full">
+            
+            <!-- TAB 1: WEB DEV INTERACTIVE PRACTICAL IDE -->
+            <div id="tabContent-web-sandbox" class="space-y-5">
+                <div class="glass-panel rounded-3xl p-5 sm:p-6 shadow-cardDepth">
+                    <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center pb-4 mb-4 border-b border-cyberBorder/30 gap-3">
+                        <div>
+                            <h3 class="font-orbitron text-lg font-bold text-white flex items-center gap-2">
+                                <i class="fa-solid fa-laptop-code text-cyberCyan"></i> Web Dev Interactive IDE
+                            </h3>
+                            <p class="text-xs text-slate-400 mt-0.5">Select a practical template or edit code directly on the left to test instant execution on the right!</p>
+                        </div>
+
+                        <!-- Template Switcher & Action Buttons -->
+                        <div class="flex flex-wrap items-center gap-2">
+                            <select id="codeSnippetSelect" onchange="loadWebTemplate(this.value)" class="bg-cyberDark border border-cyberBorder/50 text-slate-200 text-xs rounded-xl px-3 py-1.5 font-mono outline-none focus:border-cyberCyan">
+                                <option value="cyberCard">Template: Cyber Card Component</option>
+                                <option value="particleCanvas">Template: Animated Particle Canvas</option>
+                                <option value="interactiveCounter">Template: Interactive Counter App</option>
+                            </select>
+                            <button onclick="playSound('click'); resetWebCode()" class="px-3 py-1.5 rounded-xl bg-cyberDark text-slate-300 hover:text-white border border-slate-700 text-xs font-mono transition">
+                                <i class="fa-solid fa-rotate-left mr-1"></i> Reset
+                            </button>
+                            <button onclick="playSound('compile'); executeWebCode()" class="px-4 py-1.5 rounded-xl bg-gradient-to-r from-cyberCyan to-cyberBlue text-cyberDark font-orbitron font-bold text-xs shadow-cyberGlow hover:scale-105 transition flex items-center gap-1.5">
+                                <i class="fa-solid fa-play"></i> RUN PRACTICAL CODE
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Split Code Editor & Live Canvas Sandbox -->
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                        <!-- Code Input Area -->
+                        <div class="flex flex-col h-[420px] bg-cyberDark/90 rounded-2xl border border-cyberBorder/40 overflow-hidden shadow-inner">
+                            <div class="bg-cyberNavy px-4 py-2 border-b border-cyberBorder/30 flex justify-between items-center text-xs font-mono text-slate-300">
+                                <span><i class="fa-brands fa-html5 text-orange-500 mr-1.5"></i> Practical HTML/CSS/JS Editor</span>
+                                <span class="text-emerald-400 text-[10px] flex items-center gap-1"><i class="fa-solid fa-circle text-[8px] animate-pulse"></i> Auto Compiler</span>
+                            </div>
+                            <textarea id="webCodeInput" oninput="autoCompileWebCode()" class="w-full flex-1 p-4 bg-transparent text-emerald-400 font-mono-code text-xs leading-relaxed outline-none resize-none" spellcheck="false"></textarea>
+                        </div>
+
+                        <!-- Live Output Sandbox & Output Console -->
+                        <div class="flex flex-col h-[420px] bg-cyberDark/90 rounded-2xl border border-cyberBorder/40 overflow-hidden shadow-inner">
+                            <div class="bg-cyberNavy px-4 py-2 border-b border-cyberBorder/30 flex justify-between items-center text-xs font-mono text-slate-300">
+                                <span><i class="fa-solid fa-eye text-cyberCyan mr-1.5"></i> Live Execution Practical Output</span>
+                                <span class="text-cyberCyan text-[10px]">Real-time Frame</span>
+                            </div>
+                            <iframe id="webCodeOutput" class="w-full flex-1 bg-cyberDark border-none"></iframe>
+                        </div>
+                    </div>
+
+                    <!-- Task Verification Banner -->
+                    <div class="mt-4 pt-4 border-t border-cyberBorder/30 flex flex-col sm:flex-row justify-between items-center gap-3">
+                        <div class="flex items-center space-x-3 text-xs font-mono text-slate-300">
+                            <span class="text-cyberCyan font-bold">Practical Objective:</span>
+                            <span class="bg-cyberDark px-3 py-1 rounded-lg border border-slate-800 text-slate-300" id="currentTaskDesc">Modify styling or click action and hit verify task.</span>
+                        </div>
+                        <button onclick="playSound('success'); verifyWebTask()" class="px-4 py-1.5 rounded-xl bg-cyberPurple text-white text-xs font-orbitron font-semibold hover:bg-purple-600 transition shadow-purpleGlow flex items-center gap-1.5">
+                            <i class="fa-solid fa-circle-check"></i> Verify Practical Task (+50 XP)
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div id="tabContent-hardware-sandbox" class="hidden space-y-5">
+                <div class="glass-panel rounded-3xl p-5 sm:p-6 shadow-cardDepth">
+                    <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center pb-4 mb-4 border-b border-cyberBorder/30 gap-3">
+                        <div>
+                            <h3 class="font-orbitron text-lg font-bold text-white flex items-center gap-2">
+                                <i class="fa-solid fa-microchip text-cyberPurple"></i> ESP32 IoT Circuit Board & Live Oscilloscope
+                            </h3>
+                            <p class="text-xs text-slate-400 mt-0.5">Toggle GPIO pins, adjust analog potentiometers/sensors, and inspect live waveform outputs!</p>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="text-xs font-mono text-emerald-400 bg-emerald-500/10 px-3 py-1 rounded-lg border border-emerald-500/30 flex items-center gap-1.5">
+                                <span class="w-2 h-2 rounded-full bg-emerald-400 online-ping"></span> Board Online (GPIO 2,4,5 Active)
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+                        
+                        <!-- Visual Microcontroller Board & Oscilloscope -->
+                        <div class="lg:col-span-2 bg-cyberDark/90 p-5 rounded-2xl border border-cyberBorder/40 flex flex-col justify-between relative min-h-[380px]">
+                            
+                            <!-- ESP32 Hardware Visual -->
+                            <div class="flex flex-col md:flex-row items-center justify-between gap-4 bg-cyberNavy/60 p-4 rounded-xl border border-slate-800">
+                                <!-- ESP32 Chip representation -->
+                                <div class="w-64 bg-slate-900 border-2 border-cyberPurple/80 rounded-2xl p-4 shadow-purpleGlow flex flex-col items-center">
+                                    <div class="w-16 h-8 bg-gradient-to-r from-amber-600 to-amber-700 rounded-md border border-amber-400 flex items-center justify-center mb-3">
+                                        <span class="font-orbitron text-[9px] text-black font-extrabold tracking-widest">ESP32</span>
+                                    </div>
+                                    <h4 class="font-orbitron text-xs font-bold text-cyberCyan mb-1">MZ-IOT NODE v3</h4>
+
+                                    <!-- LED Indicators -->
+                                    <div class="flex space-x-5 my-3">
+                                        <div class="text-center">
+                                            <div id="ledIndicator1" class="w-7 h-7 rounded-full bg-slate-800 border border-slate-600 transition-all duration-300 mx-auto"></div>
+                                            <span class="text-[9px] font-mono text-slate-400 mt-1 block">GPIO 02</span>
+                                        </div>
+                                        <div class="text-center">
+                                            <div id="ledIndicator2" class="w-7 h-7 rounded-full bg-slate-800 border border-slate-600 transition-all duration-300 mx-auto"></div>
+                                            <span class="text-[9px] font-mono text-slate-400 mt-1 block">GPIO 04</span>
+                                        </div>
+                                        <div class="text-center">
+                                            <div id="ledIndicator3" class="w-7 h-7 rounded-full bg-slate-800 border border-slate-600 transition-all duration-300 mx-auto"></div>
+                                            <span class="text-[9px] font-mono text-slate-400 mt-1 block">GPIO 05</span>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Ultrasonic Sensor Widget -->
+                                <div class="flex-1 space-y-2 w-full">
+                                    <div class="flex justify-between text-xs font-mono text-slate-300">
+                                        <span><i class="fa-solid fa-radar text-cyberCyan mr-1"></i> Ultrasonic Distance Sensor:</span>
+                                        <span id="sensorDistVal" class="text-cyberCyan font-bold">45 cm</span>
+                                    </div>
+                                    <input type="range" min="2" max="200" value="45" oninput="updateSensorDistance(this.value)" class="w-full accent-cyberCyan cursor-pointer">
+                                    <p class="text-[10px] text-slate-400 font-mono">Simulating distance reading sent over I2C serial channel.</p>
+                                </div>
+                            </div>
+
+                            <!-- Interactive Canvas Oscilloscope Display -->
+                            <div class="mt-4 bg-slate-950 rounded-xl border border-cyberBorder/40 p-3 relative">
+                                <div class="flex justify-between items-center mb-1 text-xs font-mono">
+                                    <span class="text-emerald-400 font-bold"><i class="fa-solid fa-wave-square mr-1"></i> Live Signal Waveform Oscilloscope</span>
+                                    <span class="text-slate-400 text-[10px]">Frequency: <span id="freqText" class="text-cyberCyan">10 Hz</span></span>
+                                </div>
+                                <canvas id="oscilloscopeCanvas" class="w-full h-28 bg-black rounded border border-slate-800"></canvas>
+                            </div>
+                        </div>
+
+                        <!-- Hardware Switch Controls & Serial Log Monitor -->
+                        <div class="space-y-4">
+                            <div class="bg-cyberDark p-4 rounded-2xl border border-cyberBorder/30 space-y-3">
+                                <h4 class="font-orbitron text-xs font-bold text-white flex items-center gap-2">
+                                    <i class="fa-solid fa-sliders text-cyberCyan"></i> GPIO Pin Controls
+                                </h4>
+
+                                <div class="flex justify-between items-center bg-cyberNavy p-2.5 rounded-xl border border-slate-800">
+                                    <span class="text-xs font-mono text-slate-300">Red LED (Pin 02)</span>
+                                    <button onclick="playSound('click'); togglePin(1)" id="pinBtn1" class="px-3.5 py-1 rounded-lg bg-slate-800 text-slate-400 text-xs font-mono font-bold hover:text-white transition">
+                                        OFF
+                                    </button>
+                                </div>
+
+                                <div class="flex justify-between items-center bg-cyberNavy p-2.5 rounded-xl border border-slate-800">
+                                    <span class="text-xs font-mono text-slate-300">Blue LED (Pin 04)</span>
+                                    <button onclick="playSound('click'); togglePin(2)" id="pinBtn2" class="px-3.5 py-1 rounded-lg bg-slate-800 text-slate-400 text-xs font-mono font-bold hover:text-white transition">
+                                        OFF
+                                    </button>
+                                </div>
+
+                                <div class="flex justify-between items-center bg-cyberNavy p-2.5 rounded-xl border border-slate-800">
+                                    <span class="text-xs font-mono text-slate-300">Green LED (Pin 05)</span>
+                                    <button onclick="playSound('click'); togglePin(3)" id="pinBtn3" class="px-3.5 py-1 rounded-lg bg-slate-800 text-slate-400 text-xs font-mono font-bold hover:text-white transition">
+                                        OFF
+                                    </button>
+                                </div>
+
+                                <!-- Potentiometer Slider -->
+                                <div class="pt-2">
+                                    <div class="flex justify-between text-xs font-mono text-slate-300 mb-1">
+                                        <span>Potentiometer Voltage:</span>
+                                        <span id="potValue" class="text-cyberCyan font-bold">1.65 V</span>
+                                    </div>
+                                    <input type="range" min="0" max="3.3" step="0.01" value="1.65" oninput="updatePotentiometer(this.value)" class="w-full accent-cyberCyan cursor-pointer">
+                                </div>
+                            </div>
+
+                            <!-- Hardware Serial Monitor -->
+                            <div class="bg-cyberDark p-4 rounded-2xl border border-cyberBorder/30">
+                                <h4 class="font-orbitron text-xs font-bold text-white mb-2 flex items-center justify-between">
+                                    <span><i class="fa-solid fa-terminal text-emerald-400 mr-1.5"></i> Hardware Serial Monitor</span>
+                                    <span class="text-[10px] text-slate-400 font-mono">115200 Baud</span>
+                                </h4>
+                                <div id="hardwareSerialLog" class="h-28 overflow-y-auto font-mono-code text-[11px] text-emerald-400 space-y-1 bg-slate-950 p-2.5 rounded-xl border border-slate-800">
+                                    <p class="text-slate-500">[MZ ESP32 READY]</p>
+                                    <p>[System] Initialized GPIO pins 2, 4, 5.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="tabContent-vector-sandbox" class="hidden space-y-5">
+                <div class="glass-panel rounded-3xl p-5 sm:p-6 shadow-cardDepth">
+                    <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center pb-4 mb-4 border-b border-cyberBorder/30 gap-3">
+                        <div>
+                            <h3 class="font-orbitron text-lg font-bold text-white flex items-center gap-2">
+                                <i class="fa-solid fa-pen-nib text-cyberAmber"></i> CorelDRAW Practical Vector Workbench
+                            </h3>
+                            <p class="text-xs text-slate-400 mt-0.5">Interactive vector canvas. Click and drag to draw lines, rectangles, circles, or custom vector badge artwork!</p>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button onclick="playSound('click'); toggleCanvasGrid()" id="gridToggleBtn" class="px-3 py-1.5 rounded-xl bg-cyberDark text-slate-300 hover:text-white border border-slate-700 text-xs font-mono">
+                                <i class="fa-solid fa-border-all mr-1"></i> Toggle Grid
+                            </button>
+                            <button onclick="playSound('click'); clearVectorCanvas()" class="px-3 py-1.5 rounded-xl bg-cyberDark text-slate-300 hover:text-white border border-slate-700 text-xs font-mono">
+                                <i class="fa-solid fa-trash mr-1"></i> Clear Canvas
+                            </button>
+                            <button onclick="playSound('success'); downloadCanvasArt()" class="px-4 py-1.5 rounded-xl bg-gradient-to-r from-cyberAmber to-orange-500 text-cyberDark font-orbitron font-bold text-xs shadow-cyberGlow hover:scale-105 transition flex items-center gap-1.5">
+                                <i class="fa-solid fa-download"></i> EXPORT VECTOR ARTWORK
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Canvas Drawing Toolbar & Workspace -->
+                    <div class="grid grid-cols-1 lg:grid-cols-4 gap-5">
+                        <!-- Tools Panel -->
+                        <div class="bg-cyberDark p-4 rounded-2xl border border-cyberBorder/30 space-y-4">
+                            <h4 class="font-orbitron text-xs font-bold text-white">Vector Tools</h4>
+                            
+                            <div class="grid grid-cols-2 gap-2">
+                                <button onclick="playSound('click'); setVectorTool('freehand')" id="toolBtn-freehand" class="p-2.5 rounded-xl bg-cyberCyan text-cyberDark font-bold text-xs font-mono flex flex-col items-center gap-1 border border-cyberCyan transition">
+                                    <i class="fa-solid fa-pencil text-base"></i> Pen Brush
+                                </button>
+                                <button onclick="playSound('click'); setVectorTool('rect')" id="toolBtn-rect" class="p-2.5 rounded-xl bg-cyberNavy text-slate-300 font-bold text-xs font-mono flex flex-col items-center gap-1 border border-slate-800 hover:border-cyberCyan transition">
+                                    <i class="fa-regular fa-square text-base"></i> Rectangle
+                                </button>
+                                <button onclick="playSound('click'); setVectorTool('circle')" id="toolBtn-circle" class="p-2.5 rounded-xl bg-cyberNavy text-slate-300 font-bold text-xs font-mono flex flex-col items-center gap-1 border border-slate-800 hover:border-cyberCyan transition">
+                                    <i class="fa-regular fa-circle text-base"></i> Circle
+                                </button>
+                                <button onclick="playSound('click'); setVectorTool('star')" id="toolBtn-star" class="p-2.5 rounded-xl bg-cyberNavy text-slate-300 font-bold text-xs font-mono flex flex-col items-center gap-1 border border-slate-800 hover:border-cyberCyan transition">
+                                    <i class="fa-solid fa-star text-base"></i> Vector Star
+                                </button>
+                            </div>
+
+                            <div class="pt-2 border-t border-slate-800 space-y-3">
+                                <div>
+                                    <label class="text-xs font-mono text-slate-300 block mb-1">Stroke Width:</label>
+                                    <input type="range" min="1" max="15" value="3" oninput="setStrokeWidth(this.value)" class="w-full accent-cyberCyan cursor-pointer">
+                                </div>
+
+                                <div>
+                                    <label class="text-xs font-mono text-slate-300 block mb-1">Stroke Color:</label>
+                                    <div class="flex gap-2">
+                                        <button onclick="playSound('click'); setStrokeColor('#00f6ff')" class="w-7 h-7 rounded-full bg-cyberCyan border-2 border-white hover:scale-110 transition"></button>
+                                        <button onclick="playSound('click'); setStrokeColor('#b026ff')" class="w-7 h-7 rounded-full bg-cyberPurple border-2 border-transparent hover:scale-110 transition"></button>
+                                        <button onclick="playSound('click'); setStrokeColor('#f59e0b')" class="w-7 h-7 rounded-full bg-cyberAmber border-2 border-transparent hover:scale-110 transition"></button>
+                                        <button onclick="playSound('click'); setStrokeColor('#10b981')" class="w-7 h-7 rounded-full bg-emerald-400 border-2 border-transparent hover:scale-110 transition"></button>
+                                        <button onclick="playSound('click'); setStrokeColor('#ff007f')" class="w-7 h-7 rounded-full bg-cyberPink border-2 border-transparent hover:scale-110 transition"></button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Canvas Interactive Workspace -->
+                        <div class="lg:col-span-3 bg-cyberDark rounded-2xl border border-cyberBorder/40 overflow-hidden flex items-center justify-center p-2 relative">
+                            <canvas id="vectorCanvas" class="bg-[#080d1a] rounded-xl cursor-crosshair w-full h-[380px]"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="tabContent-workstations" class="hidden space-y-5">
+                <div class="glass-panel rounded-3xl p-5 sm:p-6 shadow-cardDepth">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4 border-b border-cyberBorder/30 pb-4">
+                        <div>
+                            <h3 class="font-orbitron text-lg font-bold text-white flex items-center gap-2.5">
+                                <i class="fa-solid fa-desktop text-cyberCyan"></i> Workstation Practical Nodes Grid (34 Active)
+                            </h3>
+                            <p class="text-xs text-slate-400 mt-0.5">Click any occupied workstation to spectate live student practical tasks in real-time!</p>
+                        </div>
+
+                        <div class="flex items-center space-x-3 text-xs font-mono">
+                            <span class="flex items-center gap-1.5 text-emerald-400 bg-emerald-500/10 px-3 py-1.5 rounded-lg border border-emerald-500/30">
+                                <span class="w-2.5 h-2.5 rounded-full bg-emerald-400"></span> Occupied (34)
+                            </span>
+                            <span class="flex items-center gap-1.5 text-cyberCyan bg-cyberCyan/10 px-3 py-1.5 rounded-lg border border-cyberCyan/30">
+                                <span class="w-2.5 h-2.5 rounded-full bg-cyberCyan"></span> Available (16)
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Filter Bar -->
+                    <div class="mb-4 flex flex-col sm:flex-row gap-3 justify-between">
+                        <input type="text" id="wsSearchInput" oninput="filterWorkstations()" placeholder="Search learner or task..." class="bg-cyberDark border border-cyberBorder/40 text-slate-200 text-xs rounded-xl px-4 py-2 font-mono outline-none focus:border-cyberCyan w-full sm:w-72">
+                        <div class="flex gap-2">
+                            <button onclick="filterWsStatus('all')" class="px-3 py-1.5 rounded-xl bg-cyberCyan text-cyberDark text-xs font-orbitron font-bold">All Nodes</button>
+                            <button onclick="filterWsStatus('occupied')" class="px-3 py-1.5 rounded-xl bg-cyberDark text-emerald-400 text-xs font-orbitron border border-slate-800">Occupied</button>
+                            <button onclick="filterWsStatus('available')" class="px-3 py-1.5 rounded-xl bg-cyberDark text-slate-400 text-xs font-orbitron border border-slate-800">Available</button>
+                        </div>
+                    </div>
+
+                    <!-- Workstations Rendered via JS -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4" id="workstationGrid"></div>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            
+            <!-- Practical Interactive CLI Terminal -->
+            <div class="lg:col-span-2 glass-panel rounded-3xl p-5 sm:p-6 shadow-cardDepth flex flex-col justify-between">
+                <div class="flex justify-between items-center mb-3 pb-3 border-b border-cyberBorder/30">
+                    <h3 class="font-orbitron text-base font-bold text-white flex items-center gap-2">
+                        <i class="fa-solid fa-terminal text-cyberCyan"></i> Practical Interactive Terminal Console
+                    </h3>
+                    <div class="flex space-x-1.5">
+                        <span class="w-3 h-3 rounded-full bg-red-500/80 inline-block"></span>
+                        <span class="w-3 h-3 rounded-full bg-yellow-500/80 inline-block"></span>
+                        <span class="w-3 h-3 rounded-full bg-green-500/80 inline-block"></span>
+                    </div>
+                </div>
+
+                <div class="bg-cyberDark p-4 rounded-xl border border-cyberBorder/40 font-mono-code text-xs text-emerald-400 space-y-1.5 h-52 overflow-y-auto shadow-inner" id="terminalOutput">
+                    <p class="text-slate-400">[MZ ACADEMY 24/7 PRACTICAL ENGINE v5.0 - ONLINE]</p>
+                    <p class="text-slate-400">Type <span class="text-cyberCyan">help</span> or click quick command buttons below.</p>
+                </div>
+
+                <div class="mt-3 flex gap-2">
+                    <input type="text" id="cliInput" onkeydown="handleCliEnter(event)" placeholder="Type CLI command (e.g., status, xp, test, clear)..." class="flex-1 bg-cyberDark border border-cyberBorder/40 text-emerald-400 text-xs font-mono-code rounded-xl px-3 py-2 outline-none focus:border-cyberCyan">
+                    <button onclick="sendCliCommand()" class="px-4 py-2 rounded-xl bg-cyberCyan text-cyberDark font-orbitron font-bold text-xs hover:shadow-cyberGlow">Send</button>
+                </div>
+
+                <div class="mt-3 pt-3 border-t border-cyberBorder/30 flex flex-wrap gap-2">
+                    <button onclick="runCommand('status')" class="px-3 py-1 rounded-lg bg-cyberDark text-cyberCyan border border-cyberCyan/40 font-mono text-xs hover:bg-cyberCyan/20 transition flex items-center gap-1">
+                        <i class="fa-solid fa-play text-[10px]"></i> status
+                    </button>
+                    <button onclick="runCommand('verify-labs')" class="px-3 py-1 rounded-lg bg-cyberDark text-emerald-400 border border-emerald-500/40 font-mono text-xs hover:bg-emerald-500/20 transition flex items-center gap-1">
+                        <i class="fa-solid fa-check-double text-[10px]"></i> verify-labs
+                    </button>
+                    <button onclick="runCommand('test-iot')" class="px-3 py-1 rounded-lg bg-cyberDark text-cyberPurple border border-cyberPurple/40 font-mono text-xs hover:bg-cyberPurple/20 transition flex items-center gap-1">
+                        <i class="fa-solid fa-microchip text-[10px]"></i> test-iot
+                    </button>
+                    <button onclick="clearTerminal()" class="px-3 py-1 rounded-lg bg-cyberDark text-slate-400 border border-slate-700 font-mono text-xs hover:text-white transition ml-auto">
+                        Clear Log
+                    </button>
+                </div>
+            </div>
+
+            <!-- Active Learners Leaderboard -->
+            <div class="glass-panel rounded-3xl p-5 sm:p-6 shadow-cardDepth flex flex-col justify-between">
+                <div>
+                    <h3 class="font-orbitron text-base font-bold text-white mb-2 flex items-center gap-2">
+                        <i class="fa-solid fa-users text-cyberCyan"></i> Active Practical Learners
+                    </h3>
+                    <p class="text-xs text-slate-400 mb-4">Live student practical progress leaderboard</p>
+
+                    <div class="space-y-3 h-52 overflow-y-auto pr-1" id="activeStudentListMini"></div>
+                </div>
+
+                <div class="pt-3 border-t border-cyberBorder/30 text-xs font-mono text-slate-400 flex justify-between items-center">
+                    <span>Verified Tasks Completed: <strong class="text-emerald-400">100%</strong></span>
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- Workstation Remote Inspect Modal -->
+    <div id="workstationModal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+        <div class="glass-panel w-full max-w-lg rounded-3xl p-6 shadow-cardDepth border border-cyberCyan relative">
+            <button onclick="closeWorkstationModal()" class="absolute top-5 right-5 text-slate-400 hover:text-white text-lg">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+            
+            <div class="flex items-center space-x-3 mb-6">
+                <div class="w-12 h-12 rounded-2xl bg-cyberCyan/10 border border-cyberCyan text-cyberCyan flex items-center justify-center text-xl font-orbitron font-bold">
+                    MZ
+                </div>
+                <div>
+                    <h4 id="modalDeskTitle" class="font-orbitron text-lg font-bold text-white">Workstation Node</h4>
+                    <p class="text-xs font-mono text-slate-400">24/7 Practical Session Live Inspector</p>
+                </div>
+            </div>
+
+            <div class="space-y-3 font-mono text-xs bg-cyberDark p-4 rounded-2xl border border-cyberBorder/30">
+                <div class="flex justify-between border-b border-slate-800 pb-2">
+                    <span class="text-slate-400">Active Learner:</span>
+                    <span id="modalStudentName" class="text-white font-bold">Ahmad Raza</span>
+                </div>
+                <div class="flex justify-between border-b border-slate-800 pb-2">
+                    <span class="text-slate-400">Practical Course:</span>
+                    <span id="modalCourse" class="text-cyberCyan font-bold">Full Stack Web Dev</span>
+                </div>
+                <div class="flex justify-between border-b border-slate-800 pb-2">
+                    <span class="text-slate-400">Active Practical Task:</span>
+                    <span id="modalTask" class="text-emerald-400">React Interactive UI Component</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="text-slate-400">Node Session Uptime:</span>
+                    <span class="text-amber-400">3 hrs 42 mins</span>
+                </div>
+            </div>
+
+            <div class="mt-6 flex justify-end gap-3">
+                <button onclick="closeWorkstationModal()" class="px-4 py-2 rounded-xl bg-cyberDark text-slate-300 font-orbitron text-xs border border-slate-700 hover:text-white">
+                    Close
+                </button>
+                <button onclick="spectateWorkstation()" class="px-5 py-2 rounded-xl bg-gradient-to-r from-cyberCyan to-cyberBlue text-cyberDark font-orbitron text-xs font-bold hover:shadow-cyberGlow">
+                    <i class="fa-solid fa-eye mr-1"></i> Open Workspace
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="w-full max-w-[1600px] mx-auto mt-8 pt-5 border-t border-cyberBorder/30 flex flex-col sm:flex-row justify-between items-center text-xs text-slate-400 gap-3 z-10 font-mono">
+        <div class="flex items-center gap-2">
+            <span class="font-orbitron font-bold text-cyberCyan">MZ ACADEMY</span> 24/7 Interactive Practical Studio © 2026.
+        </div>
+        <div class="flex items-center space-x-6">
+            <span class="text-emerald-400"><i class="fa-solid fa-circle text-[8px] mr-1 animate-pulse"></i> ALL PRACTICAL NODES OPERATIONAL</span>
+        </div>
+    </footer>
+
+    <script>
+        /* Audio Synthesizer using Web Audio API */
+        let audioEnabled = true;
+        let audioCtx = null;
+
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+        }
+
+        function toggleAudio() {
+            audioEnabled = !audioEnabled;
+            const btn = document.getElementById('audioToggleBtn');
+            if (audioEnabled) {
+                btn.innerHTML = `<i class="fa-solid fa-volume-high text-sm"></i>`;
+                showToast("Audio effects enabled", "cyan");
+            } else {
+                btn.innerHTML = `<i class="fa-solid fa-volume-xmark text-sm text-slate-500"></i>`;
+                showToast("Audio effects muted", "slate");
+            }
+        }
+
+        function playSound(type) {
+            if (!audioEnabled) return;
+            try {
+                initAudio();
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                if (type === 'click') {
+                    osc.frequency.setValueAtTime(440, audioCtx.currentTime);
+                    gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.08);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.08);
+                } else if (type === 'compile') {
+                    osc.frequency.setValueAtTime(220, audioCtx.currentTime);
+                    osc.frequency.exponentialRampToValueAtTime(880, audioCtx.currentTime + 0.2);
+                    gain.gain.setValueAtTime(0.08, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.2);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.2);
+                } else if (type === 'success') {
+                    osc.frequency.setValueAtTime(523.25, audioCtx.currentTime);
+                    osc.frequency.setValueAtTime(659.25, audioCtx.currentTime + 0.1);
+                    gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.3);
+                    osc.start();
+                    osc.stop(audioCtx.currentTime + 0.3);
+                }
+            } catch (e) {
+                // Audio not allowed yet without user gesture
+            }
+        }
+
+        /* Toast Notifications */
+        function showToast(msg, type = 'cyan') {
+            const container = document.getElementById('toastContainer');
+            if (!container) return;
+            const toast = document.createElement('div');
+            
+            const colorClass = type === 'purple' ? 'border-cyberPurple text-cyberPurple' : 
+                               type === 'emerald' ? 'border-emerald-400 text-emerald-400' : 'border-cyberCyan text-cyberCyan';
+
+            toast.className = `glass-panel px-4 py-2.5 rounded-xl border ${colorClass} text-xs font-orbitron font-bold flex items-center gap-2 shadow-cardDepth transition-all duration-300 opacity-0 transform translate-x-5 pointer-events-auto`;
+            toast.innerHTML = `<i class="fa-solid fa-circle-info"></i> ${msg}`;
+
+            container.appendChild(toast);
+            setTimeout(() => {
+                toast.classList.remove('opacity-0', 'translate-x-5');
+            }, 10);
+
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'translate-x-5');
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+
+        /* Live Clock Logic */
+        function updateClock() {
+            const now = new Date();
+            const timeStr = now.toUTCString().split(' ')[4] + ' UTC';
+            const clock = document.getElementById('liveClock');
+            if (clock) clock.innerText = timeStr;
+        }
+        setInterval(updateClock, 1000);
+        updateClock();
+
+        /* XP System */
+        let currentXp = 240;
+        function addXp(amount) {
+            currentXp += amount;
+            document.getElementById('userXp').innerText = currentXp;
+            showToast(`Earned +${amount} XP! Total: ${currentXp} XP`, 'emerald');
+        }
+
+        /* Main Tab Switcher */
+        function switchMainTab(tabId) {
+            const tabs = ['web-sandbox', 'hardware-sandbox', 'vector-sandbox', 'workstations'];
+            tabs.forEach(id => {
+                const content = document.getElementById(`tabContent-${id}`);
+                const btn = document.getElementById(`tabBtn-${id}`);
+                if (content && btn) {
+                    if (id === tabId) {
+                        content.classList.remove('hidden');
+                        btn.className = "px-4 py-2 rounded-xl text-xs font-orbitron font-bold text-cyberDark bg-cyberCyan transition flex items-center gap-2 shadow-cyberGlow whitespace-nowrap";
+                    } else {
+                        content.classList.add('hidden');
+                        btn.className = "px-4 py-2 rounded-xl text-xs font-orbitron font-bold text-slate-300 hover:text-white transition flex items-center gap-2 whitespace-nowrap";
+                    }
+                }
+            });
+
+            if (tabId === 'vector-sandbox') {
+                initVectorCanvas();
+            } else if (tabId === 'hardware-sandbox') {
+                initOscilloscope();
+            }
+        }
+
+        /* WEB DEV TEMPLATES */
+        const webTemplates = {
+            cyberCard: `<!-- Practical Task: MZ Cyber Card Component -->
+<div style="background: linear-gradient(135deg, #0b1329, #14203e); border: 2px solid #00f6ff; padding: 25px; border-radius: 16px; color: #fff; text-align: center; font-family: sans-serif; box-shadow: 0 0 25px rgba(0,246,255,0.3);">
+  <h2 style="color: #00f6ff; margin-top: 0; font-size: 22px;">MZ Practical Task #01</h2>
+  <p style="color: #cbd5e1; font-size: 14px;">Welcome to MZ Academy 24/7 Practical Lab!</p>
+  <button style="background: #00f6ff; color: #030712; border: none; padding: 10px 20px; font-weight: bold; border-radius: 8px; cursor: pointer; transition: 0.3s;" onclick="this.innerText = 'Practical Action Executed!'">
+    Test Practical Action
+  </button>
+</div>`,
+            particleCanvas: `<!-- Practical Task: Canvas Particle Wave -->
+<canvas id="c" style="background:#030712; width:100%; height:100%; display:block;"></canvas>
+<script>
+  const c = document.getElementById('c');
+  const ctx = c.getContext('2d');
+  c.width = window.innerWidth; c.height = window.innerHeight;
+  let p = Array.from({length: 40}, () => ({
+    x: Math.random()*c.width, y: Math.random()*c.height,
+    r: Math.random()*3 + 1, dx: (Math.random()-0.5)*2, dy: (Math.random()-0.5)*2
+  }));
+  function draw() {
+    ctx.clearRect(0,0,c.width,c.height);
+    ctx.fillStyle = '#00f6ff';
+    p.forEach(i => {
+      ctx.beginPath(); ctx.arc(i.x, i.y, i.r, 0, Math.PI*2); ctx.fill();
+      i.x += i.dx; i.y += i.dy;
+      if (i.x < 0 || i.x > c.width) i.dx *= -1;
+      if (i.y < 0 || i.y > c.height) i.dy *= -1;
+    });
+    requestAnimationFrame(draw);
+  }
+  draw();
+<\/script>`,
+            interactiveCounter: `<!-- Practical Task: Interactive State Counter -->
+<div style="background: #0b1329; border: 1px solid #b026ff; padding: 30px; border-radius: 20px; text-align: center; font-family: sans-serif; color: white;">
+  <h3 style="color: #b026ff; margin-top:0;">Interactive Counter Widget</h3>
+  <h1 id="count" style="font-size: 48px; color: #00f6ff; margin: 15px 0;">0</h1>
+  <div>
+    <button style="background:#b026ff; color:#fff; border:none; padding:8px 16px; font-weight:bold; border-radius:8px; cursor:pointer; margin-right:8px;" onclick="change(1)">+ Increase</button>
+    <button style="background:#ef4444; color:#fff; border:none; padding:8px 16px; font-weight:bold; border-radius:8px; cursor:pointer;" onclick="change(-1)">- Decrease</button>
+  </div>
+  <script>
+    let v = 0;
+    function change(d) { v += d; document.getElementById('count').innerText = v; }
+  <\/script>
+</div>`
+        };
+
+        function loadWebTemplate(key) {
+            if (webTemplates[key]) {
+                document.getElementById('webCodeInput').value = webTemplates[key];
+                executeWebCode();
+                showToast("Loaded practical template", "cyan");
+            }
+        }
+
+        let compileTimeout = null;
+        function autoCompileWebCode() {
+            clearTimeout(compileTimeout);
+            compileTimeout = setTimeout(executeWebCode, 600);
+        }
+
+        function executeWebCode() {
+            const code = document.getElementById('webCodeInput').value;
+            const outputFrame = document.getElementById('webCodeOutput');
+            const doc = outputFrame.contentDocument || outputFrame.contentWindow.document;
+            doc.open();
+            doc.write(code);
+            doc.close();
+        }
+
+        function resetWebCode() {
+            const sel = document.getElementById('codeSnippetSelect').value;
+            loadWebTemplate(sel);
+        }
+
+        function verifyWebTask() {
+            const term = document.getElementById('terminalOutput');
+            const p = document.createElement('p');
+            p.className = "text-emerald-400 font-bold";
+            p.innerText = "✓ [VERIFIED] Practical Web IDE Code Executed Successfully!";
+            term.appendChild(p);
+            term.scrollTop = term.scrollHeight;
+            addXp(50);
+        }
+
+        /* IOT HARDWARE CIRCUIT SIMULATOR */
+        const pinState = { 1: false, 2: false, 3: false };
+        let potVal = 1.65;
+
+        function togglePin(pinNum) {
+            pinState[pinNum] = !pinState[pinNum];
+            const isON = pinState[pinNum];
+            const btn = document.getElementById(`pinBtn${pinNum}`);
+            const indicator = document.getElementById(`ledIndicator${pinNum}`);
+            const log = document.getElementById('hardwareSerialLog');
+
+            const colors = { 1: '#ef4444', 2: '#3b82f6', 3: '#10b981' };
+            const names = { 1: 'GPIO 02 (Red LED)', 2: 'GPIO 04 (Blue LED)', 3: 'GPIO 05 (Green LED)' };
+
+            if (isON) {
+                btn.innerText = "ON";
+                btn.className = "px-3.5 py-1 rounded-lg bg-emerald-500 text-cyberDark font-bold text-xs font-mono transition shadow-cyberGlow";
+                indicator.style.backgroundColor = colors[pinNum];
+                indicator.style.boxShadow = `0 0 20px ${colors[pinNum]}`;
+            } else {
+                btn.innerText = "OFF";
+                btn.className = "px-3.5 py-1 rounded-lg bg-slate-800 text-slate-400 text-xs font-mono font-bold hover:text-white transition";
+                indicator.style.backgroundColor = '#1e293b';
+                indicator.style.boxShadow = 'none';
+            }
+
+            const logItem = document.createElement('p');
+            logItem.innerText = `[GPIO] ${names[pinNum]} -> ${isON ? 'HIGH (3.3V)' : 'LOW (0V)'}`;
+            log.appendChild(logItem);
+            log.scrollTop = log.scrollHeight;
+        }
+
+        function updatePotentiometer(val) {
+            potVal = parseFloat(val);
+            document.getElementById('potValue').innerText = `${val} V`;
+            const log = document.getElementById('hardwareSerialLog');
+            const logItem = document.createElement('p');
+            logItem.className = "text-cyberCyan";
+            logItem.innerText = `[ADC] Potentiometer Voltage: ${val}V (ADC: ${Math.round(val * 1240)})`;
+            log.appendChild(logItem);
+            log.scrollTop = log.scrollHeight;
+        }
+
+        function updateSensorDistance(val) {
+            document.getElementById('sensorDistVal').innerText = `${val} cm`;
+        }
+
+        /* OSCILLOSCOPE CANVAS */
+        let oscCanvas, oscCtx, oscAnimation;
+        let oscStep = 0;
+
+        function initOscilloscope() {
+            oscCanvas = document.getElementById('oscilloscopeCanvas');
+            if (!oscCanvas) return;
+            oscCtx = oscCanvas.getContext('2d');
+            oscCanvas.width = oscCanvas.parentElement.clientWidth;
+            oscCanvas.height = 110;
+
+            if (oscAnimation) cancelAnimationFrame(oscAnimation);
+
+            function renderOsc() {
+                oscCtx.fillStyle = 'rgba(0, 0, 0, 0.2)';
+                oscCtx.fillRect(0, 0, oscCanvas.width, oscCanvas.height);
+
+                // Grid background
+                oscCtx.strokeStyle = 'rgba(0, 246, 255, 0.08)';
+                oscCtx.lineWidth = 1;
+                for (let x = 0; x < oscCanvas.width; x += 20) {
+                    oscCtx.beginPath(); oscCtx.moveTo(x, 0); oscCtx.lineTo(x, oscCanvas.height); oscCtx.stroke();
+                }
+                for (let y = 0; y < oscCanvas.height; y += 20) {
+                    oscCtx.beginPath(); oscCtx.moveTo(0, y); oscCtx.lineTo(oscCanvas.width, y); oscCtx.stroke();
+                }
+
+                // Waveform rendering based on potentiometer voltage
+                oscCtx.beginPath();
+                oscCtx.strokeStyle = '#00f6ff';
+                oscCtx.lineWidth = 2;
+                oscCtx.shadowBlur = 8;
+                oscCtx.shadowColor = '#00f6ff';
+
+                const amplitude = (potVal / 3.3) * 40;
+                const freq = 0.05 + (potVal * 0.02);
+
+                for (let x = 0; x < oscCanvas.width; x++) {
+                    const y = (oscCanvas.height / 2) + Math.sin((x + oscStep) * freq) * amplitude;
+                    if (x === 0) oscCtx.moveTo(x, y);
+                    else oscCtx.lineTo(x, y);
+                }
+                oscCtx.stroke();
+                oscCtx.shadowBlur = 0;
+
+                oscStep += 3;
+                oscAnimation = requestAnimationFrame(renderOsc);
+            }
+            renderOsc();
+        }
+
+        /* COREL VECTOR GRAPHICS CANVAS */
+        let canvas, ctx;
+        let activeTool = 'freehand';
+        let strokeColor = '#00f6ff';
+        let strokeWidth = 3;
+        let isDrawing = false;
+        let showGrid = true;
+        let startX, startY;
+
+        function initVectorCanvas() {
+            canvas = document.getElementById('vectorCanvas');
+            if (!canvas) return;
+            ctx = canvas.getContext('2d');
+            
+            canvas.width = canvas.parentElement.clientWidth;
+            canvas.height = 380;
+            drawGrid();
+
+            canvas.onmousedown = (e) => {
+                isDrawing = true;
+                const rect = canvas.getBoundingClientRect();
+                startX = e.clientX - rect.left;
+                startY = e.clientY - rect.top;
+                ctx.beginPath();
+                ctx.moveTo(startX, startY);
+            };
+
+            canvas.onmousemove = (e) => {
+                if (!isDrawing) return;
+                const rect = canvas.getBoundingClientRect();
+                const currentX = e.clientX - rect.left;
+                const currentY = e.clientY - rect.top;
+
+                if (activeTool === 'freehand') {
+                    ctx.strokeStyle = strokeColor;
+                    ctx.lineWidth = strokeWidth;
+                    ctx.lineCap = 'round';
+                    ctx.lineTo(currentX, currentY);
+                    ctx.stroke();
+                }
+            };
+
+            canvas.onmouseup = (e) => {
+                if (!isDrawing) return;
+                isDrawing = false;
+                const rect = canvas.getBoundingClientRect();
+                const endX = e.clientX - rect.left;
+                const endY = e.clientY - rect.top;
+
+                ctx.strokeStyle = strokeColor;
+                ctx.fillStyle = strokeColor + '33'; // 20% opacity fill
+                ctx.lineWidth = strokeWidth;
+
+                if (activeTool === 'rect') {
+                    const width = endX - startX;
+                    const height = endY - startY;
+                    ctx.fillRect(startX, startY, width, height);
+                    ctx.strokeRect(startX, startY, width, height);
+                } else if (activeTool === 'circle') {
+                    const radius = Math.sqrt(Math.pow(endX - startX, 2) + Math.pow(endY - startY, 2));
+                    ctx.beginPath();
+                    ctx.arc(startX, startY, radius, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.stroke();
+                } else if (activeTool === 'star') {
+                    drawStar(startX, startY, 5, 28, 14);
+                }
+            };
+        }
+
+        function drawGrid() {
+            if (!showGrid || !ctx) return;
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.04)';
+            ctx.lineWidth = 1;
+            for (let x = 0; x < canvas.width; x += 30) {
+                ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, canvas.height); ctx.stroke();
+            }
+            for (let y = 0; y < canvas.height; y += 30) {
+                ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(canvas.width, y); ctx.stroke();
+            }
+        }
+
+        function toggleCanvasGrid() {
+            showGrid = !showGrid;
+            clearVectorCanvas();
+            showToast(`Grid ${showGrid ? 'enabled' : 'disabled'}`, 'cyan');
+        }
+
+        function drawStar(cx, cy, spikes, outerRadius, innerRadius) {
+            let rot = Math.PI / 2 * 3;
+            let x = cx, y = cy;
+            let step = Math.PI / spikes;
+
+            ctx.beginPath();
+            ctx.moveTo(cx, cy - outerRadius);
+            for (let i = 0; i < spikes; i++) {
+                x = cx + Math.cos(rot) * outerRadius;
+                y = cy + Math.sin(rot) * outerRadius;
+                ctx.lineTo(x, y);
+                rot += step;
+
+                x = cx + Math.cos(rot) * innerRadius;
+                y = cy + Math.sin(rot) * innerRadius;
+                ctx.lineTo(x, y);
+                rot += step;
+            }
+            ctx.lineTo(cx, cy - outerRadius);
+            ctx.closePath();
+            ctx.fill();
+            ctx.stroke();
+        }
+
+        function setVectorTool(tool) {
+            activeTool = tool;
+            ['freehand', 'rect', 'circle', 'star'].forEach(t => {
+                const btn = document.getElementById(`toolBtn-${t}`);
+                if (btn) {
+                    if (t === tool) {
+                        btn.className = "p-2.5 rounded-xl bg-cyberCyan text-cyberDark font-bold text-xs font-mono flex flex-col items-center gap-1 border border-cyberCyan transition";
+                    } else {
+                        btn.className = "p-2.5 rounded-xl bg-cyberNavy text-slate-300 font-bold text-xs font-mono flex flex-col items-center gap-1 border border-slate-800 hover:border-cyberCyan transition";
+                    }
+                }
+            });
+        }
+
+        function setStrokeColor(color) { strokeColor = color; }
+        function setStrokeWidth(w) { strokeWidth = w; }
+
+        function clearVectorCanvas() {
+            if (ctx && canvas) {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                drawGrid();
+            }
+        }
+
+        function downloadCanvasArt() {
+            if (!canvas) return;
+            const link = document.createElement('a');
+            link.download = 'mz-practical-artwork.png';
+            link.href = canvas.toDataURL();
+            link.click();
+            addXp(30);
+        }
+
+        /* WORKSTATIONS DATA & RENDER */
+        const workstations = [
+            { id: "WS-01", status: "occupied", student: "Ahmad Raza", course: "Web Dev IDE", task: "React Practical UI Component", icon: "fa-code" },
+            { id: "WS-02", status: "occupied", student: "Sara Malik", course: "UI/UX Design", task: "Figma Component System Design", icon: "fa-bezier-curve" },
+            { id: "WS-03", status: "available", student: "Unassigned", course: "CorelDRAW", task: "Ready for Learner Connection", icon: "fa-pen-nib" },
+            { id: "WS-04", status: "occupied", student: "Usman Ali", course: "Hardware IoT", task: "ESP32 Sensor Soldering & Code", icon: "fa-microchip" },
+            { id: "WS-05", status: "occupied", student: "Zainab Fatima", course: "Web Dev IDE", task: "Next.js API Route Building", icon: "fa-laptop-code" },
+            { id: "WS-06", status: "available", student: "Unassigned", course: "Web Dev IDE", task: "Ready for Learner Connection", icon: "fa-terminal" },
+            { id: "WS-07", status: "occupied", student: "Hamza Tariq", course: "CorelDRAW", task: "Vector Branding Artwork", icon: "fa-vector-square" },
+            { id: "WS-08", status: "occupied", student: "Bilal Hassan", course: "UI/UX Design", task: "Mobile App Wireframe Prototype", icon: "fa-mobile-screen" }
+        ];
+
+        let currentWsStatusFilter = 'all';
+
+        function renderWorkstations() {
+            const grid = document.getElementById('workstationGrid');
+            if (!grid) return;
+
+            const searchVal = document.getElementById('wsSearchInput')?.value.toLowerCase() || '';
+
+            const filtered = workstations.filter(ws => {
+                const matchSearch = ws.student.toLowerCase().includes(searchVal) || ws.task.toLowerCase().includes(searchVal) || ws.id.toLowerCase().includes(searchVal);
+                const matchStatus = currentWsStatusFilter === 'all' || ws.status === currentWsStatusFilter;
+                return matchSearch && matchStatus;
+            });
+
+            grid.innerHTML = filtered.map(ws => `
+                <div onclick="playSound('click'); openWorkstationModal('${ws.id}', '${ws.student}', '${ws.course}', '${ws.task}')"
+                     class="cursor-pointer bg-cyberDark/90 border ${ws.status === 'occupied' ? 'border-cyberBorder hover:border-cyberCyan' : 'border-slate-800 hover:border-emerald-500'} p-4 rounded-2xl transition hover:scale-[1.02] flex flex-col justify-between group shadow-cardDepth">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="font-orbitron text-xs font-bold ${ws.status === 'occupied' ? 'text-cyberCyan' : 'text-slate-500'}">${ws.id}</span>
+                        <span class="text-[10px] font-mono px-2 py-0.5 rounded ${ws.status === 'occupied' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30' : 'bg-slate-800 text-slate-400'}">
+                            ${ws.status === 'occupied' ? 'LIVE' : 'FREE'}
+                        </span>
+                    </div>
+                    <div class="space-y-1 my-2">
+                        <h4 class="text-xs font-bold text-white group-hover:text-cyberCyan transition flex items-center gap-1.5">
+                            <i class="fa-solid ${ws.icon} text-cyberCyan text-[11px]"></i> ${ws.student}
+                        </h4>
+                        <p class="text-[11px] text-slate-400 font-mono truncate">${ws.task}</p>
+                    </div>
+                    <div class="pt-2 border-t border-slate-800 flex justify-between items-center text-[10px] text-slate-400 font-mono">
+                        <span>${ws.course}</span>
+                        <i class="fa-solid fa-arrow-right text-cyberCyan opacity-0 group-hover:opacity-100 transition"></i>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function filterWorkstations() { renderWorkstations(); }
+        function filterWsStatus(st) { currentWsStatusFilter = st; renderWorkstations(); }
+
+        const activeStudents = [
+            { name: "Ahmad Raza", task: "E-Commerce Frontend App", badge: "Web Dev" },
+            { name: "Sara Malik", task: "Cyberpunk Interface Mockup", badge: "UI/UX" },
+            { name: "Muhammad Hamza", task: "Vector Logo Branding Art", badge: "CorelDRAW" },
+            { name: "Usman Ali", task: "ESP32 Sensor Soldering Lab", badge: "IoT Lab" }
+        ];
+
+        function renderStudentMiniList() {
+            const list = document.getElementById('activeStudentListMini');
+            if (!list) return;
+
+            list.innerHTML = activeStudents.map(s => `
+                <div class="bg-cyberDark p-3 rounded-xl border border-cyberBorder/30 flex justify-between items-center hover:border-cyberCyan transition">
+                    <div>
+                        <h5 class="text-xs font-bold text-white">${s.name}</h5>
+                        <p class="text-[10px] text-slate-400 font-mono truncate">${s.task}</p>
+                    </div>
+                    <span class="text-[9px] font-mono bg-cyberCyan/10 text-cyberCyan px-2 py-0.5 rounded border border-cyberCyan/30">${s.badge}</span>
+                </div>
+            `).join('');
+        }
+
+        function openWorkstationModal(id, student, course, task) {
+            document.getElementById('modalDeskTitle').innerText = `Workstation ${id}`;
+            document.getElementById('modalStudentName').innerText = student;
+            document.getElementById('modalCourse').innerText = course;
+            document.getElementById('modalTask').innerText = task;
+            document.getElementById('workstationModal').classList.remove('hidden');
+        }
+
+        function closeWorkstationModal() {
+            document.getElementById('workstationModal').classList.add('hidden');
+        }
+
+        function spectateWorkstation() {
+            closeWorkstationModal();
+            switchMainTab('web-sandbox');
+            showToast("Connected to live student workspace", "emerald");
+        }
+
+        /* CLI TERMINAL COMMANDS */
+        function sendCliCommand() {
+            const input = document.getElementById('cliInput');
+            const val = input.value.trim().toLowerCase();
+            if (val) {
+                runCommand(val);
+                input.value = '';
+            }
+        }
+
+        function handleCliEnter(e) {
+            if (e.key === 'Enter') sendCliCommand();
+        }
+
+        function runCommand(cmd) {
+            playSound('click');
+            const term = document.getElementById('terminalOutput');
+            const log = document.createElement('p');
+            log.className = "text-cyberCyan";
+            log.innerText = `$ ${cmd}`;
+            term.appendChild(log);
+
+            const res = document.createElement('p');
+            res.className = "text-emerald-400";
+
+            if (cmd === 'help') {
+                res.innerText = "Available CLI commands: status, verify-labs, test-iot, xp, students, clear";
+            } else if (cmd === 'status') {
+                res.innerText = "✓ System Status: 34 Active Desks, 100+ Enrolled Learners, Nodes 100% Operational.";
+            } else if (cmd === 'verify-labs') {
+                res.innerText = "✓ Practical unit verification completed across all 34 nodes. No syntax errors detected.";
+            } else if (cmd === 'test-iot') {
+                res.innerText = "✓ ESP32 board responsive on GPIO 02, 04, 05. Ultrasonic & ADC pins responding.";
+            } else if (cmd === 'xp') {
+                res.innerText = `Current Student XP: ${currentXp} points. Level status: Practical Scholar.`;
+            } else if (cmd === 'clear') {
+                clearTerminal();
+                return;
+            } else {
+                res.className = "text-amber-400";
+                res.innerText = `Command '${cmd}' recognized. Executing practical diagnostic sweep... Done.`;
+            }
+            
+            term.appendChild(res);
+            term.scrollTop = term.scrollHeight;
+        }
+
+        function clearTerminal() {
+            document.getElementById('terminalOutput').innerHTML = `<p class="text-slate-400">[MZ ACADEMY 24/7 PRACTICAL ENGINE v5.0 - LOG CLEARED]</p>`;
+        }
+
+        function randomizeHardwareLoad() {
+            const cpu = Math.floor(Math.random() * 30) + 25;
+            const gpu = Math.floor(Math.random() * 40) + 35;
+            document.getElementById('cpuLoadText').innerText = `${cpu}%`;
+            document.getElementById('cpuBar').style.width = `${cpu}%`;
+            document.getElementById('gpuLoadText').innerText = `${gpu}%`;
+            document.getElementById('gpuBar').style.width = `${gpu}%`;
+            showToast("Hardware cluster load refreshed", "cyan");
+        }
+
+        /* Initial Execution on Load */
+        window.onload = function() {
+            loadWebTemplate('cyberCard');
+            renderWorkstations();
+            renderStudentMiniList();
+            initOscilloscope();
+        };
+
+        // Attach global functions for window inline triggers
+        window.switchMainTab = switchMainTab;
+        window.executeWebCode = executeWebCode;
+        window.resetWebCode = resetWebCode;
+        window.loadWebTemplate = loadWebTemplate;
+        window.verifyWebTask = verifyWebTask;
+        window.autoCompileWebCode = autoCompileWebCode;
+        window.togglePin = togglePin;
+        window.updatePotentiometer = updatePotentiometer;
+        window.updateSensorDistance = updateSensorDistance;
+        window.setVectorTool = setVectorTool;
+        window.setStrokeColor = setStrokeColor;
+        window.setStrokeWidth = setStrokeWidth;
+        window.clearVectorCanvas = clearVectorCanvas;
+        window.downloadCanvasArt = downloadCanvasArt;
+        window.toggleCanvasGrid = toggleCanvasGrid;
+        window.openWorkstationModal = openWorkstationModal;
+        window.closeWorkstationModal = closeWorkstationModal;
+        window.spectateWorkstation = spectateWorkstation;
+        window.runCommand = runCommand;
+        window.sendCliCommand = sendCliCommand;
+        window.handleCliEnter = handleCliEnter;
+        window.clearTerminal = clearTerminal;
+        window.randomizeHardwareLoad = randomizeHardwareLoad;
+        window.filterWorkstations = filterWorkstations;
+        window.filterWsStatus = filterWsStatus;
+        window.toggleAudio = toggleAudio;
+        window.playSound = playSound;
+    </script>
+</body>
+</html>

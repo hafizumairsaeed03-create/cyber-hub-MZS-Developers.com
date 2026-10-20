@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="ur">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Initialization Page</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            width: 100vw;
+            overflow: hidden;
+            background-color: #000;
+            background-image: url('assets/logo.jpeg');
+            background-size: 100% 100%;
+            background-position: center;
+            background-repeat: no-repeat;
+            color: #ffffff;
+            position: relative;
+        }
+
+        .bottom-content {
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+            width: 100%;
+        }
+
+        .btn-init {
+            background: #00ff80;
+            color: #000000;
+            border: none;
+            padding: 12px 30px;
+            font-size: 1rem;
+            font-weight: 800;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 20px rgba(0, 255, 128, 0.6);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .btn-init:hover {
+            transform: scale(1.08);
+            box-shadow: 0 0 30px rgba(0, 255, 128, 0.9);
+            background: #00bd56;
+            color: #fff;
+        }
+
+        .btn-init:disabled {
+            cursor: not-allowed;
+            opacity: 0.8;
+            transform: none;
+        }
+
+        #status {
+            margin-top: 10px;
+            font-size: 0.95rem;
+            color: #00ff80;
+            min-height: 20px;
+            font-weight: 700;
+            text-shadow: 0 0 8px rgba(0, 0, 0, 0.9);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="bottom-content">
+        <button class="btn-init" id="initBtn" onclick="startInitialization()">Initialization</button>
+        <div id="status"></div>
+    </div>
+
+    <script>
+        function startInitialization() {
+            const btn = document.getElementById('initBtn');
+            const status = document.getElementById('status');
+            
+            btn.disabled = true;
+            btn.innerText = "Initializing...";
+            status.innerText = "Please wait, starting process...";
+
+            setTimeout(() => {
+                status.innerText = "Redirecting to Initialization Page...";
+                
+                // Yahan aapke Initialization page ka file name aayega (e.g., initialization.html)
+                setTimeout(() => {
+                    window.location.href = "initialization.html";
+                }, 1000);
+
+            }, 1500);
+        }
+    </script>
+
+</body>
+</html>

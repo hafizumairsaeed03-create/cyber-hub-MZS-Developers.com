@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MZ Digital Forensics Live Investigation Suite</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome CDN for High-Tech Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        cyberDark: '#080c14',
+                        cyberPanel: 'rgba(15, 23, 42, 0.75)',
+                        cyberBorder: '#1e293b',
+                        neonCyan: '#06b6d4',
+                        neonGreen: '#10b981',
+                        neonBlue: '#3b82f6',
+                        neonRed: '#ef4444'
+                    },
+                    fontFamily: {
+                        mono: ['Fira Code', 'Courier New', 'monospace'],
+                        sans: ['Inter', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background-color: #050811;
+            color: #e2e8f0;
+            overflow-x: hidden;
+            font-family: 'Inter', sans-serif;
+        }
+
+        /* Glassmorphism Panel Styling */
+        .glass-panel {
+            background: rgba(13, 20, 36, 0.7);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(56, 189, 248, 0.15);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+
+        .glass-panel-glow {
+            border: 1px solid rgba(6, 182, 212, 0.4);
+            box-shadow: 0 0 15px rgba(6, 182, 212, 0.25);
+        }
+
+        /* Scanline Overlay Effect */
+        .scanline-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none;
+            background: linear-gradient(
+                to bottom,
+                rgba(255, 255, 255, 0),
+                rgba(255, 255, 255, 0) 50%,
+                rgba(0, 255, 204, 0.02) 50%,
+                rgba(0, 255, 204, 0.02)
+            );
+            background-size: 100% 4px;
+            z-index: 99;
+        }
+
+        /* Glowing text effects */
+        .glow-text-cyan {
+            text-shadow: 0 0 8px rgba(6, 182, 212, 0.6);
+        }
+
+        .glow-text-green {
+            text-shadow: 0 0 8px rgba(16, 185, 129, 0.6);
+        }
+
+        /* Custom Scrollbars */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(15, 23, 42, 0.8);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #06b6d4;
+            border-radius: 3px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #3b82f6;
+        }
+
+        /* Radar Sweep Animation */
+        @keyframes radar-sweep {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .radar-sweeper {
+            animation: radar-sweep 4s linear infinite;
+            transform-origin: center;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col p-4 md:p-6 text-xs sm:text-sm selection:bg-cyan-500 selection:text-black">
+    <!-- Overlay for CRT screen feel -->
+    <div class="scanline-overlay"></div>
+
+    <!-- Header / Navbar -->
+    <header class="glass-panel rounded-xl p-4 mb-4 flex flex-wrap items-center justify-between gap-4 border-b border-cyan-500/30">
+        <div class="flex items-center gap-3">
+            <div class="relative flex items-center justify-center w-10 h-10 rounded-lg bg-cyan-950/80 border border-cyan-400 text-cyan-400">
+                <i class="fa-solid font-bold fa-shield-halved text-xl animate-pulse"></i>
+                <span class="absolute -top-1 -right-1 flex h-3 w-3">
+                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
+                </span>
+            </div>
+            <div>
+                <h1 class="text-lg font-bold tracking-wider text-white flex items-center gap-2">
+                    MZ <span class="text-cyan-400 glow-text-cyan">FORENSIC </span> 
+                    <span class="text-[10px] px-2 py-0.5 rounded bg-cyan-900/60 border border-cyan-500/40 text-cyan-300">v4.8 LIVE</span>
+                </h1>
+                <p class="text-slate-400 text-xs">Autonomous Deep Memory & Disk Evidence Extractor</p>
+            </div>
+        </div>
+
+        <!-- System Quick Stats -->
+        <div class="flex flex-wrap items-center gap-4 text-xs">
+            <div class="bg-slate-900/80 px-3 py-1.5 rounded-lg border border-slate-700/60 flex items-center gap-2">
+                <i class="fa-solid fa-microchip text-cyan-400"></i>
+                <span>AI MODEL: <strong class="text-emerald-400">CYBER-LLM v3</strong></span>
+            </div>
+            <div class="bg-slate-900/80 px-3 py-1.5 rounded-lg border border-slate-700/60 flex items-center gap-2">
+                <i class="fa-solid fa-hard-drive text-blue-400"></i>
+                <span>TARGET: <strong class="text-cyan-300">NVMe_NVRAM_EV3.img</strong></span>
+            </div>
+            <div class="bg-slate-900/80 px-3 py-1.5 rounded-lg border border-slate-700/60 flex items-center gap-2">
+                <i class="fa-solid fa-signal text-emerald-400 animate-pulse"></i>
+                <span>STATE: <strong class="text-emerald-400 glow-text-green" id="systemState">ANALYZING</strong></span>
+            </div>
+            <button id="toggleStreamBtn" onclick="toggleAnalysis()" class="px-4 py-1.5 rounded-lg bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-300 border border-cyan-500/50 transition-all flex items-center gap-2 font-mono">
+                <i class="fa-solid fa-pause" id="pauseIcon"></i> <span id="pauseBtnText">PAUSE ENGINE</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Dashboard Grid Layout -->
+    <main class="grid grid-cols-1 lg:grid-cols-12 gap-4 flex-1">
+        
+        <!-- LEFT COLUMN: Live Terminal Logs & Hexadecimal Stream (5 Cols) -->
+        <section class="lg:col-span-5 flex flex-col gap-4">
+            
+            <!-- Hexadecimal Live Data Stream Panel -->
+            <div class="glass-panel rounded-xl p-4 flex-1 flex flex-col min-h-[280px]">
+                <div class="flex items-center justify-between mb-3 border-b border-slate-800 pb-2">
+                    <h2 class="font-mono text-xs uppercase tracking-wider text-cyan-400 flex items-center gap-2">
+                        <i class="fa-solid fa-code"></i> Live Binary / Hex Stream
+                    </h2>
+                    <span class="text-[10px] text-slate-500 font-mono" id="hexAddrRange">0x00004F20 - 0x00004FA0</span>
+                </div>
+                
+                <div class="font-mono text-[11px] leading-relaxed overflow-y-auto flex-1 bg-black/60 p-3 rounded-lg border border-slate-800/80 text-cyan-200/90" id="hexViewer">
+                    <!-- Dynamic Hex Lines will be appended/updated by JavaScript -->
+                </div>
+            </div>
+
+            <!-- Terminal / AI Analysis Command Log Panel -->
+            <div class="glass-panel rounded-xl p-4 flex-1 flex flex-col min-h-[260px]">
+                <div class="flex items-center justify-between mb-2 border-b border-slate-800 pb-2">
+                    <h2 class="font-mono text-xs uppercase tracking-wider text-emerald-400 flex items-center gap-2">
+                        <i class="fa-solid fa-terminal"></i> AI Pattern & Anomaly Engine Log
+                    </h2>
+                    <span class="flex items-center gap-1.5 text-[10px] text-emerald-400">
+                        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span> LOGGING
+                    </span>
+                </div>
+                <div class="font-mono text-[11px] overflow-y-auto flex-1 bg-black/80 p-3 rounded-lg border border-slate-800 space-y-1.5 text-slate-300" id="terminalLog">
+                    <!-- Dynamic terminal logs will populate here -->
+                </div>
+            </div>
+        </section>
+
+        <!-- CENTER COLUMN: Network Graph, Threat Map & Decryption (4 Cols) -->
+        <section class="lg:col-span-4 flex flex-col gap-4">
+            
+            <!-- Network Topology & Threat Node Visualizer Canvas -->
+            <div class="glass-panel rounded-xl p-4 flex flex-col min-h-[300px] relative overflow-hidden">
+                <div class="flex items-center justify-between mb-2 z-10">
+                    <h2 class="font-mono text-xs uppercase tracking-wider text-cyan-400 flex items-center gap-2">
+                        <i class="fa-solid fa-diagram-project"></i> Threat Vector & Packet Node Graph
+                    </h2>
+                    <span class="text-[10px] bg-red-500/20 text-red-400 px-2 py-0.5 rounded border border-red-500/30">
+                        1 ANOMALY DETECTED
+                    </span>
+                </div>
+
+                <!-- Radar Canvas Overlay -->
+                <div class="relative flex-1 bg-black/50 rounded-lg border border-slate-800 flex items-center justify-center overflow-hidden">
+                    <canvas id="nodeCanvas" class="w-full h-full absolute inset-0"></canvas>
+                    
+                    <!-- Radar Overlay Sweep Lines -->
+                    <div class="absolute w-[220px] h-[220px] rounded-full border border-cyan-500/20 pointer-events-none flex items-center justify-center">
+                        <div class="w-[150px] h-[150px] rounded-full border border-cyan-500/20"></div>
+                        <div class="w-[80px] h-[80px] rounded-full border border-cyan-500/20"></div>
+                        <div class="absolute w-full h-[1px] bg-cyan-500/20"></div>
+                        <div class="absolute h-full w-[1px] bg-cyan-500/20"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Active Decryption & File Extraction Progress Panel -->
+            <div class="glass-panel rounded-xl p-4 flex flex-col gap-3">
+                <h2 class="font-mono text-xs uppercase tracking-wider text-blue-400 flex items-center gap-2 border-b border-slate-800 pb-2">
+                    <i class="fa-solid fa-key"></i> Active Decryption Queue & Carving
+                </h2>
+
+                <!-- Item 1: AES Payload -->
+                <div class="bg-slate-900/60 p-2.5 rounded-lg border border-slate-800 space-y-1">
+                    <div class="flex justify-between text-xs">
+                        <span class="text-slate-300 font-mono">Encrypted_Payload_01.dat (AES-256)</span>
+                        <span class="text-cyan-400 font-mono" id="decVal1">68%</span>
+                    </div>
+                    <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
+                        <div id="decBar1" class="bg-gradient-to-r from-cyan-500 to-blue-500 h-full transition-all duration-300" style="width: 68%;"></div>
+                    </div>
+                </div>
+
+                <!-- Item 2: SAM Registry Memory Hive -->
+                <div class="bg-slate-900/60 p-2.5 rounded-lg border border-slate-800 space-y-1">
+                    <div class="flex justify-between text-xs">
+                        <span class="text-slate-300 font-mono">SAM_Registry_Hashes.hive</span>
+                        <span class="text-emerald-400 font-mono" id="decVal2">92%</span>
+                    </div>
+                    <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
+                        <div id="decBar2" class="bg-gradient-to-r from-emerald-500 to-teal-400 h-full transition-all duration-300" style="width: 92%;"></div>
+                    </div>
+                </div>
+
+                <!-- Item 3: Suspicious DLL Reconstruction -->
+                <div class="bg-slate-900/60 p-2.5 rounded-lg border border-slate-800 space-y-1">
+                    <div class="flex justify-between text-xs">
+                        <span class="text-slate-300 font-mono">Kernel_Hook_Injected.dll</span>
+                        <span class="text-amber-400 font-mono" id="decVal3">34%</span>
+                    </div>
+                    <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
+                        <div id="decBar3" class="bg-gradient-to-r from-amber-500 to-red-500 h-full transition-all duration-300" style="width: 34%;"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- RIGHT COLUMN: Evidence Carving & Artifact Inspection (3 Cols) -->
+        <section class="lg:col-span-3 flex flex-col gap-4">
+            
+            <!-- Carved Evidence Artifacts Table -->
+            <div class="glass-panel rounded-xl p-4 flex-1 flex flex-col">
+                <div class="flex items-center justify-between mb-3 border-b border-slate-800 pb-2">
+                    <h2 class="font-mono text-xs uppercase tracking-wider text-purple-400 flex items-center gap-2">
+                        <i class="fa-solid fa-box-archive"></i> Extracted Artifacts
+                    </h2>
+                    <span class="text-[10px] text-purple-300 bg-purple-900/40 px-2 py-0.5 rounded border border-purple-500/30">
+                        14 Files Carved
+                    </span>
+                </div>
+
+                <div class="space-y-2 overflow-y-auto max-h-[320px] pr-1" id="artifactList">
+                    <!-- Dynamic artifact items will load here -->
+                </div>
+            </div>
+
+            <!-- Forensics Metadata & Hash Verification Box -->
+            <div class="glass-panel rounded-xl p-4 flex flex-col gap-2">
+                <h2 class="font-mono text-xs uppercase tracking-wider text-amber-400 flex items-center gap-2 border-b border-slate-800 pb-2">
+                    <i class="fa-solid fa-fingerprint"></i> Evidence Integrity Hash
+                </h2>
+                <div class="space-y-2 text-[11px] font-mono">
+                    <div>
+                        <span class="text-slate-500 block">MD5 HASH VERIFIED:</span>
+                        <span class="text-emerald-400 bg-black/50 p-1.5 rounded block truncate border border-slate-800">
+                            e4d909c290d0fb1ca068ffaddf22cbd0
+                        </span>
+                    </div>
+                    <div>
+                        <span class="text-slate-500 block">SHA-256 HASH VERIFIED:</span>
+                        <span class="text-cyan-400 bg-black/50 p-1.5 rounded block truncate border border-slate-800">
+                            2c26b46b68ffc68ff99b453c1d30413413422d706483bfa0f98a5e886266e7ae
+                        </span>
+                    </div>
+                    <div class="flex items-center justify-between pt-1">
+                        <span class="text-slate-400">Chain of Custody:</span>
+                        <span class="text-emerald-400 font-bold"><i class="fa-solid fa-check-circle"></i> SECURE</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        /* State Variables */
+        let isRunning = true;
+        let hexOffset = 0x4F20;
+
+        /* Hexadecimal Stream Generator */
+        const hexViewer = document.getElementById('hexViewer');
+        const hexAddrRange = document.getElementById('hexAddrRange');
+        
+        function generateHexChunk() {
+            const hexChars = '0123456789ABCDEF';
+            let html = '';
+            
+            for (let line = 0; line < 11; line++) {
+                const currentAddr = '0x' + (hexOffset + (line * 16)).toString(16).toUpperCase().padStart(8, '0');
+                let hexBytes = '';
+                let asciiStr = '';
+
+                for (let b = 0; b < 16; b++) {
+                    const byteVal = Math.floor(Math.random() * 256);
+                    const hexByte = byteVal.toString(16).toUpperCase().padStart(2, '0');
+                    
+                    // Highlight suspicious/random bytes in red or cyan occasionally
+                    if (byteVal > 220) {
+                        hexBytes += `<span class="text-red-400 font-bold">${hexByte}</span> `;
+                    } else if (byteVal < 35) {
+                        hexBytes += `<span class="text-cyan-400">${hexByte}</span> `;
+                    } else {
+                        hexBytes += `${hexByte} `;
+                    }
+
+                    // Printable ASCII simulation
+                    asciiStr += (byteVal >= 32 && byteVal <= 126) ? String.fromCharCode(byteVal) : '.';
+                }
+
+                html += `<div class="flex justify-between items-center hover:bg-slate-800/50 px-1 rounded">
+                    <span class="text-slate-500 font-bold">${currentAddr}</span>
+                    <span class="text-cyan-300/80">${hexBytes.trim()}</span>
+                    <span class="text-emerald-400/90 font-mono">[${asciiStr}]</span>
+                </div>`;
+            }
+
+            hexViewer.innerHTML = html;
+            hexAddrRange.innerText = `0x${hexOffset.toString(16).toUpperCase()} - 0x${(hexOffset + 176).toString(16).toUpperCase()}`;
+            hexOffset += 16;
+            if (hexOffset > 0xFFFF00) hexOffset = 0x4F20;
+        }
+
+        /* AI Terminal Log Engine */
+        const terminalLog = document.getElementById('terminalLog');
+        const sampleLogs = [
+            { type: 'info', msg: 'AI Engine scanning unallocated disk sectors [Block #884920]' },
+            { type: 'success', msg: 'Match found: YARA rule [APT_Trojan_Memory_Inject]' },
+            { type: 'warn', msg: 'Encrypted payload identified at sector Offset 0x00A4F80' },
+            { type: 'info', msg: 'Decrypting AES key schedule via GPU CUDA cluster...' },
+            { type: 'danger', msg: 'ANOMALY DETECTED: Rootkit hook inside Ntoskrnl.exe!' },
+            { type: 'success', msg: 'Reconstructed deleted browser history cookie database.' },
+            { type: 'info', msg: 'Parsing Prefetch files & UserAssist registry artifacts...' },
+            { type: 'warn', msg: 'Hidden network socket listening on non-standard port 4444' }
+        ];
+
+        function addTerminalLog() {
+            const randomEntry = sampleLogs[Math.floor(Math.random() * sampleLogs.length)];
+            const timestamp = new Date().toISOString().split('T')[1].slice(0, 8);
+            
+            let colorClass = 'text-cyan-300';
+            let prefix = '[INFO]';
+
+            if (randomEntry.type === 'success') {
+                colorClass = 'text-emerald-400';
+                prefix = '[SUCCESS]';
+            } else if (randomEntry.type === 'warn') {
+                colorClass = 'text-amber-300';
+                prefix = '[WARN]';
+            } else if (randomEntry.type === 'danger') {
+                colorClass = 'text-red-400 font-bold';
+                prefix = '[ALERT]';
+            }
+
+            const logLine = document.createElement('div');
+            logLine.className = 'hover:bg-slate-900/60 p-1 rounded transition-colors';
+            logLine.innerHTML = `<span class="text-slate-500">${timestamp}</span> <span class="${colorClass}">${prefix} ${randomEntry.msg}</span>`;
+            
+            terminalLog.appendChild(logLine);
+            terminalLog.scrollTop = terminalLog.scrollHeight;
+
+            if (terminalLog.children.length > 30) {
+                terminalLog.removeChild(terminalLog.children[0]);
+            }
+        }
+
+        /* Decryption Progress Bar Simulation */
+        function updateProgressBars() {
+            const bar1 = document.getElementById('decBar1');
+            const val1 = document.getElementById('decVal1');
+            const bar2 = document.getElementById('decBar2');
+            const val2 = document.getElementById('decVal2');
+            const bar3 = document.getElementById('decBar3');
+            const val3 = document.getElementById('decVal3');
+
+            let v1 = (parseInt(val1.innerText) + Math.floor(Math.random() * 3)) % 100;
+            let v2 = (parseInt(val2.innerText) + Math.floor(Math.random() * 2)) % 100;
+            let v3 = (parseInt(val3.innerText) + Math.floor(Math.random() * 4)) % 100;
+
+            bar1.style.width = v1 + '%';
+            val1.innerText = v1 + '%';
+
+            bar2.style.width = v2 + '%';
+            val2.innerText = v2 + '%';
+
+            bar3.style.width = v3 + '%';
+            val3.innerText = v3 + '%';
+        }
+
+        /* Carved Evidence Artifact List Builder */
+        const artifacts = [
+            { name: 'passwords_vault.db', type: 'SQLITE', size: '2.4 MB', status: 'Carved', color: 'text-emerald-400' },
+            { name: 'network_dump.pcap', type: 'PACKET', size: '148.1 MB', status: 'Scanning', color: 'text-cyan-400' },
+            { name: 'system_log_event.evtx', type: 'LOG', size: '12.8 MB', status: 'Parsed', color: 'text-purple-400' },
+            { name: 'bitcoin_wallet.dat', type: 'CRYPTO', size: '512 KB', status: 'Flagged', color: 'text-red-400' },
+            { name: 'shadow_copy_v12.sys', type: 'BACKUP', size: '1.2 GB', status: 'Carved', color: 'text-emerald-400' }
+        ];
+
+        function renderArtifacts() {
+            const container = document.getElementById('artifactList');
+            container.innerHTML = '';
+            
+            artifacts.forEach((art) => {
+                const item = document.createElement('div');
+                item.className = "bg-slate-900/70 p-2.5 rounded-lg border border-slate-800 flex items-center justify-between text-xs hover:border-cyan-500/40 transition-all cursor-pointer";
+                item.innerHTML = `
+                    <div class="flex items-center gap-2.5 overflow-hidden">
+                        <i class="fa-solid fa-file-code text-cyan-400 text-sm"></i>
+                        <div class="truncate">
+                            <p class="font-mono text-slate-200 truncate">${art.name}</p>
+                            <p class="text-[10px] text-slate-500">${art.type} • ${art.size}</p>
+                        </div>
+                    </div>
+                    <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-black/40 border border-slate-700 ${art.color}">
+                        ${art.status}
+                    </span>
+                `;
+                container.appendChild(item);
+            });
+        }
+
+        /* Canvas Network Node Animation */
+        const canvas = document.getElementById('nodeCanvas');
+        const ctx = canvas.getContext('2d');
+        let nodes = [];
+
+        function resizeCanvas() {
+            canvas.width = canvas.parentElement.clientWidth;
+            canvas.height = canvas.parentElement.clientHeight;
+        }
+
+        window.addEventListener('resize', resizeCanvas);
+
+        function initNodes() {
+            nodes = [];
+            const numNodes = 12;
+            for (let i = 0; i < numNodes; i++) {
+                nodes.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    vx: (Math.random() - 0.5) * 1.2,
+                    vy: (Math.random() - 0.5) * 1.2,
+                    radius: Math.random() * 3 + 2,
+                    isThreat: i === 0 // 1 Anomaly threat node
+                });
+            }
+        }
+
+        function drawNodes() {
+            if (!ctx) return;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Draw Connections
+            for (let i = 0; i < nodes.length; i++) {
+                for (let j = i + 1; j < nodes.length; j++) {
+                    const dx = nodes[i].x - nodes[j].x;
+                    const dy = nodes[i].y - nodes[j].y;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+
+                    if (dist < 100) {
+                        ctx.beginPath();
+                        ctx.moveTo(nodes[i].x, nodes[i].y);
+                        ctx.lineTo(nodes[j].x, nodes[j].y);
+                        ctx.strokeStyle = nodes[i].isThreat || nodes[j].isThreat ? 
+                            `rgba(239, 68, 68, ${1 - dist / 100})` : 
+                            `rgba(6, 182, 212, ${0.4 - dist / 250})`;
+                        ctx.lineWidth = 1;
+                        ctx.stroke();
+                    }
+                }
+            }
+
+            // Draw & Update Nodes
+            nodes.forEach(node => {
+                if (isRunning) {
+                    node.x += node.vx;
+                    node.y += node.vy;
+
+                    if (node.x < 0 || node.x > canvas.width) node.vx *= -1;
+                    if (node.y < 0 || node.y > canvas.height) node.vy *= -1;
+                }
+
+                ctx.beginPath();
+                ctx.arc(node.x, node.y, node.radius, 0, Math.PI * 2);
+                ctx.fillStyle = node.isThreat ? '#ef4444' : '#06b6d4';
+                ctx.shadowBlur = node.isThreat ? 12 : 6;
+                ctx.shadowColor = node.isThreat ? '#ef4444' : '#06b6d4';
+                ctx.fill();
+                ctx.shadowBlur = 0; // reset
+            });
+
+            requestAnimationFrame(drawNodes);
+        }
+
+        /* Controls & Loop Timing */
+        function toggleAnalysis() {
+            isRunning = !isRunning;
+            const stateLabel = document.getElementById('systemState');
+            const pauseIcon = document.getElementById('pauseIcon');
+            const pauseBtnText = document.getElementById('pauseBtnText');
+
+            if (isRunning) {
+                stateLabel.innerText = "ANALYZING";
+                stateLabel.className = "text-emerald-400 glow-text-green";
+                pauseIcon.className = "fa-solid fa-pause";
+                pauseBtnText.innerText = "PAUSE ENGINE";
+            } else {
+                stateLabel.innerText = "PAUSED";
+                stateLabel.className = "text-amber-400";
+                pauseIcon.className = "fa-solid fa-play";
+                pauseBtnText.innerText = "RESUME ENGINE";
+            }
+        }
+
+        // Main Refresh Timers
+        window.onload = function () {
+            resizeCanvas();
+            initNodes();
+            drawNodes();
+            renderArtifacts();
+
+            // Initial Hex and Log seeds
+            for (let i = 0; i < 5; i++) addTerminalLog();
+            generateHexChunk();
+
+            // Timed simulation loops
+            setInterval(() => {
+                if (isRunning) {
+                    generateHexChunk();
+                }
+            }, 600);
+
+            setInterval(() => {
+                if (isRunning) {
+                    addTerminalLog();
+                }
+            }, 1200);
+
+            setInterval(() => {
+                if (isRunning) {
+                    updateProgressBars();
+                }
+            }, 800);
+        };
+    </script>
+</body>
+</html>

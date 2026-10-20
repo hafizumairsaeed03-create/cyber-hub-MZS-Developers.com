@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Face Attendance System - Fast Recognition Portal</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        darkbg: '#070b12',
+                        cardbg: '#0c1322',
+                        cardborder: '#18253f',
+                        neoncyan: '#00f2fe',
+                        neonblue: '#4facfe',
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @keyframes scanonce {
+            0% { top: 0%; opacity: 0.2; }
+            50% { opacity: 1; }
+            100% { top: 98%; opacity: 0.2; }
+        }
+        .scanner-beam {
+            position: absolute;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, #00f2fe, transparent);
+            box-shadow: 0 0 15px #00f2fe, 0 0 5px #fff;
+            z-index: 20;
+            pointer-events: none;
+            display: none;
+        }
+        .scanner-beam.active {
+            display: block;
+            animation: scanonce 1.8s ease-in-out infinite;
+        }
+    </style>
+</head>
+<body class="bg-darkbg text-slate-100 min-h-screen font-sans antialiased overflow-x-hidden">
+
+    <!-- Top Header Bar -->
+    <header class="bg-cardbg border-b border-cardborder px-6 py-4 flex flex-col md:flex-row justify-between items-center gap-4 sticky top-0 z-50 shadow-lg">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-500 to-blue-600 flex items-center justify-center shadow-lg shadow-cyan-500/30">
+                <i class="fa-solid fa-brain text-white text-lg"></i>
+            </div>
+            <div>
+                <div class="flex items-center gap-2">
+                    <h1 class="font-bold tracking-wider text-lg bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">AI FACE ATTENDANCE SYSTEM</h1>
+                    <span class="bg-cyan-500/10 text-cyan-400 border border-cyan-500/30 text-[10px] px-2 py-0.5 rounded-full font-mono font-semibold">v3.0 Pro</span>
+                </div>
+                <p class="text-xs text-slate-400">FAST RECOGNITION PORTAL • PAKISTAN CAMPUS</p>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-4">
+            <button id="autoScanBtn" onclick="toggleAutoScan()" class="bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white px-5 py-2 rounded-xl font-semibold text-sm shadow-lg shadow-emerald-500/20 transition-all flex items-center gap-2 cursor-pointer">
+                <i id="scanBtnIcon" class="fa-solid fa-play"></i>
+                <span id="scanBtnText">Start Fast Auto-Scan</span>
+            </button>
+            <button onclick="toggleVoiceMute()" id="muteBtn" class="bg-cardborder hover:bg-slate-800 text-slate-300 p-2.5 rounded-xl transition-all cursor-pointer" title="Toggle Voice Mute">
+                <i id="muteIcon" class="fa-solid fa-volume-high text-cyan-400"></i>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Dashboard Container -->
+    <main class="p-6 max-w-full mx-auto grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+        <!-- Left Column: Scanner & Current Target -->
+        <div class="lg:col-span-4 flex flex-col gap-6">
+            
+            <!-- Statistics Quick Row -->
+            <div class="grid grid-cols-3 gap-3">
+                <div class="bg-cardbg border border-cardborder rounded-2xl p-4 text-center shadow-md">
+                    <div class="text-slate-400 text-xs font-medium mb-1">Total</div>
+                    <div id="statTotal" class="text-2xl font-bold text-slate-100">50</div>
+                </div>
+                <div class="bg-cardbg border border-cardborder rounded-2xl p-4 text-center shadow-md">
+                    <div class="text-slate-400 text-xs font-medium mb-1">Present</div>
+                    <div id="statPresent" class="text-2xl font-bold text-emerald-400">0</div>
+                </div>
+                <div class="bg-cardbg border border-cardborder rounded-2xl p-4 text-center shadow-md">
+                    <div class="text-slate-400 text-xs font-medium mb-1">Absent</div>
+                    <div id="statAbsent" class="text-2xl font-bold text-rose-400">0</div>
+                </div>
+            </div>
+
+            <!-- Live Camera Feed Box -->
+            <div class="bg-cardbg border border-cardborder rounded-2xl p-4 shadow-xl flex flex-col gap-4 relative overflow-hidden">
+                <div class="flex justify-between items-center z-10">
+                    <div class="flex items-center gap-2">
+                        <span class="w-2 h-2 rounded-full bg-rose-500 animate-ping"></span>
+                        <h2 class="text-xs font-bold tracking-wider text-slate-300 uppercase">LIVE SCANNER FEED</h2>
+                    </div>
+                    <span class="bg-rose-500/10 text-rose-400 border border-rose-500/30 text-[10px] px-2 py-0.5 rounded font-mono font-semibold">REC • AI CAM 01</span>
+                </div>
+
+                <!-- Scanner Viewport with Oval Face Frame -->
+                <div class="relative w-full aspect-[4/3] bg-darkbg rounded-xl border border-cardborder overflow-hidden flex items-center justify-center shadow-inner">
+                    <!-- Scanner Laser Beam -->
+                    <div id="scannerBeam" class="scanner-beam"></div>
+
+                    <!-- Target Face Image Container -->
+                    <div id="cameraFaceContainer" class="relative w-40 h-52 rounded-[50%] overflow-hidden border-2 border-cyan-400/80 shadow-[0_0_20px_rgba(0,242,254,0.3)] flex items-center justify-center bg-slate-900">
+                        <img id="activeCameraImg" src="https://images.unsplash.com/photo-1595152772835-219674b2a8a6?w=400&auto=format&fit=crop&q=80" alt="Scanning Face" class="w-full h-full object-cover">
+                        <div class="absolute inset-0 border border-cyan-400/30 rounded-[50%] pointer-events-none"></div>
+                    </div>
+
+                    <!-- HUD Telemetry footer -->
+                    <div class="absolute bottom-3 left-3 right-3 flex justify-between items-center text-[10px] font-mono text-cyan-400 bg-darkbg/80 backdrop-blur px-2.5 py-1 rounded border border-cyan-500/20 z-20">
+                        <span>FPS: 60.0</span>
+                        <span id="hudStatusText" class="text-emerald-400 font-bold">READY TO SCAN</span>
+                        <span>CONF: 99.4%</span>
+                    </div>
+                </div>
+
+                <!-- Current Active Target Details Box -->
+                <div class="bg-darkbg border border-cardborder rounded-xl p-4 flex flex-col gap-2">
+                    <div class="text-[10px] font-mono text-slate-400 uppercase tracking-widest">Current Recognized Target</div>
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <h3 id="currentTargetName" class="text-base font-bold text-slate-100">Awaiting Scan...</h3>
+                            <p id="currentTargetRoll" class="text-xs text-cyan-400 font-mono mt-0.5">Roll No: -- (MZ----)</p>
+                            <p id="currentTargetDept" class="text-xs text-slate-400 mt-0.5">Dept: --</p>
+                        </div>
+                        <div id="currentTargetBadge" class="bg-slate-800 text-slate-400 text-xs px-3 py-1 rounded-full font-semibold border border-slate-700">
+                            Waiting
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Right Column: Student Attendance Database Table -->
+        <div class="lg:col-span-8 flex flex-col gap-6">
+
+            <!-- Search and Filter Bar -->
+            <div class="bg-cardbg border border-cardborder rounded-2xl p-4 flex flex-col md:flex-row justify-between items-center gap-4 shadow-md">
+                <div class="relative w-full md:w-96">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-sm"></i>
+                    <input type="text" id="searchInput" oninput="filterStudents()" placeholder="Search Pakistani student name, roll no or dept..." class="w-full bg-darkbg border border-cardborder rounded-xl pl-10 pr-4 py-2.5 text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:border-cyan-500 transition-all">
+                </div>
+
+                <div class="flex items-center gap-2">
+                    <button onclick="setFilter('all')" id="filterBtn-all" class="px-4 py-2 rounded-xl text-xs font-semibold bg-cyan-500 text-slate-950 transition-all cursor-pointer">All (50)</button>
+                    <button onclick="setFilter('present')" id="filterBtn-present" class="px-4 py-2 rounded-xl text-xs font-semibold bg-darkbg border border-cardborder text-slate-300 transition-all cursor-pointer">Present (0)</button>
+                    <button onclick="setFilter('absent')" id="filterBtn-absent" class="px-4 py-2 rounded-xl text-xs font-semibold bg-darkbg border border-cardborder text-slate-300 transition-all cursor-pointer">Absent (50)</button>
+                </div>
+            </div>
+
+            <!-- Attendance Table Container -->
+            <div class="bg-cardbg border border-cardborder rounded-2xl shadow-xl overflow-hidden flex flex-col flex-grow">
+                <div class="overflow-x-auto max-h-[600px]">
+                    <table class="w-full text-left border-collapse whitespace-nowrap">
+                        <thead class="bg-darkbg/80 text-slate-400 text-[11px] uppercase font-mono tracking-wider sticky top-0 z-10 border-b border-cardborder backdrop-blur">
+                            <tr>
+                                <th class="py-3.5 px-4 w-[28%]">Student Name</th>
+                                <th class="py-3.5 px-4 w-[18%]">Roll Number</th>
+                                <th class="py-3.5 px-4 w-[22%]">Department</th>
+                                <th class="py-3.5 px-4 w-[12%]">Status</th>
+                                <th class="py-3.5 px-4 w-[10%]">Scan Time</th>
+                                <th class="py-3.5 px-4 w-[10%] text-center">Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="studentTableBody" class="divide-y divide-cardborder text-sm"></tbody>
+                    </table>
+                </div>
+
+                <div class="bg-darkbg/50 border-t border-cardborder px-6 py-3 flex justify-between items-center text-xs text-slate-400">
+                    <span id="tableStatusCount">Showing 50 of 50 Pakistani students</span>
+                    <span class="font-mono text-[11px] text-cyan-400">Auto-Sync Active</span>
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- JavaScript Application Logic -->
+    <script>
+        const studentsData = [
+            // Males (25)
+            { id: 1, name: "Hamza Khan", gender: "Male", roll: "MZ-101", dept: "Computer Science", present: false, time: "--:--" },
+            { id: 2, name: "Usman Raza", gender: "Male", roll: "MZ-103", dept: "Mathematics", present: false, time: "--:--" },
+            { id: 3, name: "Bilal Tariq", gender: "Male", roll: "MZ-105", dept: "Computer Science", present: false, time: "--:--" },
+            { id: 4, name: "Ali Hassan", gender: "Male", roll: "MZ-107", dept: "AI & Data Science", present: false, time: "--:--" },
+            { id: 5, name: "Saad Farooq", gender: "Male", roll: "MZ-109", dept: "Mathematics", present: false, time: "--:--" },
+            { id: 6, name: "Zubair Shah", gender: "Male", roll: "MZ-111", dept: "Software Eng.", present: false, time: "--:--" },
+            { id: 7, name: "Ahmed Raza", gender: "Male", roll: "MZ-113", dept: "Cyber Security", present: false, time: "--:--" },
+            { id: 8, name: "Danish Ali", gender: "Male", roll: "MZ-115", dept: "Software Eng.", present: false, time: "--:--" },
+            { id: 9, name: "Fahad Mustafa", gender: "Male", roll: "MZ-117", dept: "Mathematics", present: false, time: "--:--" },
+            { id: 10, name: "Hassan Malik", gender: "Male", roll: "MZ-119", dept: "Computer Science", present: false, time: "--:--" },
+            { id: 11, name: "Imran Khan", gender: "Male", roll: "MZ-121", dept: "Cyber Security", present: false, time: "--:--" },
+            { id: 12, name: "Junaid Jamshed", gender: "Male", roll: "MZ-123", dept: "Software Eng.", present: false, time: "--:--" },
+            { id: 13, name: "Kashif Ali", gender: "Male", roll: "MZ-125", dept: "Mathematics", present: false, time: "--:--" },
+            { id: 14, name: "Moiz Ahmed", gender: "Male", roll: "MZ-127", dept: "Computer Science", present: false, time: "--:--" },
+            { id: 15, name: "Noman Ali", gender: "Male", roll: "MZ-129", dept: "Cyber Security", present: false, time: "--:--" },
+            { id: 16, name: "Owais Qarni", gender: "Male", roll: "MZ-131", dept: "Software Eng.", present: false, time: "--:--" },
+            { id: 17, name: "Qasim Akram", gender: "Male", roll: "MZ-133", dept: "AI & Data Science", present: false, time: "--:--" },
+            { id: 18, name: "Rizwan Ahmed", gender: "Male", roll: "MZ-135", dept: "Computer Science", present: false, time: "--:--" },
+            { id: 19, name: "Salman Butt", gender: "Male", roll: "MZ-137", dept: "Mathematics", present: false, time: "--:--" },
+            { id: 20, name: "Taha Siddiqui", gender: "Male", roll: "MZ-139", dept: "Software Eng.", present: false, time: "--:--" },
+            { id: 21, name: "Umer Akram", gender: "Male", roll: "MZ-141", dept: "AI & Data Science", present: false, time: "--:--" },
+            { id: 22, name: "Waqar Younis", gender: "Male", roll: "MZ-143", dept: "Computer Science", present: false, time: "--:--" },
+            { id: 23, name: "Yasir Shah", gender: "Male", roll: "MZ-145", dept: "Cyber Security", present: false, time: "--:--" },
+            { id: 24, name: "Zeeshan Haider", gender: "Male", roll: "MZ-147", dept: "Software Eng.", present: false, time: "--:--" },
+            { id: 25, name: "Adeel Ahmed", gender: "Male", roll: "MZ-149", dept: "Mathematics", present: false, time: "--:--" },
+            // Females (25)
+            { id: 26, name: "Ayesha Malik", gender: "Female", roll: "MZ-102", dept: "Software Eng.", present: false, time: "--:--" },
+            { id: 27, name: "Fatima Zehra", gender: "Female", roll: "MZ-104", dept: "Cyber Security", present: false, time: "--:--" },
+            { id: 28, name: "Zainab Ahmed", gender: "Female", roll: "MZ-106", dept: "Mathematics", present: false, time: "--:--" },
+            { id: 29, name: "Mahnoor Qureshi", gender: "Female", roll: "MZ-108", dept: "Cyber Security", present: false, time: "--:--" },
+            { id: 30, name: "Kinza Hashmi", gender: "Female", roll: "MZ-110", dept: "AI & Data Science", present: false, time: "--:--" },
+            { id: 31, name: "Sana Javed", gender: "Female", roll: "MZ-112", dept: "Computer Science", present: false, time: "--:--" },
+            { id: 32, name: "Hira Mani", gender: "Female", roll: "MZ-114", dept: "Software Eng.", present: false, time: "--:--" },
+            { id: 33, name: "Mehwish Hayat", gender: "Female", roll: "MZ-116", dept: "Mathematics", present: false, time: "--:--" },
+            { id: 34, name: "Sajal Ali", gender: "Female", roll: "MZ-118", dept: "AI & Data Science", present: false, time: "--:--" },
+            { id: 35, name: "Yumna Zaidi", gender: "Female", roll: "MZ-120", dept: "Computer Science", present: false, time: "--:--" },
+            { id: 36, name: "Iqra Aziz", gender: "Female", roll: "MZ-122", dept: "Software Eng.", present: false, time: "--:--" },
+            { id: 37, name: "Zara Noor", gender: "Female", roll: "MZ-124", dept: "Cyber Security", present: false, time: "--:--" },
+            { id: 38, name: "Ramsha Khan", gender: "Female", roll: "MZ-126", dept: "Mathematics", present: false, time: "--:--" },
+            { id: 39, name: "Hania Amir", gender: "Female", roll: "MZ-128", dept: "Computer Science", present: false, time: "--:--" },
+            { id: 40, name: "Kubra Khan", gender: "Female", roll: "MZ-130", dept: "Software Eng.", present: false, time: "--:--" },
+            { id: 41, name: "Alizeh Shah", gender: "Female", roll: "MZ-132", dept: "Cyber Security", present: false, time: "--:--" },
+            { id: 42, name: "Saba Qamar", gender: "Female", roll: "MZ-134", dept: "AI & Data Science", present: false, time: "--:--" },
+            { id: 43, name: "Mawra Hocane", gender: "Female", roll: "MZ-136", dept: "Mathematics", present: false, time: "--:--" },
+            { id: 44, name: "Urwa Hocane", gender: "Female", roll: "MZ-138", dept: "Software Eng.", present: false, time: "--:--" },
+            { id: 45, name: "Ayeza Khan", gender: "Female", roll: "MZ-140", dept: "Cyber Security", present: false, time: "--:--" },
+            { id: 46, name: "Neelam Muneer", gender: "Female", roll: "MZ-142", dept: "Mathematics", present: false, time: "--:--" },
+            { id: 47, name: "Sonya Hussyn", gender: "Female", roll: "MZ-144", dept: "Computer Science", present: false, time: "--:--" },
+            { id: 48, name: "Armeena Khan", gender: "Female", roll: "MZ-146", dept: "Software Eng.", present: false, time: "--:--" },
+            { id: 49, name: "Sanam Baloch", gender: "Female", roll: "MZ-148", dept: "Cyber Security", present: false, time: "--:--" },
+            { id: 50, name: "Aina Asif", gender: "Female", roll: "MZ-150", dept: "AI & Data Science", present: false, time: "--:--" }
+        ];
+
+        // Unique South Asian / Pakistani University Student Portraits Pool (25 distinct male & 25 distinct female photos)
+        const malePhotos = [
+            "https://images.unsplash.com/photo-1595152772835-219674b2a8a6?w=400&auto=format&fit=crop&q=80",
+            "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400&auto=format&fit=crop&q=80",
+            "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=400&auto=format&fit=crop&q=80",
+            "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&auto=format&fit=crop&q=80",
+            "https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=400&auto=format&fit=crop&q=80",
+            "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&auto=format&fit=crop&q=80",
+            "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&auto=format&fit=crop&q=80",
+            "https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?w=400&auto=format&fit=crop&q=80",
+            "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=400&auto=format&fit=crop&q=80",
+            "https://images.unsplash.com/photo-1539571696357-5a69c17a67c6?w=400&auto=format&fit=crop&q=80",
+            "https://images.unsplash.com/photo-1480429370139-e0132c086e2a?w=400&auto=format&fit=crop&q=80",
+            "https://images.unsplash.com/photo-1501196354995-cbb51c65aaea?w=400&auto=format&fit=crop&q=80",
+            "https://images.unsplash.com/photo-1525134479668-1bee5c7c6845?w=400&auto=format&fit=crop&q=80",
+            "https://images.unsplash.com/photo-1557862921-37829c790f19?w=400&auto=format&fit=crop&q=80",
+            "https://images.unsplash.com/photo-1566492031773-4f4e44671857?w=400&auto=format&fit=crop&q=80",
+            "https://images.unsplash.com/photo-1527980965255-d3b416303d12?w=400&auto=format&fit=crop&q=80",
+            "https://images.unsplash.com/photo-1583864697784-a0efc8379f70?w=400&auto=format&fit=crop&q=80",
+            "https://images.unsplash.com/photo-1628157582853-a796fa650a6a?w=400&auto=format&fit=crop&q=80",
+            "https://images.unsplash.com/photo-1533227268428-f9ed0900fb3b?w=400&auto=format&fit=crop&q=80",
+            "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=400&auto=format&fit=crop&q=80",
+            "https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?w=400&auto=format&fit=crop&q=80",
+            "https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?w=400&auto=format&fit=crop&q=80",
+            "https://images.unsplash.com/photo-1622253692010-333f2da6031d?w=400&auto=format&fit=crop&q=80",
+            "https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?w=400&auto=format&fit=crop&q=80",
+            "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=400&auto=format&fit=crop&q=80"
+        ];
+
+        const femalePhotos = [
+            "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400&auto=format&fit=crop&q=80",
+            "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=400&auto=format&fit=crop&q=80",
+            "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&auto=format&fit=crop&q=80",
+            "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400&auto=format&fit=crop&q=80",
+            "https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=400&auto=format&fit=crop&q=80",
+            "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=400&auto=format&fit=crop&q=80",
+            "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=400&auto=format&fit=crop&q=80",
+            "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&auto=format&fit=crop&q=80",
+            "https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?w=400&auto=format&fit=crop&q=80",
+            "https://images.unsplash.com/photo-1508214751196-bcfd4ca60f91?w=400&auto=format&fit=crop&q=80",
+            "https://images.unsplash.com/photo-1567532939604-b6b5b0db2604?w=400&auto=format&fit=crop&q=80",
+            "https://images.unsplash.com/photo-1534751516642-a1af1ed26a56?w=400&auto=format&fit=crop&q=80",
+            "https://images.unsplash.com/photo-1548142813-c348350df52b?w=400&auto=format&fit=crop&q=80",
+            "https://images.unsplash.com/photo-1569173112611-53a7ad16474f?w=400&auto=format&fit=crop&q=80",
+            "https://images.unsplash.com/photo-1541647376583-8934aaf3448a?w=400&auto=format&fit=crop&q=80",
+            "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=400&auto=format&fit=crop&q=80",
+            "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=400&auto=format&fit=crop&q=80",
+            "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&auto=format&fit=crop&q=80",
+            "https://images.unsplash.com/photo-1509783236416-c9ad59bae472?w=400&auto=format&fit=crop&q=80",
+            "https://images.unsplash.com/photo-1525134479668-1bee5c7c6845?w=400&auto=format&fit=crop&q=80",
+            "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=400&auto=format&fit=crop&q=80",
+            "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400&auto=format&fit=crop&q=80",
+            "https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=400&auto=format&fit=crop&q=80",
+            "https://images.unsplash.com/photo-1517841905240-472988babdf9?w=400&auto=format&fit=crop&q=80",
+            "https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=400&auto=format&fit=crop&q=80"
+        ];
+
+        // Assign completely unique photos to each student
+        let maleIdx = 0;
+        let femaleIdx = 0;
+        studentsData.forEach((s) => {
+            if (s.gender === 'Male') {
+                s.img = malePhotos[maleIdx % malePhotos.length];
+                maleIdx++;
+            } else {
+                s.img = femalePhotos[femaleIdx % femalePhotos.length];
+                femaleIdx++;
+            }
+        });
+
+        let currentFilter = 'all';
+        let isScanningActive = false;
+        let scanTimeout = null;
+        let isMuted = false;
+
+        function renderTable(dataToRender = studentsData) {
+            const tbody = document.getElementById('studentTableBody');
+            tbody.innerHTML = '';
+
+            dataToRender.forEach((s) => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-800/40 transition-colors";
+                tr.innerHTML = `
+                    <td class="py-3 px-4 flex items-center gap-3">
+                        <img src="${s.img}" alt="${s.name}" class="w-9 h-9 rounded-full object-cover border border-cardborder shadow-sm shrink-0">
+                        <div class="truncate">
+                            <div class="font-semibold text-slate-200 truncate">${s.name}</div>
+                            <span class="inline-block text-[10px] px-1.5 py-0.5 rounded ${s.gender === 'Male' ? 'bg-blue-500/10 text-blue-400 border border-blue-500/30' : 'bg-pink-500/10 text-pink-400 border border-pink-500/30'} font-mono">${s.gender}</span>
+                        </div>
+                    </td>
+                    <td class="py-3 px-4 font-mono text-xs text-slate-300">Roll No: ${s.id} (${s.roll})</td>
+                    <td class="py-3 px-4 text-xs text-slate-300 font-medium truncate">
+                        <span class="bg-cardborder px-2.5 py-1 rounded-md text-cyan-400 border border-cardborder inline-block truncate max-w-[180px]">${s.dept}</span>
+                    </td>
+                    <td class="py-3 px-4">
+                        <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold ${s.present ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30' : 'bg-rose-500/10 text-rose-400 border border-rose-500/30'}">
+                            <i class="fa-solid ${s.present ? 'fa-check' : 'fa-xmark'} text-[10px]"></i>
+                            ${s.present ? 'Present' : 'Absent'}
+                        </span>
+                    </td>
+                    <td class="py-3 px-4 font-mono text-xs text-slate-400">${s.time}</td>
+                    <td class="py-3 px-4 text-center">
+                        <button onclick="toggleAttendance(${s.id})" class="px-3 py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer ${s.present ? 'bg-cardborder hover:bg-slate-700 text-slate-300' : 'bg-emerald-500/20 text-emerald-400 hover:bg-emerald-500/30 border border-emerald-500/30'}">
+                            ${s.present ? 'Verified' : 'Mark Present'}
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+            updateStats();
+        }
+
+        function updateStats() {
+            const total = studentsData.length;
+            const presentCount = studentsData.filter(s => s.present).length;
+            const absentCount = total - presentCount;
+
+            document.getElementById('statTotal').innerText = total;
+            document.getElementById('statPresent').innerText = presentCount;
+            document.getElementById('statAbsent').innerText = absentCount;
+            document.getElementById('filterBtn-present').innerText = `Present (${presentCount})`;
+            document.getElementById('filterBtn-absent').innerText = `Absent (${absentCount})`;
+        }
+
+        function filterStudents() {
+            const query = document.getElementById('searchInput').value.toLowerCase();
+            let filtered = studentsData.filter(s => 
+                s.name.toLowerCase().includes(query) || 
+                s.roll.toLowerCase().includes(query) || 
+                s.id.toString() === query ||
+                s.dept.toLowerCase().includes(query)
+            );
+
+            if (currentFilter === 'present') filtered = filtered.filter(s => s.present);
+            if (currentFilter === 'absent') filtered = filtered.filter(s => !s.present);
+
+            renderTable(filtered);
+            document.getElementById('tableStatusCount').innerText = `Showing ${filtered.length} of 50 Pakistani students`;
+        }
+
+        function setFilter(type) {
+            currentFilter = type;
+            ['all', 'present', 'absent'].forEach(t => {
+                const btn = document.getElementById(`filterBtn-${t}`);
+                if (t === type) {
+                    btn.className = "px-4 py-2 rounded-xl text-xs font-semibold bg-cyan-500 text-slate-950 transition-all cursor-pointer";
+                } else {
+                    btn.className = "px-4 py-2 rounded-xl text-xs font-semibold bg-darkbg border border-cardborder text-slate-300 transition-all cursor-pointer";
+                }
+            });
+            filterStudents();
+        }
+
+        function speakAnnouncement(text, callback) {
+            if (isMuted || !('speechSynthesis' in window)) {
+                if (callback) callback();
+                return;
+            }
+            window.speechSynthesis.cancel();
+            const utterance = new SpeechSynthesisUtterance(text);
+            utterance.rate = 0.55; 
+            utterance.pitch = 1.0;
+            utterance.volume = 1.0;
+            
+            utterance.onend = function() {
+                if (callback) callback();
+            };
+            utterance.onerror = function() {
+                if (callback) callback();
+            };
+
+            window.speechSynthesis.speak(utterance);
+        }
+
+        function toggleVoiceMute() {
+            isMuted = !isMuted;
+            const icon = document.getElementById('muteIcon');
+            icon.className = isMuted ? "fa-solid fa-volume-xmark text-rose-400" : "fa-solid fa-volume-high text-cyan-400";
+        }
+
+        function toggleAttendance(id) {
+            const s = studentsData.find(item => item.id === id);
+            if (!s) return;
+            s.present = !s.present;
+            if (s.present) {
+                const now = new Date();
+                s.time = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                updateCameraFeed(s, "VERIFIED");
+                // Voice announcement with Department included
+                speakAnnouncement(`Roll number ${s.id}, ${s.name}, from ${s.dept} department, present at ${s.time}`);
+            } else {
+                s.time = "--:--";
+            }
+            filterStudents();
+        }
+
+        function updateCameraFeed(s, statusMessage) {
+            document.getElementById('activeCameraImg').src = s.img;
+            document.getElementById('currentTargetName').innerText = s.name;
+            document.getElementById('currentTargetRoll').innerText = `Roll No: ${s.id} (${s.roll})`;
+            document.getElementById('currentTargetDept').innerText = `Dept: ${s.dept}`;
+            
+            const badge = document.getElementById('currentTargetBadge');
+            const hudStatus = document.getElementById('hudStatusText');
+            const beam = document.getElementById('scannerBeam');
+
+            if (statusMessage === "VERIFIED") {
+                badge.className = "bg-emerald-500/20 text-emerald-400 text-xs px-3 py-1 rounded-full font-semibold border border-emerald-500/30";
+                badge.innerText = "PRESENT";
+                hudStatus.innerText = "FACE VERIFIED & LOCKED";
+                hudStatus.className = "text-emerald-400 font-bold";
+                beam.classList.remove('active');
+            } else {
+                badge.className = "bg-cyan-500/20 text-cyan-400 text-xs px-3 py-1 rounded-full font-semibold border border-cyan-500/30 animate-pulse";
+                badge.innerText = "SCANNING...";
+                hudStatus.innerText = "SCANNING FACE...";
+                hudStatus.className = "text-cyan-400 font-bold";
+                beam.classList.add('active');
+            }
+        }
+
+        function toggleAutoScan() {
+            isScanningActive = !isScanningActive;
+            const btn = document.getElementById('autoScanBtn');
+            const icon = document.getElementById('scanBtnIcon');
+            const text = document.getElementById('scanBtnText');
+
+            if (isScanningActive) {
+                btn.className = "bg-gradient-to-r from-rose-500 to-red-600 hover:from-rose-600 hover:to-red-700 text-white px-5 py-2 rounded-xl font-semibold text-sm shadow-lg shadow-rose-500/20 transition-all flex items-center gap-2 cursor-pointer";
+                icon.className = "fa-solid fa-stop";
+                text.innerText = "Stop Fast Auto-Scan";
+
+                runNextScanStep();
+            } else {
+                stopAutoScan();
+            }
+        }
+
+        function stopAutoScan() {
+            isScanningActive = false;
+            clearTimeout(scanTimeout);
+            window.speechSynthesis.cancel();
+            
+            const btn = document.getElementById('autoScanBtn');
+            const icon = document.getElementById('scanBtnIcon');
+            const text = document.getElementById('scanBtnText');
+
+            btn.className = "bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white px-5 py-2 rounded-xl font-semibold text-sm shadow-lg shadow-emerald-500/20 transition-all flex items-center gap-2 cursor-pointer";
+            icon.className = "fa-solid fa-play";
+            text.innerText = "Start Fast Auto-Scan";
+            document.getElementById('hudStatusText').innerText = "SCAN PAUSED";
+            document.getElementById('scannerBeam').classList.remove('active');
+        }
+
+        function runNextScanStep() {
+            if (!isScanningActive) return;
+
+            let unmarkedStudents = studentsData.filter(s => !s.present);
+            if (unmarkedStudents.length === 0) {
+                speakAnnouncement("All fifty students attendance marked successfully.");
+                stopAutoScan();
+                return;
+            }
+
+            let s = unmarkedStudents[0];
+            updateCameraFeed(s, "SCANNING");
+
+            scanTimeout = setTimeout(() => {
+                if (!isScanningActive) return;
+                
+                s.present = true;
+                const now = new Date();
+                s.time = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                
+                updateCameraFeed(s, "VERIFIED");
+                filterStudents();
+
+                // Voice announcement with Department included
+                const speechText = `Roll number ${s.id}, ${s.name}, from ${s.dept} department, present at ${s.time}`;
+                speakAnnouncement(speechText, () => {
+                    if (isScanningActive) {
+                        scanTimeout = setTimeout(runNextScanStep, 50);
+                    }
+                });
+
+            }, 1600);
+        }
+
+        renderTable();
+    </script>
+</body>
+</html>

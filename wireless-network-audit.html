@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MZ Wireless Network Audit - Live Demo</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-dark: #030712;
+            --card-bg: #0b1329;
+            --border-color: #1e293b;
+            --cyan: #00f2fe;
+            --text-main: #f3f4f6;
+            --text-muted: #94a3b8;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: var(--text-main);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 10px;
+            min-height: 100vh;
+        }
+
+        /* FULL WIDTH CONTAINER */
+        .dashboard-container {
+            width: 100%;
+            margin: 0;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            background: #020617;
+            box-shadow: 0 0 35px rgba(0, 242, 254, 0.12);
+        }
+
+        /* HEADER NAVIGATION */
+        .dash-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+
+        .dash-title {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .dash-title h2 { margin: 0; font-size: 1.6rem; color: #fff; }
+        .dash-title span { color: var(--text-muted); font-size: 0.9rem; margin-left: 10px; }
+
+        .dash-status {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .live-badge {
+            background: rgba(16, 185, 129, 0.2);
+            color: #10b981;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .pulse-dot {
+            width: 8px;
+            height: 8px;
+            background: #10b981;
+            border-radius: 50%;
+            box-shadow: 0 0 8px #10b981;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 0.3; }
+            50% { opacity: 1; }
+            100% { opacity: 0.3; }
+        }
+
+        /* MAIN GRID LAYOUT */
+        .grid-layout {
+            display: grid;
+            grid-template-columns: 2.5fr 1fr;
+            gap: 20px;
+        }
+
+        /* SCANNING CONTROL SECTION */
+        .scan-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 18px 22px;
+            margin-bottom: 20px;
+        }
+
+        .scan-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .progress-bar-bg {
+            background: #1e293b;
+            height: 10px;
+            border-radius: 5px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .progress-bar-fill {
+            background: linear-gradient(90deg, #00f2fe, #10b981);
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s linear;
+            box-shadow: 0 0 10px #00f2fe;
+        }
+
+        .progress-bar-fill.scanning-active {
+            animation: scanPulse 1.5s infinite alternate;
+        }
+
+        @keyframes scanPulse {
+            0% { opacity: 0.7; }
+            100% { opacity: 1; filter: drop-shadow(0 0 8px #00f2fe); }
+        }
+
+        .btn-scan {
+            background: var(--cyan);
+            color: #030712;
+            border: none;
+            padding: 9px 18px;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .btn-scan:hover { opacity: 0.9; transform: scale(1.02); }
+
+        /* TABLE STYLES */
+        .table-box {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 18px;
+            margin-bottom: 20px;
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 0.95rem;
+        }
+
+        th {
+            color: var(--text-muted);
+            border-bottom: 1px solid var(--border-color);
+            padding: 12px 10px;
+        }
+
+        td {
+            padding: 14px 10px;
+            border-bottom: 1px solid rgba(255,255,255,0.03);
+        }
+
+        .risk-badge {
+            padding: 4px 12px;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 0.8rem;
+            display: inline-block;
+        }
+
+        .low { background: rgba(16, 185, 129, 0.2); color: #10b981; }
+        .medium { background: rgba(245, 158, 11, 0.2); color: #f59e0b; }
+        .high { background: rgba(239, 68, 68, 0.2); color: #ef4444; }
+        .critical { background: rgba(220, 38, 38, 0.4); color: #ff4d4d; border: 1px solid #ef4444; }
+
+        /* CHARTS SECTION */
+        .charts-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .chart-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 18px;
+        }
+
+        /* SIGNAL BARS VISUALIZATION */
+        .signal-bars {
+            display: flex;
+            align-items: flex-end;
+            justify-content: space-around;
+            height: 140px;
+            padding-top: 20px;
+        }
+
+        .bar-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .bar {
+            width: 32px;
+            border-radius: 4px 4px 0 0;
+            transition: height 0.5s ease;
+        }
+
+        /* RIGHT SIDEBAR - TERMINAL & STATS */
+        .terminal-card {
+            background: #020617;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 15px;
+            font-family: monospace;
+            font-size: 0.85rem;
+            height: 250px;
+            overflow-y: auto;
+            color: #38bdf8;
+            margin-bottom: 20px;
+            line-height: 1.6;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .stat-box {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 14px;
+            text-align: center;
+        }
+
+        .stat-num {
+            font-size: 1.6rem;
+            font-weight: bold;
+            margin-top: 5px;
+        }
+
+        .risk-list {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 18px;
+            font-size: 0.9rem;
+        }
+
+        .risk-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        /* FINDINGS CARD */
+        .findings-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 18px;
+            font-size: 0.88rem;
+            color: var(--text-muted);
+        }
+
+        .findings-card ul { padding-left: 20px; margin: 8px 0; }
+        .findings-card li { margin-bottom: 8px; }
+
+        .back-link {
+            display: inline-block;
+            margin-bottom: 10px;
+            color: var(--cyan);
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 0.95rem;
+        }
+    </style>
+</head>
+<body>
+
+    <a href="wireless-mobile-security.html" class="back-link">&larr; Back to Wireless Security</a>
+
+    <div class="dashboard-container">
+        
+        <!-- HEADER -->
+        <div class="dash-header">
+            <div class="dash-title">
+                <i class="fa-solid fa-wifi" style="color: var(--cyan); font-size: 1.6rem;"></i>
+                <h2>MZ Wireless Network Audit</h2>
+                <span>Scan • Analyze • Secure</span>
+            </div>
+            <div class="dash-status">
+                <div class="live-badge"><div class="pulse-dot"></div> Live Scan Active</div>
+                <div><i class="fa-solid fa-clock"></i> <span id="timer">00:00:00</span></div>
+                <div>Interface: <strong style="color:#fff;">wlan0</strong> (Monitor)</div>
+            </div>
+        </div>
+
+        <!-- MAIN LAYOUT -->
+        <div class="grid-layout">
+            
+            <!-- LEFT PANEL -->
+            <div>
+                <!-- SCAN CONTROL -->
+                <div class="scan-card">
+                    <div class="scan-header">
+                        <div>
+                            <strong id="scanStatusText">Continuous Scanning Active...</strong>
+                            <div style="font-size: 0.82rem; color: var(--text-muted); margin-top:2px;">Listening for nearby access points & packets</div>
+                        </div>
+                        <button class="btn-scan" onclick="restartAudit()"><i class="fa-solid fa-rotate"></i> Reset Terminal</button>
+                    </div>
+                    <div class="progress-bar-bg">
+                        <div class="progress-bar-fill" id="progressBar"></div>
+                    </div>
+                </div>
+
+                <!-- NETWORK TABLE -->
+                <div class="table-box">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>SSID / Network Name</th>
+                                <th>Security</th>
+                                <th>Signal</th>
+                                <th>Channel</th>
+                                <th>BSSID</th>
+                                <th>Risk</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td>1</td><td style="color:#fff; font-weight:600;"><i class="fa-solid fa-wifi" style="color:#10b981; margin-right:6px;"></i> CyberHub_5G</td><td>WPA3</td><td id="sig1">-48 dBm</td><td>36</td><td>C4:2A:1F:7B:3D:9E</td><td><span class="risk-badge low">Low</span></td></tr>
+                            <tr><td>2</td><td style="color:#fff; font-weight:600;"><i class="fa-solid fa-wifi" style="color:#10b981; margin-right:6px;"></i> Home_Network</td><td>WPA2-AES</td><td id="sig2">-55 dBm</td><td>6</td><td>D8:6F:4A:2C:1E:77</td><td><span class="risk-badge medium">Medium</span></td></tr>
+                            <tr><td>3</td><td style="color:#fff; font-weight:600;"><i class="fa-solid fa-wifi" style="color:#f59e0b; margin-right:6px;"></i> Office_WiFi</td><td>WPA2-TKIP</td><td id="sig3">-62 dBm</td><td>11</td><td>A0:9B:3C:7D:6E:12</td><td><span class="risk-badge high">High</span></td></tr>
+                            <tr><td>4</td><td style="color:#fff; font-weight:600;"><i class="fa-solid fa-wifi" style="color:#ef4444; margin-right:6px;"></i> Guest_WiFi</td><td>Open</td><td id="sig4">-45 dBm</td><td>1</td><td>F2:5C:8D:9E:3B:44</td><td><span class="risk-badge critical">Critical</span></td></tr>
+                            <tr><td>5</td><td style="color:#fff; font-weight:600;"><i class="fa-solid fa-wifi" style="color:#10b981; margin-right:6px;"></i> TP-Link_2.4G</td><td>WPA2-AES</td><td id="sig5">-70 dBm</td><td>3</td><td>84:D6:20:11:9F:32</td><td><span class="risk-badge medium">Medium</span></td></tr>
+                            <tr><td>6</td><td style="color:#fff; font-weight:600;"><i class="fa-solid fa-wifi" style="color:#f59e0b; margin-right:6px;"></i> Unknown_AP</td><td>WPA2-CCMP</td><td id="sig6">-78 dBm</td><td>9</td><td>12:34:56:78:9A:BC</td><td><span class="risk-badge medium">Medium</span></td></tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- CHARTS -->
+                <div class="charts-grid">
+                    <div class="chart-card">
+                        <strong style="font-size:0.9rem;">Wi-Fi Signal Strength (Live)</strong>
+                        <div class="signal-bars">
+                            <div class="bar-group"><div class="bar" id="b1" style="height:90px; background:#10b981;"></div><span>CyberHub</span></div>
+                            <div class="bar-group"><div class="bar" id="b2" style="height:75px; background:#10b981;"></div><span>Home</span></div>
+                            <div class="bar-group"><div class="bar" id="b3" style="height:60px; background:#f59e0b;"></div><span>Office</span></div>
+                            <div class="bar-group"><div class="bar" id="b4" style="height:95px; background:#ef4444;"></div><span>Guest</span></div>
+                            <div class="bar-group"><div class="bar" id="b5" style="height:40px; background:#f59e0b;"></div><span>TP-Link</span></div>
+                        </div>
+                    </div>
+
+                    <div class="findings-card">
+                        <strong style="color:#fff; font-size:0.95rem;"><i class="fa-solid fa-shield-halved" style="color:var(--cyan);"></i> Key Findings & Recommendations</strong>
+                        <ul>
+                            <li><strong>Office_WiFi</strong> uses legacy TKIP encryption. Upgrade to WPA2-AES or WPA3.</li>
+                            <li><strong>Guest_WiFi</strong> is open (unencrypted). Enable WPA3 & Guest Isolation.</li>
+                            <li>Ensure all access points have strong passwords and disabled WPS PINs.</li>
+                        </ul>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- RIGHT PANEL -->
+            <div>
+                <!-- LIVE LOG TERMINAL -->
+                <strong style="font-size:0.9rem; display:block; margin-bottom:8px;">Live Scan Log (Auto-Updating)</strong>
+                <div class="terminal-card" id="terminalLog"></div>
+
+                <!-- STATS CARDS -->
+                <div class="stats-grid">
+                    <div class="stat-box">
+                        <div style="font-size:0.75rem; color:var(--text-muted);">Total</div>
+                        <div class="stat-num" style="color:var(--cyan);">6</div>
+                    </div>
+                    <div class="stat-box">
+                        <div style="font-size:0.75rem; color:var(--text-muted);">Secure</div>
+                        <div class="stat-num" style="color:#10b981;">4</div>
+                    </div>
+                    <div class="stat-box">
+                        <div style="font-size:0.75rem; color:var(--text-muted);">At Risk</div>
+                        <div class="stat-num" style="color:#ef4444;">2</div>
+                    </div>
+                </div>
+
+                <!-- RISK ASSESSMENT -->
+                <div class="risk-list">
+                    <strong style="display:block; margin-bottom:12px; font-size:0.95rem;">Risk Assessment</strong>
+                    <div class="risk-row"><span><i class="fa-solid fa-circle" style="color:#10b981; font-size:0.6rem; margin-right:6px;"></i> Low Risk</span> <span>1 (16.7%)</span></div>
+                    <div class="risk-row"><span><i class="fa-solid fa-circle" style="color:#f59e0b; font-size:0.6rem; margin-right:6px;"></i> Medium Risk</span> <span>3 (50.0%)</span></div>
+                    <div class="risk-row"><span><i class="fa-solid fa-circle" style="color:#ef4444; font-size:0.6rem; margin-right:6px;"></i> High Risk</span> <span>1 (16.7%)</span></div>
+                    <div class="risk-row"><span><i class="fa-solid fa-circle" style="color:#dc2626; font-size:0.6rem; margin-right:6px;"></i> Critical Risk</span> <span>1 (16.7%)</span></div>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- INFINITE SCRIPT -->
+    <script>
+        const initialLogs = [
+            "[INIT] Starting wireless monitor wlan0...",
+            "[SCAN] Hopping channels 1-13, 36-165...",
+            "[FOUND] SSID: Guest_WiFi (Open Network Detected)",
+            "[FOUND] SSID: Home_Network (WPA2-AES / Strong)",
+            "[FOUND] SSID: TP-Link_2.4G (WPA2-AES / Medium Signal)",
+            "[ANALYZING] Evaluating handshake vulnerabilities...",
+            "[FOUND] SSID: Office_WiFi (WPA2-TKIP - Legacy Vulnerability)",
+            "[FOUND] SSID: Unknown_AP (WPA2-CCMP)",
+            "[FOUND] SSID: CyberHub_5G (WPA3-SAE Encrypted)",
+            "[INFO] Initial audit cycle complete. Switching to continuous live monitoring."
+        ];
+
+        const continuousLogs = [
+            "[MONITOR] Capturing beacon frames on Channel 6...",
+            "[PACKET] Deauth frame detected on BSSID F2:5C:8D:9E:3B:44",
+            "[MONITOR] Channel hop -> Ch 11 (2.4GHz)",
+            "[SIGNAL] CyberHub_5G signal fluctuated: -48 dBm",
+            "[INFO] Checking WPS status on Unknown_AP... (Locked)",
+            "[MONITOR] Channel hop -> Ch 36 (5GHz)",
+            "[PACKET] WPA3 SAE Handshake handshake exchange captured",
+            "[MONITOR] Listening for rogue APs...",
+            "[INFO] No rogue access points detected in immediate radius.",
+            "[MONITOR] Channel hop -> Ch 1 (2.4GHz)"
+        ];
+
+        let logIndex = 0;
+        let contIndex = 0;
+        let progress = 0;
+        let seconds = 0;
+
+        function getTime() {
+            const now = new Date();
+            return `[${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}:${now.getSeconds().toString().padStart(2, '0')}]`;
+        }
+
+        // Live Clock Timer
+        setInterval(() => {
+            seconds++;
+            const mins = Math.floor(seconds / 60).toString().padStart(2, '0');
+            const secs = (seconds % 60).toString().padStart(2, '0');
+            document.getElementById('timer').innerText = `00:${mins}:${secs}`;
+        }, 1000);
+
+        // Initial Bar Load
+        const progressBar = document.getElementById('progressBar');
+        const fillInterval = setInterval(() => {
+            progress += 5;
+            progressBar.style.width = progress + '%';
+            
+            if (logIndex < initialLogs.length) {
+                appendLog(initialLogs[logIndex]);
+                logIndex++;
+            }
+
+            if (progress >= 100) {
+                clearInterval(fillInterval);
+                progressBar.classList.add('scanning-active');
+                startInfiniteMonitoring();
+            }
+        }, 400);
+
+        function appendLog(text) {
+            const log = document.getElementById('terminalLog');
+            const item = document.createElement('div');
+            
+            if (text.includes('Open') || text.includes('Legacy') || text.includes('Deauth')) {
+                item.style.color = '#ef4444';
+            } else if (text.includes('WPA3') || text.includes('Strong') || text.includes('complete')) {
+                item.style.color = '#10b981';
+            }
+
+            item.innerText = `${getTime()} ${text}`;
+            log.appendChild(item);
+            log.scrollTop = log.scrollHeight;
+        }
+
+        // Infinite Log & Signal Generator
+        function startInfiniteMonitoring() {
+            setInterval(() => {
+                // Infinite Logs Add
+                appendLog(continuousLogs[contIndex]);
+                contIndex = (contIndex + 1) % continuousLogs.length;
+
+                // Live Signal Movement
+                const h1 = 75 + Math.floor(Math.random() * 25);
+                const h2 = 60 + Math.floor(Math.random() * 25);
+                const h3 = 50 + Math.floor(Math.random() * 20);
+                const h4 = 80 + Math.floor(Math.random() * 20);
+                const h5 = 35 + Math.floor(Math.random() * 15);
+
+                document.getElementById('b1').style.height = h1 + 'px';
+                document.getElementById('b2').style.height = h2 + 'px';
+                document.getElementById('b3').style.height = h3 + 'px';
+                document.getElementById('b4').style.height = h4 + 'px';
+                document.getElementById('b5').style.height = h5 + 'px';
+
+                document.getElementById('sig1').innerText = `-${100 - h1} dBm`;
+                document.getElementById('sig2').innerText = `-${100 - h2} dBm`;
+                document.getElementById('sig3').innerText = `-${100 - h3} dBm`;
+                document.getElementById('sig4').innerText = `-${100 - h4} dBm`;
+                document.getElementById('sig5').innerText = `-${100 - h5} dBm`;
+
+            }, 2500);
+        }
+
+        function restartAudit() {
+            document.getElementById('terminalLog').innerHTML = "";
+            appendLog("[RESET] Log terminal cleared. Restarting monitor loop...");
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> MZ IOS App Security Audit & Analysis</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-main: #020612;
+            --card-bg: #070e20;
+            --card-border: #111e38;
+            --cyan-bright: #00f2fe;
+            --green-bright: #10b981;
+            --red-bright: #ef4444;
+            --yellow-bright: #f59e0b;
+            --text-main: #e2e8f0;
+            --text-muted: #64748b;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-main);
+            color: var(--text-main);
+            padding: 15px 25px;
+            min-height: 100vh;
+            width: 100vw;
+            overflow-x: hidden;
+        }
+
+        .dashboard-full {
+            width: 100%;
+            max-width: 100%;
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--cyan-bright);
+            text-decoration: none;
+            font-size: 0.82rem;
+            font-weight: 600;
+            margin-bottom: 12px;
+            transition: 0.2s;
+        }
+
+        .back-btn:hover {
+            transform: translateX(-4px);
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .header-left h2 {
+            font-size: 1.4rem;
+            color: #fff;
+        }
+
+        .header-left span {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            margin-left: 10px;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            font-size: 0.8rem;
+        }
+
+        .live-badge {
+            background: rgba(16, 185, 129, 0.15);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            color: var(--green-bright);
+            padding: 4px 12px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: 600;
+        }
+
+        .dot {
+            width: 7px;
+            height: 7px;
+            background: var(--green-bright);
+            border-radius: 50%;
+            animation: blink 1s infinite alternate;
+        }
+
+        @keyframes blink {
+            from { opacity: 0.3; }
+            to { opacity: 1; }
+        }
+
+        .app-overview-card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 10px;
+            padding: 16px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .app-info {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .app-icon {
+            width: 52px;
+            height: 52px;
+            background: rgba(0, 242, 254, 0.1);
+            border: 1px solid var(--cyan-bright);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            color: var(--cyan-bright);
+        }
+
+        .score-circle {
+            text-align: center;
+        }
+
+        .score-val {
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: var(--cyan-bright);
+            line-height: 1;
+        }
+
+        .score-lbl {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        .stats-summary {
+            display: flex;
+            gap: 25px;
+            font-size: 0.85rem;
+        }
+
+        .stat-box {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            border-bottom: 1px solid var(--card-border);
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+        }
+
+        .tab-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: 0.2s;
+        }
+
+        .tab-btn.active {
+            background: rgba(0, 242, 254, 0.12);
+            color: var(--cyan-bright);
+            border: 1px solid rgba(0, 242, 254, 0.3);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .main-grid {
+            display: grid;
+            grid-template-columns: 2.8fr 1fr;
+            gap: 15px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .risk-badge-large {
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--red-bright);
+            border: 1px solid var(--red-bright);
+            padding: 6px 14px;
+            border-radius: 6px;
+            display: inline-block;
+            font-weight: 800;
+            font-size: 0.9rem;
+            margin-bottom: 12px;
+        }
+
+        .risk-bar {
+            height: 8px;
+            background: #0d1933;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 10px;
+        }
+
+        .risk-progress {
+            height: 100%;
+            width: 72%;
+            background: linear-gradient(90deg, var(--green-bright), var(--yellow-bright), var(--red-bright));
+            border-radius: 8px;
+            transition: width 0.5s ease;
+        }
+
+        .finding-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.03);
+            font-size: 0.82rem;
+        }
+
+        .tag {
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 0.72rem;
+            font-weight: 700;
+        }
+
+        .tag-critical { background: rgba(239, 68, 68, 0.2); color: var(--red-bright); }
+        .tag-warning { background: rgba(245, 158, 11, 0.2); color: var(--yellow-bright); }
+        .tag-passed { background: rgba(16, 185, 129, 0.2); color: var(--green-bright); }
+
+        .analysis-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.02);
+            padding: 10px 14px;
+            border-radius: 8px;
+            border: 1px solid rgba(255,255,255,0.03);
+            margin-bottom: 8px;
+        }
+
+        .log-box {
+            background: #02050e;
+            border: 1px solid var(--card-border);
+            border-radius: 8px;
+            padding: 12px;
+            font-family: monospace;
+            font-size: 0.75rem;
+            height: 220px;
+            overflow-y: auto;
+            margin-bottom: 15px;
+            color: var(--green-bright);
+        }
+
+        .log-line { margin-bottom: 4px; }
+
+        .permissions-table {
+            width: 100%;
+            font-size: 0.82rem;
+            border-collapse: collapse;
+        }
+
+        .permissions-table td {
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.02);
+        }
+
+        .btn-action {
+            width: 100%;
+            background: var(--cyan-bright);
+            color: #000;
+            border: none;
+            padding: 10px;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .btn-action:hover {
+            box-shadow: 0 0 15px rgba(0,242,254,0.4);
+        }
+
+        .footer-banner {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 10px;
+            padding: 14px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 15px;
+        }
+
+        .btn-green {
+            background: var(--green-bright);
+            color: #000;
+            border: none;
+            padding: 8px 18px;
+            border-radius: 8px;
+            font-weight: 700;
+            cursor: pointer;
+            font-size: 0.85rem;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="dashboard-full">
+        <a href="wireless-mobile-security.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i> Back to Dashboard</a>
+
+        <div class="header">
+            <div class="header-left">
+                <i class="fa-brands fa-apple" style="color:var(--cyan-bright); font-size:1.6rem;"></i>
+                <h2>MZ iOS App Security</h2>
+                <span>IPA Analysis & Protection • Scan • Analyze • Detect • Secure</span>
+            </div>
+            <div class="header-right">
+                <div class="live-badge"><div class="dot"></div> <span id="scanStatusText">Analysis Complete</span></div>
+                <div>Bundle ID: <strong style="color:var(--cyan-bright)">com.securechat.app</strong></div>
+            </div>
+        </div>
+
+        <div class="app-overview-card">
+            <div class="app-info">
+                <div class="app-icon"><i class="fa-solid fa-shield-halved"></i></div>
+                <div>
+                    <h3 style="color:#fff; font-size:1.1rem;">SecureChat</h3>
+                    <div style="font-size:0.78rem; color:var(--text-muted); margin-top:2px;">SecureChat.ipa | Version: 2.4.1 | Size: 12.6 MB</div>
+                </div>
+            </div>
+            <div class="score-circle">
+                <div class="score-val" id="scoreValue">82%</div>
+                <div class="score-lbl">Security Score</div>
+            </div>
+            <div class="stats-summary">
+                <div class="stat-box">
+                    <i class="fa-solid fa-shield-halved" style="color:var(--cyan-bright)"></i>
+                    <div><span style="color:var(--text-muted)">Total Checks:</span> <strong id="totalChecks">28</strong></div>
+                </div>
+                <div class="stat-box">
+                    <i class="fa-solid fa-circle-check" style="color:var(--green-bright)"></i>
+                    <div><span style="color:var(--text-muted)">Passed:</span> <strong id="passedChecks" style="color:var(--green-bright)">22</strong></div>
+                </div>
+                <div class="stat-box">
+                    <i class="fa-solid fa-triangle-exclamation" style="color:var(--yellow-bright)"></i>
+                    <div><span style="color:var(--text-muted)">Warnings:</span> <strong id="warningChecks" style="color:var(--yellow-bright)">4</strong></div>
+                </div>
+                <div class="stat-box">
+                    <i class="fa-solid fa-circle-xmark" style="color:var(--red-bright)"></i>
+                    <div><span style="color:var(--text-muted)">Critical:</span> <strong id="criticalChecks" style="color:var(--red-bright)">2</strong></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="tabs">
+            <button class="tab-btn active" onclick="openTab(event, 'tab-overview')"><i class="fa-solid fa-house"></i> Overview</button>
+            <button class="tab-btn" onclick="openTab(event, 'tab-permissions')"><i class="fa-solid fa-key"></i> Permissions</button>
+            <button class="tab-btn" onclick="openTab(event, 'tab-code')"><i class="fa-solid fa-code"></i> Code Analysis</button>
+            <button class="tab-btn" onclick="openTab(event, 'tab-console')"><i class="fa-solid fa-terminal"></i> Live Logs</button>
+        </div>
+
+        <div id="tab-overview" class="tab-content active">
+            <div class="main-grid">
+                <div>
+                    <div class="grid-2">
+                        <div class="card">
+                            <strong style="font-size:0.85rem; color:var(--red-bright); display:block; margin-bottom:8px;"><i class="fa-solid fa-triangle-exclamation"></i> Security Risk Level</strong>
+                            <div class="risk-badge-large" id="riskBadge">HIGH RISK</div>
+                            <div class="risk-bar">
+                                <div class="risk-progress" id="riskProgressBar"></div>
+                            </div>
+                            <p style="font-size:0.78rem; color:var(--text-muted);" id="riskMessage"><i class="fa-solid fa-circle-info" style="color:var(--red-bright)"></i> 2 critical issues found. Immediate action recommended.</p>
+                        </div>
+
+                        <div class="card">
+                            <strong style="font-size:0.85rem; color:var(--cyan-bright); display:block; margin-bottom:8px;"><i class="fa-solid fa-magnifying-glass"></i> Key Findings</strong>
+                            <div class="finding-item"><span>Hardcoded API Keys</span> <span class="tag tag-critical">Critical ></span></div>
+                            <div class="finding-item"><span>Insecure Data Storage</span> <span class="tag tag-critical">Critical ></span></div>
+                            <div class="finding-item"><span>Excessive Permissions</span> <span class="tag tag-warning">Warning ></span></div>
+                            <div class="finding-item"><span>Debug Mode Enabled</span> <span class="tag tag-warning">Warning ></span></div>
+                            <div class="finding-item"><span>SSL Pinning Implemented</span> <span class="tag tag-passed">Passed ></span></div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <strong style="font-size:0.85rem; color:#fff; display:block; margin-bottom:12px;"><i class="fa-solid fa-list-check" style="color:var(--cyan-bright);"></i> Detailed Analysis</strong>
+                        <div class="analysis-row">
+                            <div style="display:flex; align-items:center; gap:10px;">
+                                <i class="fa-solid fa-shield-cat" style="color:var(--cyan-bright)"></i>
+                                <div>
+                                    <strong style="font-size:0.85rem;">Permissions</strong>
+                                    <div style="font-size:0.75rem; color:var(--text-muted);">App requests 14 permissions (7 are high risk).</div>
+                                </div>
+                            </div>
+                            <span class="tag tag-critical">High Risk</span>
+                        </div>
+
+                        <div class="analysis-row">
+                            <div style="display:flex; align-items:center; gap:10px;">
+                                <i class="fa-solid fa-network-wired" style="color:var(--cyan-bright)"></i>
+                                <div>
+                                    <strong style="font-size:0.85rem;">Network Security</strong>
+                                    <div style="font-size:0.75rem; color:var(--text-muted);">Uses HTTPS, but no certificate pinning found.</div>
+                                </div>
+                            </div>
+                            <span class="tag tag-warning">Warning</span>
+                        </div>
+
+                        <div class="analysis-row">
+                            <div style="display:flex; align-items:center; gap:10px;">
+                                <i class="fa-solid fa-database" style="color:var(--cyan-bright)"></i>
+                                <div>
+                                    <strong style="font-size:0.85rem;">Data Storage</strong>
+                                    <div style="font-size:0.75rem; color:var(--text-muted);">Sensitive data stored in plaintext (tokens, user data).</div>
+                                </div>
+                            </div>
+                            <span class="tag tag-critical">Critical</span>
+                        </div>
+
+                        <div class="analysis-row">
+                            <div style="display:flex; align-items:center; gap:10px;">
+                                <i class="fa-solid fa-file-code" style="color:var(--cyan-bright)"></i>
+                                <div>
+                                    <strong style="font-size:0.85rem;">Code Obfuscation</strong>
+                                    <div style="font-size:0.75rem; color:var(--text-muted);">Code is fully obfuscated against reverse engineering.</div>
+                                </div>
+                            </div>
+                            <span class="tag tag-passed">Passed</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <strong style="font-size:0.8rem; color:#fff; display:block; margin-bottom:8px;">Live IPA Log Stream</strong>
+                    <div class="log-box" id="consoleBox"></div>
+
+                    <div class="card">
+                        <strong style="font-size:0.85rem; color:var(--cyan-bright); display:block; margin-bottom:10px;"><i class="fa-solid fa-sliders"></i> Automatic Scanner</strong>
+                        <button class="btn-action" id="reScanBtn" onclick="runAutomaticScan()"><i class="fa-solid fa-rotate"></i> Re-Run Automated Audit</button>
+                    </div>
+
+                    <div class="card">
+                        <strong style="font-size:0.85rem; color:#fff; display:block; margin-bottom:8px;"><i class="fa-solid fa-circle-info"></i> App Metadata</strong>
+                        <div style="font-size:0.8rem; color:var(--text-muted); line-height:1.6;">
+                            <div>Bundle ID: <strong style="color:#fff;">com.securechat.app</strong></div>
+                            <div>Min iOS Version: <strong style="color:#fff;">14.0</strong></div>
+                            <div>Binary Encrypted: <strong style="color:var(--green-bright);">YES</strong></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="tab-permissions" class="tab-content">
+            <div class="card">
+                <strong style="font-size:0.9rem; color:var(--cyan-bright); display:block; margin-bottom:12px;"><i class="fa-solid fa-key"></i> iOS Entitlements & Permissions</strong>
+                <table class="permissions-table">
+                    <tr><td><i class="fa-solid fa-circle" style="color:var(--red-bright); font-size:0.5rem;"></i> NSCameraUsageDescription</td><td style="text-align:right; color:var(--red-bright); font-weight:600;">High Risk</td></tr>
+                    <tr><td><i class="fa-solid fa-circle" style="color:var(--red-bright); font-size:0.5rem;"></i> NSLocationWhenInUseUsageDescription</td><td style="text-align:right; color:var(--red-bright); font-weight:600;">High Risk</td></tr>
+                    <tr><td><i class="fa-solid fa-circle" style="color:var(--yellow-bright); font-size:0.5rem;"></i> NSPhotoLibraryUsageDescription</td><td style="text-align:right; color:var(--yellow-bright); font-weight:600;">Medium Risk</td></tr>
+                    <tr><td><i class="fa-solid fa-circle" style="color:var(--green-bright); font-size:0.5rem;"></i> NSMicrophoneUsageDescription</td><td style="text-align:right; color:var(--green-bright); font-weight:600;">Low Risk</td></tr>
+                </table>
+            </div>
+        </div>
+
+        <div id="tab-code" class="tab-content">
+            <div class="card">
+                <strong style="font-size:0.9rem; color:var(--yellow-bright); display:block; margin-bottom:12px;"><i class="fa-solid fa-bug"></i> Swift/Objective-C Binary Vulnerabilities</strong>
+                <div style="background:#02050b; padding:12px; border-radius:6px; font-family:monospace; font-size:0.8rem; color:#ef4444; border:1px solid var(--card-border);">
+                    <div>[CRITICAL] Hardcoded Token Found in ApiClient.swift:</div>
+                    <div style="color:var(--text-muted); margin-top:4px;">let bearerToken = "eyJhGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."</div>
+                </div>
+            </div>
+        </div>
+
+        <div id="tab-console" class="tab-content">
+            <div class="card">
+                <strong style="font-size:0.9rem; color:var(--green-bright); display:block; margin-bottom:12px;"><i class="fa-solid fa-terminal"></i> Terminal Logs</strong>
+                <p style="font-size:0.8rem; color:var(--text-muted);">Full system log inspection for Mach-O binary analysis.</p>
+            </div>
+        </div>
+
+        <div class="footer-banner">
+            <div>
+                <strong style="font-size:0.85rem; color:#fff; display:block;"><i class="fa-solid fa-shield-halved" style="color:var(--cyan-bright);"></i> Secure Your App</strong>
+                <span style="font-size:0.75rem; color:var(--text-muted);">Fix critical issues, remove unnecessary permissions, and protect your users.</span>
+            </div>
+            <button class="btn-green" onclick="downloadReport()"><i class="fa-solid fa-file-arrow-down"></i> Generate Report</button>
+        </div>
+    </div>
+
+    <script>
+        function openTab(evt, tabName) {
+            let i, tabcontent, tablinks;
+            tabcontent = document.getElementsByClassName("tab-content");
+            for (i = 0; i < tabcontent.length; i++) {
+                tabcontent[i].classList.remove("active");
+            }
+            tablinks = document.getElementsByClassName("tab-btn");
+            for (i = 0; i < tablinks.length; i++) {
+                tablinks[i].classList.remove("active");
+            }
+            document.getElementById(tabName).classList.add("active");
+            evt.currentTarget.classList.add("active");
+        }
+
+        let isScanning = false;
+
+        function runAutomaticScan() {
+            if (isScanning) return;
+            isScanning = true;
+
+            const statusEl = document.getElementById('scanStatusText');
+            const consoleBox = document.getElementById('consoleBox');
+            const scoreEl = document.getElementById('scoreValue');
+            const btn = document.getElementById('reScanBtn');
+            const progressBar = document.getElementById('riskProgressBar');
+
+            btn.disabled = true;
+            btn.style.opacity = '0.6';
+            statusEl.innerText = 'Analyzing IPA...';
+            consoleBox.innerHTML = '';
+            progressBar.style.width = '15%';
+
+            const logs = [
+                "[0.10s] Initializing iOS IPA inspection engine...",
+                "[0.35s] Unzipping archive and locating Payload/SecureChat.app...",
+                "[0.65s] Parsing Info.plist and entitlements configuration...",
+                "[0.95s] Performing Static Analysis on Mach-O binary...",
+                "[1.25s] Checking Keychain accessibility flags & data storage...",
+                "[1.55s] Evaluating App Transport Security (ATS) rules...",
+                "[1.85s] Scanning for hardcoded tokens and security flaws...",
+                "[2.15s] Audit complete. Security score verified."
+            ];
+
+            let step = 0;
+            const interval = setInterval(() => {
+                if (step < logs.length) {
+                    const logLine = document.createElement('div');
+                    logLine.className = 'log-line';
+                    logLine.innerText = logs[step];
+                    consoleBox.appendChild(logLine);
+                    consoleBox.scrollTop = consoleBox.scrollHeight;
+
+                    let progressValue = Math.min(100, Math.round(((step + 1) / logs.length) * 100));
+                    progressBar.style.width = progressValue + '%';
+                    scoreEl.innerText = Math.floor(75 + Math.random() * 15) + '%';
+
+                    step++;
+                } else {
+                    clearInterval(interval);
+                    statusEl.innerText = 'Analysis Complete';
+                    scoreEl.innerText = '82%';
+                    progressBar.style.width = '72%';
+                    btn.disabled = false;
+                    btn.style.opacity = '1';
+                    isScanning = false;
+                }
+            }, 300);
+        }
+
+        function downloadReport() {
+            alert("iOS Security PDF Report generated successfully!");
+        }
+
+        window.onload = function() {
+            runAutomaticScan();
+        };
+    </script>
+</body>
+</html>

@@ -1,0 +1,89 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: verdana;
+}
+
+body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background: #111;
+}
+.scan {
+    position: absolute;
+    left: 30px;
+    bottom: 30px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    z-index: 10;
+}
+.scan .fingerprint {
+    position: relative;
+    width: 200px;
+    height: 200px;
+    background: #111 url(fprint1.png) no-repeat center center;
+    background-size: cover;
+    border-radius: 50%;
+    border: 6px solid #1b4e5f;
+    box-shadow: 0 0 20px #52fefe, inset 0 0 15px rgba(82, 254, 254, 0.6), 0 0 10px #000;
+    overflow: hidden;
+}
+
+/* Second fingerprint image jo scan line ke sath reveal ho gi */
+.scan .fingerprint::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #073c4b url(fprint2.png) no-repeat center center;
+    background-size: cover;
+    clip-path: polygon(0 0, 100% 0, 100% 0, 0 0);
+    animation: animate_print 4s ease-in-out infinite;
+}
+
+/* Glowing cyan scanning line */
+.scan .fingerprint::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 5px;
+    background: #52fefe;
+    border-radius: 5px;
+    filter: drop-shadow(0 0 8px #52fefe) drop-shadow(0 0 20px #52fefe);
+    animation: animate_line 4s ease-in-out infinite;
+}
+
+/* Scanning line ki movement (top se bottom) */
+@keyframes animate_line {
+    0%, 100% {
+        top: 0px;
+    }
+    50% {
+        top: 195px; /* Container height (200px) - line height (5px) */
+    }
+}
+
+/* Fingerprint ka line ke sath khulna */
+@keyframes animate_print {
+    0%, 100% {
+        clip-path: polygon(0 0, 100% 0, 100% 0, 0 0);
+    }
+    50% {
+        clip-path: polygon(0 0, 100% 0, 100% 200px, 0 200px);
+    }
+}
+.splash-logo-img {
+    max-width: 200px;
+    height: auto;
+    display: block;
+}
+
+

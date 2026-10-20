@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EDUCONNECT LMS - Live Interactive Classroom & AI Portal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #030712; color: #f8fafc; }
+        
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #030712; }
+        ::-webkit-scrollbar-thumb { background: #1e293b; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #334155; }
+        
+        @keyframes pulse-live {
+            0% { transform: scale(0.95); opacity: 0.8; box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+            70% { transform: scale(1.05); opacity: 1; box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+            100% { transform: scale(0.95); opacity: 0.8; box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+        }
+        .live-badge-pulse {
+            animation: pulse-live 2s infinite ease-in-out;
+        }
+
+        @keyframes neonGlow {
+            0%, 100% { text-shadow: 0 0 10px rgba(59, 130, 246, 0.5), 0 0 20px rgba(59, 130, 246, 0.3); }
+            50% { text-shadow: 0 0 20px rgba(59, 130, 246, 0.8), 0 0 30px rgba(245, 158, 11, 0.5); }
+        }
+        .neon-title { animation: neonGlow 4s infinite ease-in-out; }
+
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.75);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+        }
+
+        .audio-bar {
+            transition: height 0.1s ease;
+        }
+    </style>
+</head>
+<body class="h-full bg-[#030712] text-slate-100 flex flex-col overflow-hidden selection:bg-blue-500 selection:text-white">
+
+    <!-- Ambient background glow elements -->
+    <div class="absolute top-0 left-1/4 w-96 h-96 bg-blue-600/10 rounded-full blur-[120px] pointer-events-none"></div>
+    <div class="absolute bottom-0 right-1/4 w-96 h-96 bg-amber-500/10 rounded-full blur-[120px] pointer-events-none"></div>
+
+    <!-- Futuristic Header -->
+    <header class="glass-panel border-b border-slate-800/80 h-16 flex items-center justify-between px-4 lg:px-6 shrink-0 z-30">
+        <div class="flex items-center space-x-4">
+            <div class="flex items-center space-x-1 bg-gradient-to-r from-blue-600 to-amber-500 p-0.5 rounded-xl shadow-xl shadow-blue-500/10">
+                <div class="bg-slate-950 px-3 py-1.5 rounded-[10px] flex items-center space-x-1.5">
+                    <span class="text-lg font-extrabold tracking-wider bg-gradient-to-r from-blue-400 via-indigo-300 to-amber-400 bg-clip-text text-transparent neon-title">MZ</span>
+                </div>
+            </div>
+            <div class="hidden sm:block h-6 w-px bg-slate-800"></div>
+            <div class="flex items-center space-x-2.5">
+                <div class="bg-gradient-to-br from-blue-600/20 to-indigo-600/20 text-blue-400 p-2 rounded-xl border border-blue-500/30 shadow-inner">
+                    <i class="fa-solid fa-graduation-cap text-sm"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-sm lg:text-base tracking-tight text-white flex items-center gap-2">
+                        EDUCONNECT LMS 
+                        <span class="bg-red-500/20 text-red-400 border border-red-500/30 text-[10px] font-semibold px-2.5 py-0.5 rounded-full flex items-center gap-1.5 shadow-sm shadow-red-500/20">
+                            <span class="w-2 h-2 rounded-full bg-red-500 live-badge-pulse"></span> LIVE SYNC
+                        </span>
+                    </h1>
+                    <p class="text-[11px] text-slate-400 hidden sm:block">Next-Gen Immersive Virtual Classroom with AI Voice & Visualizer</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Header Actions, Voice Toggle & Profile -->
+        <div class="flex items-center space-x-3">
+            <!-- Voice Greeting Trigger Button -->
+            <button onclick="playWelcomeVoice(true)" id="speakWelcomeBtn" title="Play Welcome Voice" class="px-3 py-2 rounded-xl bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 border border-blue-500/30 transition flex items-center gap-2 text-xs font-semibold shadow-lg shadow-blue-500/10">
+                <i class="fa-solid fa-volume-high animate-pulse"></i>
+                <span class="hidden md:inline">Voice Assistant</span>
+            </button>
+
+            <button onclick="toggleAudio()" id="audioToggleBtn" title="Toggle Sound FX" class="p-2.5 rounded-xl bg-slate-900/80 hover:bg-slate-800 text-slate-300 border border-slate-700/60 transition relative">
+                <i class="fa-solid fa-headphones text-sm" id="audioIcon"></i>
+            </button>
+            <button onclick="triggerNotification()" class="p-2.5 rounded-xl bg-slate-900/80 hover:bg-slate-800 text-slate-300 border border-slate-700/60 transition relative">
+                <i class="fa-regular fa-bell text-sm"></i>
+                <span class="absolute top-1.5 right-1.5 w-2 h-2 bg-amber-500 rounded-full animate-ping"></span>
+                <span class="absolute top-1.5 right-1.5 w-2 h-2 bg-amber-500 rounded-full"></span>
+            </button>
+            <div class="h-6 w-px bg-slate-800"></div>
+            <div class="flex items-center space-x-2.5 bg-slate-900/80 p-1.5 rounded-xl border border-slate-700/50 shadow-inner">
+                <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=120" alt="User Profile" class="w-8 h-8 rounded-lg object-cover ring-2 ring-blue-500/50">
+                <div class="hidden md:block text-left pr-2">
+                    <div class="text-xs font-semibold text-slate-200">Sarah Jenkins</div>
+                    <div class="text-[10px] text-blue-400 font-medium flex items-center gap-1">
+                        <i class="fa-solid fa-shield-halved text-[9px]"></i> Gold Tier Scholar
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="flex-1 flex overflow-hidden relative z-10">
+
+        <!-- Mobile Sidebar Toggle Button -->
+        <button onclick="toggleSidebar()" class="lg:hidden absolute top-3 left-3 z-40 bg-blue-600 text-white p-2.5 rounded-xl shadow-lg hover:bg-blue-500 transition border border-blue-400/30">
+            <i class="fa-solid fa-bars" id="sidebarToggleIcon"></i>
+        </button>
+
+        <!-- Left Sidebar: Course Modules Navigation -->
+        <aside id="sidebar" class="w-72 glass-panel border-r border-slate-800/80 flex flex-col shrink-0 transition-all duration-300 z-30 absolute lg:relative inset-y-0 left-0 -translate-x-full lg:translate-x-0">
+            <div class="p-4 border-b border-slate-800/80 flex items-center justify-between">
+                <h2 class="font-bold text-xs uppercase tracking-wider text-slate-300 flex items-center gap-2">
+                    <i class="fa-solid fa-book-bookmark text-blue-500"></i> Course Syllabus
+                </h2>
+                <span class="text-[10px] bg-blue-600/20 text-blue-400 border border-blue-500/30 px-2 py-0.5 rounded-md font-mono">Module 4 / 8</span>
+            </div>
+
+            <!-- Module list -->
+            <div class="flex-1 overflow-y-auto p-3 space-y-2.5">
+                <div class="text-[10px] font-bold text-slate-500 uppercase px-2 py-1 tracking-wider">Advanced Data Structures & Algorithms</div>
+                
+                <div onclick="switchModule('module-1')" id="nav-module-1" class="module-item group cursor-pointer p-3 rounded-xl bg-slate-900/60 hover:bg-slate-800/80 border border-slate-800/80 transition flex items-start space-x-3">
+                    <div class="w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0 mt-0.5">
+                        <i class="fa-solid fa-check text-xs"></i>
+                    </div>
+                    <div class="flex-1">
+                        <div class="text-xs font-semibold text-slate-300 group-hover:text-white">Lesson 1: Limits & Continuity</div>
+                        <div class="text-[10px] text-slate-500">Completed • 45m video</div>
+                    </div>
+                </div>
+
+                <div onclick="switchModule('module-2')" id="nav-module-2" class="module-item group cursor-pointer p-3 rounded-xl bg-slate-900/60 hover:bg-slate-800/80 border border-slate-800/80 transition flex items-start space-x-3">
+                    <div class="w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0 mt-0.5">
+                        <i class="fa-solid fa-check text-xs"></i>
+                    </div>
+                    <div class="flex-1">
+                        <div class="text-xs font-semibold text-slate-300 group-hover:text-white">Lesson 2: Derivative Applications</div>
+                        <div class="text-[10px] text-slate-500">Completed • 60m video</div>
+                    </div>
+                </div>
+
+                <div onclick="switchModule('module-3')" id="nav-module-3" class="module-item group cursor-pointer p-3 rounded-xl bg-slate-900/60 hover:bg-slate-800/80 border border-slate-800/80 transition flex items-start space-x-3">
+                    <div class="w-6 h-6 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0 mt-0.5">
+                        <i class="fa-solid fa-check text-xs"></i>
+                    </div>
+                    <div class="flex-1">
+                        <div class="text-xs font-semibold text-slate-300 group-hover:text-white">Lesson 3: Introduction to Integrals</div>
+                        <div class="text-[10px] text-slate-500">Completed • 50m video</div>
+                    </div>
+                </div>
+
+                <!-- Active LIVE Module -->
+                <div onclick="switchModule('module-4')" id="nav-module-4" class="module-item group cursor-pointer p-3.5 rounded-xl bg-gradient-to-r from-blue-600/20 to-indigo-600/10 border border-blue-500/40 shadow-lg shadow-blue-500/10 flex items-start space-x-3">
+                    <div class="w-6 h-6 rounded-full bg-blue-500 text-white flex items-center justify-center shrink-0 mt-0.5 shadow-md shadow-blue-500/50">
+                        <i class="fa-solid fa-video text-xs"></i>
+                    </div>
+                    <div class="flex-1">
+                        <div class="text-xs font-bold text-blue-300 flex items-center gap-1.5">
+                            Lesson 4: Advanced Graphs
+                            <span class="w-2 h-2 rounded-full bg-red-500 live-badge-pulse"></span>
+                        </div>
+                        <div class="text-[10px] text-slate-300 font-medium">Live Streaming Now • Dr. Aris Thorne</div>
+                    </div>
+                </div>
+
+                <div onclick="switchModule('module-5')" id="nav-module-5" class="module-item group cursor-pointer p-3 rounded-xl bg-slate-900/60 hover:bg-slate-800/80 border border-slate-800/80 transition flex items-start space-x-3">
+                    <div class="w-6 h-6 rounded-full bg-slate-800 text-slate-500 flex items-center justify-center shrink-0 mt-0.5">
+                        <i class="fa-solid fa-lock text-xs"></i>
+                    </div>
+                    <div class="flex-1">
+                        <div class="text-xs font-semibold text-slate-400 group-hover:text-slate-300">Lesson 5: Multivariable Functions</div>
+                        <div class="text-[10px] text-slate-500">Scheduled for Tomorrow</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Instructor Quick Card -->
+            <div class="p-3.5 m-3 bg-slate-950/90 rounded-2xl border border-slate-800/80 flex items-center space-x-3 shadow-md">
+                <div class="relative">
+                    <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=120" alt="Instructor" class="w-10 h-10 rounded-xl object-cover ring-1 ring-blue-500/40">
+                    <span class="absolute bottom-0 right-0 w-3 h-3 bg-emerald-500 border-2 border-slate-950 rounded-full"></span>
+                </div>
+                <div class="overflow-hidden">
+                    <div class="text-xs font-bold text-slate-200 truncate">Dr. Aris Thorne</div>
+                    <div class="text-[10px] text-slate-400 truncate">Professor of Mathematics</div>
+                    <div class="text-[10px] text-amber-400 font-semibold mt-0.5 flex items-center gap-1">
+                        <i class="fa-solid fa-star"></i> 4.9 <span class="text-slate-500">(1.2k students)</span>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <main class="flex-1 flex flex-col lg:flex-row overflow-hidden bg-slate-950/50">
+            
+            <div class="flex-1 flex flex-col p-4 lg:p-6 overflow-y-auto">
+                
+                <!-- Live Class Header Info -->
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 mb-4 glass-panel p-4 rounded-2xl border border-slate-800/80 shadow-xl">
+                    <div>
+                        <div class="flex items-center gap-2 mb-1">
+                            <span class="bg-blue-500/20 text-blue-400 border border-blue-500/30 text-[10px] uppercase font-bold px-2.5 py-0.5 rounded-full">Live Session Active</span>
+                            <span class="text-xs text-slate-400 flex items-center gap-1"><i class="fa-regular fa-clock text-blue-400"></i> Started 38 mins ago</span>
+                            <span class="text-xs text-emerald-400 hidden sm:flex items-center gap-1 font-medium"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> 248 active viewers</span>
+                        </div>
+                        <h2 class="text-base lg:text-lg font-bold text-white tracking-tight" id="courseTitleHeader">Advanced Data Structures - Lesson 4: Graphs & Traversals</h2>
+                    </div>
+                    <div class="flex items-center space-x-2.5">
+                        <button onclick="toggleFullscreen()" class="px-3 py-2 bg-slate-900 hover:bg-slate-800 text-slate-200 text-xs font-semibold rounded-xl border border-slate-700/60 transition flex items-center gap-1.5 shadow-md">
+                            <i class="fa-solid fa-expand"></i> Fullscreen
+                        </button>
+                        <button onclick="raiseHand()" id="raiseHandBtn" class="px-3.5 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white text-xs font-semibold rounded-xl shadow-lg shadow-blue-600/30 transition flex items-center gap-1.5">
+                            <i class="fa-solid fa-hand"></i> Raise Hand
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Main Video Stream & Interactive Whiteboard Container -->
+                <div class="grid grid-cols-1 xl:grid-cols-3 gap-4 flex-1">
+                    
+                    <!-- Instructor Video Feed & Audio Visualizer -->
+                    <div class="xl:col-span-1 glass-panel rounded-2xl border border-slate-800/80 overflow-hidden flex flex-col shadow-2xl">
+                        <div class="bg-slate-950/90 px-4 py-2.5 border-b border-slate-800/80 flex items-center justify-between">
+                            <div class="flex items-center space-x-2">
+                                <span class="w-2.5 h-2.5 rounded-full bg-red-500 live-badge-pulse"></span>
+                                <span class="text-xs font-semibold text-slate-300">Instructor HD Stream</span>
+                            </div>
+                            <span class="text-[10px] bg-slate-900 text-slate-400 px-2 py-0.5 rounded font-mono border border-slate-800">1080p 60fps</span>
+                        </div>
+                        
+                        <div class="relative flex-1 bg-slate-950 min-h-[220px] flex items-center justify-center overflow-hidden group">
+                            <img src="https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&q=80&w=800" alt="Live Instructor Stream" class="w-full h-full object-cover opacity-90 group-hover:scale-105 transition duration-700">
+                            
+                            <div class="absolute inset-0 bg-gradient-to-t from-slate-950/90 via-transparent to-slate-950/30"></div>
+
+                            <div class="absolute bottom-3 left-3 bg-slate-900/90 backdrop-blur-md px-3 py-1.5 rounded-xl border border-slate-700/60 flex items-center space-x-2 shadow-lg">
+                                <div class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
+                                <span class="text-xs font-bold text-white">Dr. Aris Thorne</span>
+                                <span class="text-[10px] bg-blue-500/20 text-blue-400 px-1.5 py-0.2 rounded font-semibold">Host</span>
+                            </div>
+
+                            <!-- Live Audio Visualizer Bars -->
+                            <div class="absolute top-3 right-3 bg-slate-900/80 backdrop-blur-md px-3 py-1.5 rounded-xl border border-slate-700/50 flex items-center space-x-1.5 shadow-lg">
+                                <span class="text-[9px] text-blue-400 font-mono">AUDIO</span>
+                                <div class="flex items-end space-x-1 h-4">
+                                    <div class="w-1 bg-blue-400 rounded-full audio-bar" style="height: 12px;"></div>
+                                    <div class="w-1 bg-indigo-500 rounded-full audio-bar" style="height: 16px;"></div>
+                                    <div class="w-1 bg-blue-500 rounded-full audio-bar" style="height: 8px;"></div>
+                                    <div class="w-1 bg-amber-400 rounded-full audio-bar" style="height: 14px;"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Mini Participant Grid Preview -->
+                        <div class="p-3 bg-slate-950/90 border-t border-slate-800/80 grid grid-cols-4 gap-2">
+                            <div class="relative bg-slate-900 rounded-lg overflow-hidden aspect-video border border-slate-800 flex items-center justify-center">
+                                <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=150" class="w-full h-full object-cover">
+                                <span class="absolute bottom-1 left-1 text-[9px] bg-slate-950/90 text-slate-300 px-1.5 rounded font-medium">Sarah J.</span>
+                            </div>
+                            <div class="relative bg-slate-900 rounded-lg overflow-hidden aspect-video border border-slate-800 flex items-center justify-center">
+                                <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=150" class="w-full h-full object-cover">
+                                <span class="absolute bottom-1 left-1 text-[9px] bg-slate-950/90 text-slate-300 px-1.5 rounded font-medium">Alex M.</span>
+                            </div>
+                            <div class="relative bg-slate-900 rounded-lg overflow-hidden aspect-video border border-slate-800 flex items-center justify-center">
+                                <img src="https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=150" class="w-full h-full object-cover">
+                                <span class="absolute bottom-1 left-1 text-[9px] bg-slate-950/90 text-slate-300 px-1.5 rounded font-medium">David K.</span>
+                            </div>
+                            <div class="relative bg-slate-900/90 rounded-lg overflow-hidden aspect-video border border-slate-800 flex items-center justify-center text-blue-400 text-xs font-bold bg-blue-950/30">
+                                +245
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Interactive Digital Whiteboard / Shared Screen -->
+                    <div class="xl:col-span-2 glass-panel rounded-2xl border border-slate-800/80 overflow-hidden flex flex-col shadow-2xl">
+                        <div class="bg-slate-950/90 px-4 py-2.5 border-b border-slate-800/80 flex items-center justify-between">
+                            <div class="flex items-center space-x-2">
+                                <i class="fa-solid fa-chalkboard text-blue-400"></i>
+                                <span class="text-xs font-semibold text-slate-300">Interactive Canvas - Graph Theory & Calculus Visualizer</span>
+                            </div>
+                            <div class="flex items-center space-x-1.5 bg-slate-900 p-1 rounded-lg border border-slate-800">
+                                <button onclick="setWhiteboardTab('graph')" id="wb-tab-graph" class="px-3 py-1 text-[11px] font-semibold rounded-md bg-blue-600 text-white transition shadow">Graph Theory</button>
+                                <button onclick="setWhiteboardTab('calculus')" id="wb-tab-calculus" class="px-3 py-1 text-[11px] font-semibold rounded-md text-slate-400 hover:text-white transition">Calculus</button>
+                            </div>
+                        </div>
+
+                        <!-- Whiteboard Canvas Area -->
+                        <div class="relative flex-1 bg-slate-950 p-6 flex flex-col justify-between min-h-[300px] overflow-hidden">
+                            
+                            <!-- Grid background styling -->
+                            <div class="absolute inset-0 bg-[linear-gradient(to_right,#1e293b20_1px,transparent_1px),linear-gradient(to_bottom,#1e293b20_1px,transparent_1px)] bg-[size:32px_32px]"></div>
+
+                            <!-- Interactive Canvas Particle Background -->
+                            <canvas id="particleCanvas" class="absolute inset-0 pointer-events-none opacity-40"></canvas>
+
+                            <!-- Whiteboard Content: Graph View -->
+                            <div id="whiteboard-graph-content" class="relative z-10 space-y-4">
+                                <div class="flex items-center justify-between bg-slate-900/80 backdrop-blur-md p-3.5 rounded-xl border border-slate-800 shadow-lg">
+                                    <div>
+                                        <div class="text-xs font-bold text-amber-400 flex items-center gap-1.5"><i class="fa-solid fa-bolt text-[10px]"></i> Topic: Breadth-First & Depth-First Traversals</div>
+                                        <div class="text-[11px] text-slate-400">Node complexity: O(V + E) with real-time adjacency matrix mapping</div>
+                                    </div>
+                                    <span class="bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-[10px] font-semibold px-2.5 py-1 rounded-full flex items-center gap-1"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Synced Live</span>
+                                </div>
+
+                                <!-- SVG Graph Diagram -->
+                                <div class="bg-slate-900/50 p-6 rounded-2xl border border-slate-800/80 flex items-center justify-center relative min-h-[190px]">
+                                    <svg class="w-full max-w-md h-44" viewBox="0 0 400 200">
+                                        <!-- Edges -->
+                                        <line x1="60" y1="100" x2="160" y2="50" stroke="#3b82f6" stroke-width="3" stroke-dasharray="4"/>
+                                        <line x1="60" y1="100" x2="160" y2="150" stroke="#3b82f6" stroke-width="3"/>
+                                        <line x1="160" y1="50" x2="280" y2="50" stroke="#f59e0b" stroke-width="3"/>
+                                        <line x1="160" y1="150" x2="280" y2="150" stroke="#3b82f6" stroke-width="3"/>
+                                        <line x1="280" y1="50" x2="340" y2="100" stroke="#f59e0b" stroke-width="3" stroke-dasharray="4"/>
+                                        <line x1="280" y1="150" x2="340" y2="100" stroke="#3b82f6" stroke-width="3"/>
+                                        <line x1="160" y1="50" x2="280" y2="150" stroke="#64748b" stroke-width="1.5" stroke-dasharray="2"/>
+
+                                        <!-- Nodes with hover glow effects -->
+                                        <g class="cursor-pointer transition transform hover:scale-110" onclick="highlightNode('A')">
+                                            <circle cx="60" cy="100" r="22" fill="#0f172a" stroke="#3b82f6" stroke-width="3"/>
+                                            <text x="60" y="105" fill="white" font-size="14" font-weight="bold" text-anchor="middle">A</text>
+                                        </g>
+                                        <g class="cursor-pointer transition transform hover:scale-110">
+                                            <circle cx="160" cy="50" r="22" fill="#0f172a" stroke="#f59e0b" stroke-width="3"/>
+                                            <text x="160" y="55" fill="white" font-size="14" font-weight="bold" text-anchor="middle">B</text>
+                                        </g>
+                                        <g class="cursor-pointer transition transform hover:scale-110">
+                                            <circle cx="160" cy="150" r="22" fill="#0f172a" stroke="#3b82f6" stroke-width="3"/>
+                                            <text x="160" y="155" fill="white" font-size="14" font-weight="bold" text-anchor="middle">C</text>
+                                        </g>
+                                        <g class="cursor-pointer transition transform hover:scale-110">
+                                            <circle cx="280" cy="50" r="22" fill="#0f172a" stroke="#f59e0b" stroke-width="3"/>
+                                            <text x="280" y="55" fill="white" font-size="14" font-weight="bold" text-anchor="middle">D</text>
+                                        </g>
+                                        <g class="cursor-pointer transition transform hover:scale-110">
+                                            <circle cx="280" cy="150" r="22" fill="#0f172a" stroke="#3b82f6" stroke-width="3"/>
+                                            <text x="280" y="155" fill="white" font-size="14" font-weight="bold" text-anchor="middle">E</text>
+                                        </g>
+                                        <g class="cursor-pointer transition transform hover:scale-110">
+                                            <circle cx="340" cy="100" r="22" fill="#0f172a" stroke="#10b981" stroke-width="3"/>
+                                            <text x="340" y="105" fill="white" font-size="14" font-weight="bold" text-anchor="middle">F</text>
+                                        </g>
+                                    </svg>
+                                </div>
+                            </div>
+
+                            <!-- Whiteboard Content: Calculus View -->
+                            <div id="whiteboard-calculus-content" class="relative z-10 space-y-4 hidden">
+                                <div class="flex items-center justify-between bg-slate-900/80 backdrop-blur-md p-3.5 rounded-xl border border-slate-800 shadow-lg">
+                                    <div>
+                                        <div class="text-xs font-bold text-blue-400">Topic: Integration by Parts & Series Expansion</div>
+                                        <div class="text-[11px] text-slate-400">Formula: &int; u dv = uv - &int; v du</div>
+                                    </div>
+                                    <span class="bg-blue-500/20 text-blue-400 border border-blue-500/30 text-[10px] font-semibold px-2.5 py-1 rounded-full">MZ Formula Library</span>
+                                </div>
+                                <div class="bg-slate-900/50 p-6 rounded-2xl border border-slate-800/80 flex flex-col items-center justify-center min-h-[190px] space-y-3 text-center">
+                                    <div class="text-base lg:text-xl font-serif text-amber-300 bg-slate-950/80 px-6 py-3 rounded-xl border border-slate-800 shadow-inner">
+                                        $$\int x^2 e^{x} dx = x^2 e^{x} - 2x e^{x} + 2e^{x} + C$$
+                                    </div>
+                                    <p class="text-xs text-slate-400 max-w-md">Derived during live Q&A session with student participation. Notice the step-by-step coefficient integration.</p>
+                                </div>
+                            </div>
+
+                            <!-- Whiteboard Footer Toolbar -->
+                            <div class="relative z-10 flex items-center justify-between pt-3 border-t border-slate-800/80 text-xs text-slate-400">
+                                <div class="flex items-center space-x-2">
+                                    <span class="flex items-center gap-1.5 text-blue-400 font-medium"><i class="fa-solid fa-pen-nib animate-bounce"></i> Dr. Thorne is annotating</span>
+                                </div>
+                                <div class="flex items-center space-x-3">
+                                    <button onclick="downloadNotes()" class="hover:text-white transition flex items-center gap-1.5 bg-slate-900 px-3 py-1.5 rounded-lg border border-slate-800"><i class="fa-solid fa-download text-blue-400"></i> Download Notes</button>
+                                    <button onclick="openQuizModal()" class="bg-gradient-to-r from-amber-500/20 to-orange-500/20 text-amber-400 hover:bg-amber-500/30 px-3.5 py-1.5 rounded-lg border border-amber-500/30 font-semibold transition shadow-md">Take Pop Quiz</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <aside class="w-full lg:w-80 glass-panel border-t lg:border-t-0 lg:border-l border-slate-800/80 flex flex-col shrink-0">
+                <div class="p-4 border-b border-slate-800/80 flex items-center justify-between bg-slate-950/50">
+                    <h3 class="font-bold text-xs uppercase tracking-wider text-slate-200 flex items-center gap-2">
+                        <i class="fa-solid fa-comments text-blue-400"></i> Live Class Chat
+                    </h3>
+                    <span class="text-[10px] bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-2 py-0.5 rounded-full font-semibold">248 Online</span>
+                </div>
+
+                <!-- Chat Messages Scroll Area -->
+                <div id="chatMessages" class="flex-1 overflow-y-auto p-4 space-y-3.5 max-h-[320px] lg:max-h-none">
+                    <div class="text-center">
+                        <span class="text-[10px] bg-slate-900 text-slate-400 px-3 py-1 rounded-full border border-slate-800 font-mono">Today at 10:00 AM - Session Started</span>
+                    </div>
+
+                    <div class="flex items-start space-x-2.5">
+                        <img src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&q=80&w=100" class="w-7 h-7 rounded-lg object-cover mt-0.5 ring-1 ring-slate-700">
+                        <div class="flex-1 bg-slate-900/80 p-3 rounded-xl border border-slate-800/80 shadow-sm">
+                            <div class="flex items-center justify-between mb-1">
+                                <span class="text-xs font-bold text-slate-300">Ahmed Khan</span>
+                                <span class="text-[9px] text-slate-500">10:14 AM</span>
+                            </div>
+                            <p class="text-xs text-slate-300 leading-relaxed">Sir, how do we handle disconnected edges in DFS traversal?</p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-start space-x-2.5">
+                        <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=100" class="w-7 h-7 rounded-lg object-cover mt-0.5 ring-1 ring-blue-500">
+                        <div class="flex-1 bg-gradient-to-br from-blue-950/40 to-indigo-950/30 p-3 rounded-xl border border-blue-500/30 shadow-md">
+                            <div class="flex items-center justify-between mb-1">
+                                <span class="text-xs font-bold text-blue-400">Dr. Aris Thorne (Host)</span>
+                                <span class="text-[9px] text-blue-300/70">10:15 AM</span>
+                            </div>
+                            <p class="text-xs text-blue-100 leading-relaxed">Great question Ahmed! We iterate through all vertices and run DFS on any unvisited node. Watch the whiteboard now.</p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-start space-x-2.5">
+                        <img src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=100" class="w-7 h-7 rounded-lg object-cover mt-0.5 ring-1 ring-slate-700">
+                        <div class="flex-1 bg-slate-900/80 p-3 rounded-xl border border-slate-800/80 shadow-sm">
+                            <div class="flex items-center justify-between mb-1">
+                                <span class="text-xs font-bold text-slate-300">Fatima Noor</span>
+                                <span class="text-[9px] text-slate-500">10:18 AM</span>
+                            </div>
+                            <p class="text-xs text-slate-300 leading-relaxed">The graph visualization makes it so much clearer! Thanks MZ LMS team.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Chat Input Form -->
+                <div class="p-3.5 border-t border-slate-800/80 bg-slate-950/80">
+                    <form onsubmit="sendChatMessage(event)" class="flex items-center space-x-2">
+                        <input type="text" id="chatInput" placeholder="Ask a question in live class..." class="flex-1 bg-slate-900 border border-slate-800 rounded-xl px-3.5 py-2 text-xs text-slate-100 focus:outline-none focus:border-blue-500 placeholder-slate-500 shadow-inner">
+                        <button type="submit" class="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white p-2.5 rounded-xl transition shadow-lg shadow-blue-600/30">
+                            <i class="fa-solid fa-paper-plane text-xs"></i>
+                        </button>
+                    </form>
+                    <div class="flex items-center justify-between mt-2 px-1">
+                        <span class="text-[10px] text-slate-500">Press Enter to dispatch</span>
+                        <span class="text-[10px] text-emerald-400 font-medium flex items-center gap-1"><i class="fa-solid fa-shield-halved"></i> MZ AI Moderated</span>
+                    </div>
+                </div>
+            </aside>
+        </main>
+    </div>
+
+    <!-- Quiz Modal -->
+    <div id="quizModal" class="fixed inset-0 bg-slate-950/85 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+        <div class="glass-panel border border-slate-800 rounded-2xl max-w-md w-full p-6 shadow-2xl relative">
+            <button onclick="closeQuizModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white"><i class="fa-solid fa-xmark text-lg"></i></button>
+            <div class="flex items-center space-x-2 mb-3">
+                <span class="bg-amber-500/20 text-amber-400 px-2.5 py-0.5 rounded-full text-xs font-bold border border-amber-500/30">Pop Quiz #4</span>
+                <span class="text-xs text-slate-400 flex items-center gap-1"><i class="fa-regular fa-clock"></i> 2 mins remaining</span>
+            </div>
+            <h3 class="text-base font-bold text-white mb-3">What is the time complexity of Breadth-First Search (BFS)?</h3>
+            <div class="space-y-2.5 my-4">
+                <label class="flex items-center space-x-3 p-3.5 bg-slate-900/90 rounded-xl border border-slate-800 cursor-pointer hover:border-blue-500 transition">
+                    <input type="radio" name="quiz" class="text-blue-600 focus:ring-blue-500">
+                    <span class="text-xs text-slate-200 font-medium">A) O(V^2) - Quadratic Time</span>
+                </label>
+                <label class="flex items-center space-x-3 p-3.5 bg-slate-900/90 rounded-xl border border-slate-800 cursor-pointer hover:border-blue-500 transition">
+                    <input type="radio" name="quiz" class="text-blue-600 focus:ring-blue-500">
+                    <span class="text-xs text-slate-200 font-medium">B) O(V + E) - Linear Vertex & Edge Traversal</span>
+                </label>
+                <label class="flex items-center space-x-3 p-3.5 bg-slate-900/90 rounded-xl border border-slate-800 cursor-pointer hover:border-blue-500 transition">
+                    <input type="radio" name="quiz" class="text-blue-600 focus:ring-blue-500">
+                    <span class="text-xs text-slate-200 font-medium">C) O(log N) - Logarithmic Complexity</span>
+                </label>
+            </div>
+            <div class="flex justify-end space-x-2.5">
+                <button onclick="closeQuizModal()" class="px-4 py-2 bg-slate-900 text-slate-300 text-xs font-semibold rounded-xl hover:bg-slate-800 border border-slate-800">Cancel</button>
+                <button onclick="submitQuiz()" class="px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-xs font-semibold rounded-xl hover:from-blue-500 hover:to-indigo-500 shadow-lg shadow-blue-600/30">Submit Answer</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Custom Notification Box -->
+    <div id="customNotification" class="fixed bottom-5 right-5 z-50 transform translate-y-20 opacity-0 transition-all duration-300 glass-panel border border-slate-700/80 text-white px-4 py-3.5 rounded-2xl shadow-2xl flex items-center space-x-3.5">
+        <div id="notifIcon" class="w-9 h-9 rounded-xl bg-blue-500/20 text-blue-400 flex items-center justify-center shrink-0 border border-blue-500/30">
+            <i class="fa-solid fa-info"></i>
+        </div>
+        <div>
+            <div class="text-xs font-bold" id="notifTitle">MZ Education Portal</div>
+            <div class="text-[11px] text-slate-300" id="notifMessage">Action completed successfully.</div>
+        </div>
+    </div>
+
+    <script>
+        let isAudioMuted = false;
+        let sidebarOpen = false;
+
+        // Automatically trigger synthesized welcome voice on load or user interaction
+        window.addEventListener('DOMContentLoaded', () => {
+            // Start particle background on canvas
+            initParticleCanvas();
+            
+            // Trigger welcome synthesized speech after 1 second
+            setTimeout(() => {
+                playWelcomeVoice(false);
+            }, 1200);
+        });
+
+        // Web Speech API Synthesis for Welcome Voice
+        function playWelcomeVoice(isManualClick) {
+            if ('speechSynthesis' in window) {
+                // Cancel any ongoing speech
+                window.speechSynthesis.cancel();
+                
+                const welcomeText = "Welcome to MZ Education Portal. Your live advanced calculus and data structures stream is active.";
+                const utterance = new SpeechSynthesisUtterance(welcomeText);
+                utterance.rate = 1.0;
+                utterance.pitch = 1.05;
+                utterance.volume = 1.0;
+
+                // Attempt to pick an engaging English voice if available
+                const voices = window.speechSynthesis.getVoices();
+                const preferredVoice = voices.find(v => v.name.includes('Google US English') || v.name.includes('Natural') || v.lang.includes('en-US'));
+                if (preferredVoice) {
+                    utterance.voice = preferredVoice;
+                }
+
+                window.speechSynthesis.speak(utterance);
+                showNotification("AI Voice Assistant", "Synthesized voice: 'Welcome to MZ Education Portal'", "volume", "text-blue-400 bg-blue-500/20");
+            } else if (isManualClick) {
+                showNotification("Voice Notice", "Speech synthesis is not supported in this browser environment.", "volume", "text-amber-400 bg-amber-500/20");
+            }
+        }
+
+        // Interactive Canvas Particle Background
+        function initParticleCanvas() {
+            const canvas = document.getElementById('particleCanvas');
+            if(!canvas) return;
+            const ctx = canvas.getContext('2d');
+            
+            function resizeCanvas() {
+                canvas.width = canvas.parentElement.clientWidth;
+                canvas.height = canvas.parentElement.clientHeight;
+            }
+            resizeCanvas();
+            window.addEventListener('resize', resizeCanvas);
+
+            const particles = [];
+            for(let i = 0; i < 35; i++) {
+                particles.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    radius: Math.random() * 2 + 1,
+                    vx: (Math.random() - 0.5) * 0.4,
+                    vy: (Math.random() - 0.5) * 0.4,
+                    alpha: Math.random() * 0.5 + 0.2
+                });
+            }
+
+            function animateParticles() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                ctx.fillStyle = 'rgba(59, 130, 246, 0.6)';
+                
+                particles.forEach(p => {
+                    p.x += p.vx;
+                    p.y += p.vy;
+                    if(p.x < 0 || p.x > canvas.width) p.vx *= -1;
+                    if(p.y < 0 || p.y > canvas.height) p.vy *= -1;
+
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+                    ctx.fillStyle = `rgba(59, 130, 246, ${p.alpha})`;
+                    ctx.fill();
+                });
+                requestAnimationFrame(animateParticles);
+            }
+            animateParticles();
+        }
+
+        // Toggle sidebar on mobile
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const icon = document.getElementById('sidebarToggleIcon');
+            sidebarOpen = !sidebarOpen;
+            if (sidebarOpen) {
+                sidebar.classList.remove('-translate-x-full');
+                icon.className = "fa-solid fa-xmark";
+            } else {
+                sidebar.classList.add('-translate-x-full');
+                icon.className = "fa-solid fa-bars";
+            }
+        }
+
+        // Switch module navigation
+        function switchModule(moduleId) {
+            document.querySelectorAll('.module-item').forEach(el => {
+                el.classList.remove('bg-gradient-to-r', 'from-blue-600/20', 'to-indigo-600/10', 'border-blue-500/40');
+                el.classList.add('bg-slate-900/60');
+            });
+            const selected = document.getElementById('nav-' + moduleId);
+            if (selected) {
+                selected.classList.remove('bg-slate-900/60');
+                selected.classList.add('bg-gradient-to-r', 'from-blue-600/20', 'to-indigo-600/10', 'border-blue-500/40');
+            }
+            
+            if(moduleId === 'module-4') {
+                document.getElementById('courseTitleHeader').innerText = "Advanced Data Structures - Lesson 4: Graphs & Traversals";
+                showNotification("Live Stream Active", "Switched to Dr. Aris Thorne's live lecture room.", "video", "text-blue-400 bg-blue-500/20");
+            } else {
+                document.getElementById('courseTitleHeader').innerText = "Course Archive Module: " + moduleId.toUpperCase();
+                showNotification("Module Loaded", "Loaded recorded session archive and notes.", "book", "text-emerald-400 bg-emerald-500/20");
+            }
+        }
+
+        // Switch whiteboard tabs
+        function setWhiteboardTab(tab) {
+            const graphTab = document.getElementById('wb-tab-graph');
+            const calcTab = document.getElementById('wb-tab-calculus');
+            const graphContent = document.getElementById('whiteboard-graph-content');
+            const calcContent = document.getElementById('whiteboard-calculus-content');
+
+            if(tab === 'graph') {
+                graphTab.className = "px-3 py-1 text-[11px] font-semibold rounded-md bg-blue-600 text-white transition shadow";
+                calcTab.className = "px-3 py-1 text-[11px] font-semibold rounded-md text-slate-400 hover:text-white transition";
+                graphContent.classList.remove('hidden');
+                calcContent.classList.add('hidden');
+            } else {
+                calcTab.className = "px-3 py-1 text-[11px] font-semibold rounded-md bg-blue-600 text-white transition shadow";
+                graphTab.className = "px-3 py-1 text-[11px] font-semibold rounded-md text-slate-400 hover:text-white transition";
+                calcContent.classList.remove('hidden');
+                graphContent.classList.add('hidden');
+            }
+        }
+
+        // Send chat message in live stream
+        function sendChatMessage(e) {
+            e.preventDefault();
+            const input = document.getElementById('chatInput');
+            const text = input.value.trim();
+            if(!text) return;
+
+            const chatMessages = document.getElementById('chatMessages');
+            const newMsg = document.createElement('div');
+            newMsg.className = "flex items-start space-x-2.5 animate-fadeIn";
+            newMsg.innerHTML = `
+                <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=100" class="w-7 h-7 rounded-lg object-cover mt-0.5 ring-1 ring-blue-500">
+                <div class="flex-1 bg-slate-900/90 p-3 rounded-xl border border-slate-800 shadow-sm">
+                    <div class="flex items-center justify-between mb-1">
+                        <span class="text-xs font-bold text-blue-400">Sarah Jenkins (You)</span>
+                        <span class="text-[9px] text-slate-500">Just now</span>
+                    </div>
+                    <p class="text-xs text-slate-200 leading-relaxed">${escapeHtml(text)}</p>
+                </div>
+            `;
+            chatMessages.appendChild(newMsg);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+            input.value = '';
+
+            // Simulate automated instructor reply
+            setTimeout(() => {
+                const replyMsg = document.createElement('div');
+                replyMsg.className = "flex items-start space-x-2.5";
+                replyMsg.innerHTML = `
+                    <img src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&q=80&w=100" class="w-7 h-7 rounded-lg object-cover mt-0.5 ring-1 ring-blue-500">
+                    <div class="flex-1 bg-gradient-to-br from-blue-950/40 to-indigo-950/30 p-3 rounded-xl border border-blue-500/30 shadow-md">
+                        <div class="flex items-center justify-between mb-1">
+                            <span class="text-xs font-bold text-blue-400">Dr. Aris Thorne (Instructor)</span>
+                            <span class="text-[9px] text-blue-300/70">Just now</span>
+                        </div>
+                        <p class="text-xs text-blue-100 leading-relaxed">Excellent point Sarah! Exactly right.</p>
+                    </div>
+                `;
+                chatMessages.appendChild(replyMsg);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }, 3000);
+        }
+
+        function escapeHtml(str) {
+            return str.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        }
+
+        // Raise hand action
+        function raiseHand() {
+            const btn = document.getElementById('raiseHandBtn');
+            btn.classList.toggle('from-amber-600');
+            btn.classList.toggle('to-orange-600');
+            const active = btn.classList.contains('from-amber-600');
+            btn.innerHTML = active ? '<i class="fa-solid fa-hand"></i> Hand Raised' : '<i class="fa-solid fa-hand"></i> Raise Hand';
+            showNotification("Hand Raised", active ? "Dr. Thorne has been notified. You are in the question queue." : "Hand lowered.", "hand", "text-amber-400 bg-amber-500/20");
+        }
+
+        function toggleAudio() {
+            isAudioMuted = !isAudioMuted;
+            const icon = document.getElementById('audioIcon');
+            icon.className = isAudioMuted ? "fa-solid fa-headphones text-sm text-red-400" : "fa-solid fa-headphones text-sm";
+            showNotification("Audio Stream", isAudioMuted ? "Class audio muted locally." : "Class audio active.", "volume", "text-blue-400 bg-blue-500/20");
+        }
+
+        function toggleFullscreen() {
+            if (!document.fullscreenElement) {
+                document.documentElement.requestFullscreen().catch(err => {
+                    console.log(err);
+                });
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                }
+            }
+        }
+
+        function downloadNotes() {
+            showNotification("Download Complete", "Lesson 4 Whiteboard Notes & Formulas (PDF) downloaded successfully.", "download", "text-emerald-400 bg-emerald-500/20");
+        }
+
+        function openQuizModal() {
+            document.getElementById('quizModal').classList.remove('hidden');
+        }
+
+        function closeQuizModal() {
+            document.getElementById('quizModal').classList.add('hidden');
+        }
+
+        function submitQuiz() {
+            closeQuizModal();
+            showNotification("Quiz Submitted!", "Correct answer! +10 MZ LMS Scholar Points earned.", "check", "text-emerald-400 bg-emerald-500/20");
+        }
+
+        function triggerNotification() {
+            showNotification("MZ Portal Announcements", "No new notifications. Your next lab assignment is due Monday at 11:59 PM.", "bell", "text-amber-400 bg-amber-500/20");
+        }
+
+        function showNotification(title, message, iconType, iconClass) {
+            const notif = document.getElementById('customNotification');
+            document.getElementById('notifTitle').innerText = title;
+            document.getElementById('notifMessage').innerText = message;
+            document.getElementById('notifIcon').className = `w-9 h-9 rounded-xl flex items-center justify-center shrink-0 border border-slate-700 ${iconClass}`;
+            
+            notif.classList.remove('translate-y-20', 'opacity-0');
+            setTimeout(() => {
+                notif.classList.add('translate-y-20', 'opacity-0');
+            }, 3500);
+        }
+    </script>
+</body>
+</html>

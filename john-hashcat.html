@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>John the Ripper & Hashcat - Password Cracking Toolkit</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --kali-bg: #1e1e1e;
+            --kali-sidebar: #121212;
+            --kali-topbar: #181818;
+            --kali-card: #252526;
+            --kali-border: #333333;
+            --hash-purple: #a855f7;
+            --kali-blue: #00f2fe;
+            --kali-green: #10b981;
+            --kali-text: #f1f5f9;
+            --kali-muted: #888888;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        body {
+            background-color: var(--kali-bg);
+            color: var(--kali-text);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        .desktop-topbar {
+            background: var(--kali-topbar);
+            border-bottom: 1px solid var(--kali-border);
+            height: 36px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 15px;
+            font-size: 0.78rem;
+            color: var(--kali-muted);
+        }
+
+        .topbar-left, .topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .topbar-left span { color: #fff; font-weight: 600; }
+
+        .workspace {
+            display: flex;
+            flex: 1;
+            height: calc(100vh - 36px);
+        }
+
+        .kali-sidebar {
+            width: 240px;
+            background: var(--kali-sidebar);
+            border-right: 1px solid var(--kali-border);
+            padding: 15px 10px;
+            overflow-y: auto;
+        }
+
+        .sidebar-section-title {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            color: var(--kali-muted);
+            margin: 12px 0 6px 10px;
+            letter-spacing: 0.5px;
+        }
+
+        .sidebar-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 10px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            color: #ccc;
+            text-decoration: none;
+            transition: 0.2s;
+            cursor: pointer;
+        }
+
+        .sidebar-item:hover, .sidebar-item.active {
+            background: rgba(168, 85, 247, 0.15);
+            color: var(--hash-purple);
+        }
+
+        .sidebar-item i { width: 16px; text-align: center; }
+
+        .desktop-content {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .back-nav {
+            color: var(--kali-blue);
+            text-decoration: none;
+            font-size: 0.82rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .back-nav:hover { text-decoration: underline; }
+
+        .windows-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .kali-window {
+            background: var(--kali-card);
+            border: 1px solid var(--kali-border);
+            border-radius: 8px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+        }
+
+        .window-header {
+            background: #1c1c1c;
+            padding: 8px 12px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--kali-border);
+            font-size: 0.8rem;
+        }
+
+        .window-title {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: #fff;
+            font-weight: 600;
+        }
+
+        .window-controls { display: flex; gap: 6px; }
+        .ctrl-btn { width: 10px; height: 10px; border-radius: 50%; display: inline-block; }
+        .ctrl-close { background: #ef4444; }
+        .ctrl-min { background: #f59e0b; }
+        .ctrl-max { background: #10b981; }
+
+        .window-body {
+            padding: 15px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.78rem;
+            line-height: 1.5;
+            overflow-x: auto;
+            max-height: 320px;
+        }
+
+        .kali-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 5px;
+            font-size: 0.75rem;
+            font-family: -apple-system, sans-serif;
+        }
+
+        .kali-table th {
+            text-align: left;
+            color: var(--kali-muted);
+            border-bottom: 1px solid var(--kali-border);
+            padding-bottom: 6px;
+        }
+
+        .kali-table td {
+            padding: 6px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.03);
+        }
+
+        .badge-cracked { background: rgba(16, 185, 129, 0.2); color: var(--kali-green); padding: 2px 6px; border-radius: 4px; font-weight: bold; }
+
+        .bottom-action-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--kali-card);
+            border: 1px solid var(--kali-border);
+            padding: 15px 20px;
+            border-radius: 8px;
+        }
+
+        .btn-action {
+            background: var(--hash-purple);
+            color: #fff;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-weight: 700;
+            cursor: pointer;
+            font-size: 0.82rem;
+            transition: 0.2s;
+        }
+        .btn-action:hover { box-shadow: 0 0 10px rgba(168, 85, 247, 0.5); }
+    </style>
+</head>
+<body>
+
+    <div class="desktop-topbar">
+        <div class="topbar-left">
+            <span><i class="fa-brands fa-linux"></i> Kali Linux - Hash Cracker</span>
+            <span>John</span>
+            <span>Hashcat</span>
+            <span>Wordlists</span>
+        </div>
+        <div class="topbar-right">
+            <span><i class="fa-solid fa-microchip"></i> GPU: RTX Active</span>
+            <span>Sun 10:55</span>
+        </div>
+    </div>
+
+    <div class="workspace">
+        <div class="kali-sidebar">
+            <div class="sidebar-section-title">Password Audit</div>
+            <a href="#" class="sidebar-item active"><i class="fa-solid fa-key" style="color:var(--hash-purple)"></i> John the Ripper</a>
+            <a href="#" class="sidebar-item"><i class="fa-solid fa-hashtag" style="color:var(--kali-blue)"></i> Hashcat GPU Attack</a>
+            <a href="#" class="sidebar-item"><i class="fa-solid fa-file-lines"></i> Rockyou Wordlist</a>
+
+            <div class="sidebar-section-title">Quick Navigation</div>
+            <a href="nmap-wireshark.html" class="sidebar-item"><i class="fa-solid fa-network-wired"></i> Nmap & Wireshark</a>
+            <a href="metasploit.html" class="sidebar-item"><i class="fa-solid fa-skull"></i> Metasploit</a>
+            <a href="ethical-hacking.html" class="sidebar-item"><i class="fa-solid fa-arrow-left"></i> Dashboard</a>
+        </div>
+
+        <div class="desktop-content">
+            <a href="ethical-hacking.html" class="back-nav"><i class="fa-solid fa-arrow-left"></i> Back to Dashboard</a>
+
+            <div style="font-size: 1.2rem; font-weight: 700; color: #fff;">John the Ripper & Hashcat - Advanced Password Hash Auditing & Cracking</div>
+
+            <div class="windows-grid">
+                <!-- John the Ripper Terminal Window -->
+                <div class="kali-window">
+                    <div class="window-header">
+                        <div class="window-title"><i class="fa-solid fa-terminal" style="color:var(--hash-purple)"></i> John the Ripper - Hash Auditing</div>
+                        <div class="window-controls"><span class="ctrl-btn ctrl-close"></span><span class="ctrl-btn ctrl-min"></span><span class="ctrl-btn ctrl-max"></span></div>
+                    </div>
+                    <div class="window-body" id="john-stream" style="color: #d8b4fe;">
+                        kali@kali:~$ john --wordlist=/usr/share/wordlists/rockyou.txt hashes.txt<br>
+                        Using default input encoding: UTF-8<br>
+                        Loaded 15 password hashes with no different salts<br>
+                        Press 'q' or Ctrl-C to abort, almost any other key for status<br>
+                        <span style="color:var(--kali-green)">admin123         (?!)</span><br>
+                        <span style="color:var(--kali-green)">secret99         (?!)</span><br>
+                        <span style="color:#f59e0b">[*] 2g 0:00:03:12 DONE (2026-09-19) 0.1065g/s 5231K p/s</span>
+                    </div>
+                </div>
+
+                <!-- Hashcat Results Window -->
+                <div class="kali-window">
+                    <div class="window-header">
+                        <div class="window-title"><i class="fa-solid fa-list-check" style="color:var(--kali-blue)"></i> Hashcat GPU Cracked Hashes</div>
+                        <div class="window-controls"><span class="ctrl-btn ctrl-close"></span><span class="ctrl-btn ctrl-min"></span><span class="ctrl-btn ctrl-max"></span></div>
+                    </div>
+                    <div class="window-body" style="font-family: -apple-system, sans-serif;">
+                        <table class="kali-table">
+                            <thead>
+                                <tr><th>Hash Type</th><th>Username</th><th>Cracked Password</th><th>Status</th></tr>
+                            </thead>
+                            <tbody id="hashcat-table-body">
+                                <tr><td>MD5</td><td>root</td><td>password123</td><td><span class="badge-cracked">Cracked</span></td></tr>
+                                <tr><td>SHA-256</td><td>sysadmin</td><td>welcome@1</td><td><span class="badge-cracked">Cracked</span></td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bottom-action-bar">
+                <div>
+                    <strong style="font-size: 0.85rem; color:#fff; display:block;">Cracking Status: Running Brute-Force & Dictionary Attack</strong>
+                    <span style="font-size: 0.75rem; color: var(--kali-muted);">Hashes Processed: 45,210/50,000 | Speed: 14.2 KH/s</span>
+                </div>
+                <button class="btn-action" onclick="alert('Exporting fully cracked passwords and audit report...')">Export Cracked Hashes <i class="fa-solid fa-download"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Live simulation for hashcracking updates
+        const hashTable = document.getElementById('hashcat-table-body');
+        let crackCount = 2;
+
+        setInterval(() => {
+            crackCount++;
+            const newRow = document.createElement('tr');
+            const types = ['NTLM', 'SHA-1', 'Bcrypt', 'WPA/WPA2'];
+            const users = ['db_user', 'manager', 'guest', 'network_admin'];
+            const passwords = ['letmein1', 'qwerty1234', 'monkey22', 'sunshine!'];
+            
+            const randType = types[Math.floor(Math.random() * types.length)];
+            const randUser = users[Math.floor(Math.random() * users.length)];
+            const randPass = passwords[Math.floor(Math.random() * passwords.length)];
+
+            newRow.innerHTML = `<td>${randType}</td><td>${randUser}</td><td>${randPass}</td><td><span class="badge-cracked">Cracked</span></td>`;
+            
+            if(hashTable) {
+                hashTable.appendChild(newRow);
+                if(hashTable.rows.length > 4) {
+                    hashTable.deleteRow(0);
+                }
+            }
+
+            const counterBar = document.querySelector('.bottom-action-bar span');
+            if(counterBar) {
+                counterBar.innerText = `Hashes Processed: ${45210 + crackCount * 150}/50,000 | Speed: 15.4 KH/s`;
+            }
+        }, 3500);
+    </script>
+</body>
+</html>

@@ -1,0 +1,1039 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MZ Security & Phishing Prevention Hub - MZ Shield</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        cyber: {
+                            dark: '#030712',
+                            panel: '#0B1329',
+                            card: '#111C38',
+                            cyan: '#00F0FF',
+                            purple: '#7000FF',
+                            pink: '#FF007A',
+                            emerald: '#00FF9D',
+                            alert: '#FF3366'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+            background-color: #030712;
+            color: #F3F4F6;
+            overflow-x: hidden;
+        }
+
+        /* Glassmorphism Design Tokens */
+        .glass-panel {
+            background: rgba(11, 19, 41, 0.75);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(0, 240, 255, 0.15);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+        }
+
+        .glass-card {
+            background: rgba(17, 28, 56, 0.65);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(112, 0, 255, 0.2);
+        }
+
+        .cyber-glow {
+            box-shadow: 0 0 25px -5px rgba(0, 240, 255, 0.3);
+        }
+
+        .alert-glow {
+            box-shadow: 0 0 25px -5px rgba(255, 51, 102, 0.4);
+        }
+
+        /* Radar Scanning Line Animation */
+        @keyframes radar-sweep {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .radar-sweep-line {
+            animation: radar-sweep 4s linear infinite;
+            transform-origin: center center;
+        }
+
+        /* Pulsing Threat Marker */
+        @keyframes threat-pulse {
+            0% { transform: scale(0.8); opacity: 1; }
+            50% { transform: scale(1.6); opacity: 0.3; }
+            100% { transform: scale(0.8); opacity: 1; }
+        }
+        .threat-ping {
+            animation: threat-pulse 1.8s ease-in-out infinite;
+        }
+
+        /* Scanline Overlay Effect */
+        .scanline {
+            background: linear-gradient(
+                to bottom,
+                rgba(255,255,255,0),
+                rgba(255,255,255,0) 50%,
+                rgba(0, 240, 255, 0.05) 50%,
+                rgba(0, 240, 255, 0.05)
+            );
+            background-size: 100% 4px;
+        }
+
+        /* Audio visualizer flash */
+        .cyber-flash {
+            box-shadow: 0 0 20px #00F0FF !important;
+            border-color: #00F0FF !important;
+            transition: all 0.05s ease-out;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 5px;
+            height: 5px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #030712;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #111C38;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #00F0FF;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col bg-cyber-dark text-slate-100 scanline">
+
+    <!-- Top Security Navigation Bar -->
+    <header class="sticky top-0 z-50 w-full glass-panel border-b border-cyber-cyan/20 px-4 lg:px-8 py-3">
+        <div class="max-w-7xl mx-auto flex items-center justify-between">
+            
+            <!-- MZ Brand Logo & Title -->
+            <div class="flex items-center space-x-4">
+                <div class="relative group cursor-pointer">
+                    <div class="absolute -inset-0.5 bg-gradient-to-r from-cyber-cyan via-cyber-purple to-cyber-pink rounded-xl blur opacity-75 group-hover:opacity-100 transition duration-300"></div>
+                    <div class="relative bg-cyber-dark px-3.5 py-1.5 rounded-xl flex items-center space-x-2.5 border border-cyber-cyan/30">
+                        <span class="text-2xl font-black tracking-widest bg-gradient-to-r from-cyber-cyan to-cyber-purple bg-clip-text text-transparent">MZ</span>
+                        <div class="h-4 w-[1px] bg-cyber-cyan/30"></div>
+                        <span class="text-xs font-mono tracking-wider font-bold text-cyber-cyan flex items-center gap-1">
+                            <i class="fa-solid fa-shield-halved text-cyber-emerald"></i> MZ SHIELD
+                        </span>
+                    </div>
+                </div>
+
+                <div class="hidden md:block">
+                    <h1 class="text-base font-extrabold text-white tracking-wide flex items-center gap-2">
+                        MZ Security & Phishing Prevention Hub
+                        <span class="text-[10px] bg-cyber-purple/30 border border-cyber-purple/50 text-cyber-cyan px-2 py-0.5 rounded-full font-mono">v4.2 NEURAL</span>
+                    </h1>
+                    <p class="text-xs text-slate-400">Autonomous threat detection & live email defense engine</p>
+                </div>
+            </div>
+
+            <!-- Header Controls & Cyber Stats -->
+            <div class="flex items-center space-x-3">
+                <!-- Sound Synthesizer Audio Toggle -->
+                <button id="audioToggleBtn" onclick="toggleCyberAudio()" title="Toggle Cyber Telemetry Audio Effects" 
+                    class="flex items-center gap-2 bg-cyber-card hover:bg-slate-800 border border-slate-700/80 text-slate-300 hover:text-white text-xs px-3 py-1.5 rounded-xl font-medium transition-all">
+                    <i id="audioIcon" class="fa-solid fa-volume-xmark text-cyber-pink"></i>
+                    <span id="audioStatusText" class="hidden sm:inline">Audio: Muted</span>
+                </button>
+
+                <!-- Defense Shield Status indicator -->
+                <div class="flex items-center gap-2 bg-cyber-emerald/10 border border-cyber-emerald/30 text-cyber-emerald text-xs px-3 py-1.5 rounded-xl font-mono">
+                    <span class="w-2 h-2 rounded-full bg-cyber-emerald threat-ping"></span>
+                    <span class="hidden sm:inline">MZ Shield Active</span>
+                </div>
+
+                <!-- Run Quick Security Scan Button -->
+                <button onclick="triggerQuickSecurityScan()" class="bg-gradient-to-r from-cyber-cyan to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-cyber-dark font-black text-xs px-4 py-2 rounded-xl shadow-lg shadow-cyber-cyan/20 transition-all transform hover:scale-105 flex items-center gap-2">
+                    <i class="fa-solid fa-radar"></i>
+                    <span>Scan System</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Workspace Container -->
+       <!-- Aapka keylogger wala sara content yahan aayega -->
+    </div>
+</main>
+        <!-- Top Metrics Overview Bar -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div class="glass-card p-4 rounded-2xl border-l-4 border-l-cyber-cyan relative overflow-hidden">
+                <div class="flex items-center justify-between">
+                    <span class="text-xs text-slate-400 font-mono">Threats Intercepted</span>
+                    <i class="fa-solid fa-shield-virus text-cyber-cyan"></i>
+                </div>
+                <div class="text-2xl font-black text-white mt-2 font-mono" id="statThreatsBlocked">1,482,904</div>
+                <span class="text-[10px] text-cyber-emerald mt-1 block flex items-center gap-1">
+                    <i class="fa-solid fa-arrow-trend-up"></i> +142 threats/sec
+                </span>
+            </div>
+
+            <div class="glass-card p-4 rounded-2xl border-l-4 border-l-cyber-purple relative overflow-hidden">
+                <div class="flex items-center justify-between">
+                    <span class="text-xs text-slate-400 font-mono">Phishing Link Accuracy</span>
+                    <i class="fa-solid fa-bullseye text-cyber-purple"></i>
+                </div>
+                <div class="text-2xl font-black text-white mt-2 font-mono">99.98%</div>
+                <span class="text-[10px] text-cyber-cyan mt-1 block">Neural Model v4.2</span>
+            </div>
+
+            <div class="glass-card p-4 rounded-2xl border-l-4 border-l-cyber-pink relative overflow-hidden">
+                <div class="flex items-center justify-between">
+                    <span class="text-xs text-slate-400 font-mono">Zero-Day Spoofs Blocked</span>
+                    <i class="fa-solid fa-bug-slash text-cyber-pink"></i>
+                </div>
+                <div class="text-2xl font-black text-white mt-2 font-mono" id="statZeroDay">3,892</div>
+                <span class="text-[10px] text-cyber-pink mt-1 block font-mono">Live Defense Sync</span>
+            </div>
+
+            <div class="glass-card p-4 rounded-2xl border-l-4 border-l-cyber-emerald relative overflow-hidden">
+                <div class="flex items-center justify-between">
+                    <span class="text-xs text-slate-400 font-mono">MZ Defense Latency</span>
+                    <i class="fa-solid fa-bolt text-cyber-emerald"></i>
+                </div>
+                <div class="text-2xl font-black text-white mt-2 font-mono">0.8 ms</div>
+                <span class="text-[10px] text-cyber-emerald mt-1 block">Ultra-low Latency Neural Edge</span>
+            </div>
+        </div>
+
+        <!-- ================= SECTION 1: LIVE CANVAS NETWORK DEFENSE VISUALIZER ================= -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div class="lg:col-span-2 glass-panel p-5 rounded-3xl border border-cyber-cyan/20 relative flex flex-col">
+                <div class="flex items-center justify-between mb-4">
+                    <div class="flex items-center space-x-3">
+                        <div class="p-2.5 rounded-xl bg-cyber-cyan/10 border border-cyber-cyan/30 text-cyber-cyan">
+                            <i class="fa-solid fa-network-wired text-lg"></i>
+                        </div>
+                        <div>
+                            <h2 class="font-bold text-white text-base flex items-center gap-2">
+                                MZ Autonomous Threat Neural Network
+                                <span class="w-2 h-2 rounded-full bg-cyber-cyan threat-ping"></span>
+                            </h2>
+                            <p class="text-xs text-slate-400">Live AI shield neutralizing incoming phishing vectors in real-time</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center space-x-2 text-xs font-mono">
+                        <span class="bg-cyber-dark/80 border border-cyber-cyan/30 text-cyber-cyan px-2.5 py-1 rounded-lg">
+                            Nodes: <span id="nodeCount">45</span>
+                        </span>
+                        <span class="bg-cyber-dark/80 border border-cyber-pink/30 text-cyber-pink px-2.5 py-1 rounded-lg">
+                            Interceptions: <span id="interceptionCount">0</span>
+                        </span>
+                    </div>
+                </div>
+
+                <!-- Interactive Particle Canvas -->
+                <div class="relative w-full h-80 rounded-2xl overflow-hidden border border-slate-800 bg-cyber-dark/90">
+                    <canvas id="cyberCanvas" class="w-full h-full cursor-crosshair"></canvas>
+                    
+                    <!-- Canvas HUD Overlay -->
+                    <div class="absolute bottom-3 left-3 bg-cyber-dark/80 border border-slate-800 p-2.5 rounded-xl text-[11px] font-mono text-slate-300 flex items-center gap-3 pointer-events-none">
+                        <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-cyber-cyan inline-block"></span> Safe AI Node</span>
+                        <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-cyber-pink inline-block"></span> Phishing Threat Vector</span>
+                        <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-cyber-emerald inline-block"></span> MZ Neutralizing Shield</span>
+                    </div>
+
+                    <div class="absolute top-3 right-3 text-right pointer-events-none">
+                        <span class="text-[10px] font-mono text-cyber-cyan bg-cyber-dark/80 border border-cyber-cyan/20 px-2 py-1 rounded">Click canvas to trigger localized AI EMP burst</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ================= RADAR / THREAT MAP PANEL ================= -->
+            <div class="glass-panel p-5 rounded-3xl border border-cyber-cyan/20 flex flex-col justify-between">
+                <div>
+                    <div class="flex items-center justify-between mb-3">
+                        <h3 class="font-bold text-white text-base flex items-center gap-2">
+                            <i class="fa-solid fa-radar text-cyber-cyan"></i>
+                            Global Phishing Radar
+                        </h3>
+                        <span class="text-[10px] font-mono text-cyber-emerald bg-cyber-emerald/10 border border-cyber-emerald/30 px-2 py-0.5 rounded">Scanning 24/7</span>
+                    </div>
+                    <p class="text-xs text-slate-400 mb-4">Targeted phishing campaigns detected across global routing nodes</p>
+
+                    <!-- Animated Radar Widget -->
+                    <div class="relative w-48 h-48 mx-auto my-2 rounded-full border-2 border-cyber-cyan/30 bg-cyber-dark/90 flex items-center justify-center overflow-hidden shadow-inner shadow-cyber-cyan/20">
+                        <!-- Concentric Radar Rings -->
+                        <div class="absolute inset-4 rounded-full border border-cyber-cyan/20"></div>
+                        <div class="absolute inset-12 rounded-full border border-cyber-cyan/20"></div>
+                        <div class="absolute inset-20 rounded-full border border-cyber-cyan/20"></div>
+                        
+                        <!-- Axis Lines -->
+                        <div class="absolute w-full h-[1px] bg-cyber-cyan/20"></div>
+                        <div class="absolute h-full w-[1px] bg-cyber-cyan/20"></div>
+
+                        <!-- Sweep Line -->
+                        <div class="absolute inset-0 radar-sweep-line">
+                            <div class="w-1/2 h-1/2 bg-gradient-to-br from-cyber-cyan/40 to-transparent origin-bottom-right rounded-tl-full"></div>
+                        </div>
+
+                        <!-- Dynamic Radar Threat Pings -->
+                        <div id="radarPing1" class="absolute top-10 left-12 w-2 h-2 bg-cyber-pink rounded-full threat-ping"></div>
+                        <div id="radarPing2" class="absolute bottom-12 right-14 w-2 h-2 bg-cyber-pink rounded-full threat-ping"></div>
+                        <div id="radarPing3" class="absolute top-16 right-10 w-2 h-2 bg-cyber-cyan rounded-full threat-ping"></div>
+
+                        <!-- Center MZ Core -->
+                        <div class="relative z-10 w-6 h-6 rounded-full bg-cyber-cyan border-2 border-white flex items-center justify-center shadow-lg shadow-cyber-cyan/50">
+                            <span class="text-[9px] font-black text-cyber-dark">MZ</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Live Attack Feed Carousel -->
+                <div class="mt-4 pt-3 border-t border-slate-800">
+                    <div class="flex items-center justify-between text-xs mb-2">
+                        <span class="font-mono text-slate-400 text-[11px]">Latest Interception</span>
+                        <span class="text-cyber-pink font-mono text-[10px]" id="liveAttackTime">Just now</span>
+                    </div>
+                    <div id="radarAlertBox" class="p-3 bg-cyber-pink/10 border border-cyber-pink/30 rounded-xl text-xs transition-all">
+                        <div class="flex items-center justify-between font-semibold text-cyber-pink">
+                            <span>Spoofed Office365 Login</span>
+                            <span class="text-[10px] bg-cyber-pink/20 px-1.5 py-0.5 rounded">BLOCKED</span>
+                        </div>
+                        <p class="text-slate-300 text-[11px] mt-1 font-mono text-ellipsis overflow-hidden whitespace-nowrap" id="radarAlertDomain">Origin IP: 185.220.101.45 (Spear Phishing)</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= SECTION 2: INTERACTIVE PHISHING EMAIL ANALYZER ================= -->
+        <div class="glass-panel p-6 rounded-3xl border border-cyber-cyan/20 space-y-5">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-800 pb-4">
+                <div>
+                    <h2 class="font-bold text-white text-lg flex items-center gap-2.5">
+                        <i class="fa-solid fa-envelope-open-text text-cyber-cyan"></i>
+                        Interactive MZ Phishing Email Analyzer
+                    </h2>
+                    <p class="text-xs text-slate-400 mt-0.5">Test suspected phishing emails, header spoofs, or suspicious links against MZ AI inspection engine</p>
+                </div>
+
+                <!-- Sample Presets -->
+                <div class="flex items-center space-x-2 text-xs">
+                    <span class="text-slate-400 hidden sm:inline">Load Preset Samples:</span>
+                    <button onclick="loadSampleEmail('phish')" class="bg-cyber-pink/10 hover:bg-cyber-pink/20 border border-cyber-pink/30 text-cyber-pink px-2.5 py-1.5 rounded-lg font-medium transition">
+                        Phishing Spoof
+                    </button>
+                    <button onclick="loadSampleEmail('spear')" class="bg-cyber-purple/10 hover:bg-cyber-purple/20 border border-cyber-purple/30 text-cyber-purple px-2.5 py-1.5 rounded-lg font-medium transition">
+                        Executive Urgent (CEO Scam)
+                    </button>
+                    <button onclick="loadSampleEmail('legit')" class="bg-cyber-emerald/10 hover:bg-cyber-emerald/20 border border-cyber-emerald/30 text-cyber-emerald px-2.5 py-1.5 rounded-lg font-medium transition">
+                        Legitimate Notice
+                    </button>
+                </div>
+            </div>
+
+            <!-- Email Input and Scanning Controls -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-mono text-slate-300 mb-1">Sender Address / Email Header</label>
+                        <input type="text" id="emailSenderInput" value="support-security@micros0ft-verify-acc.com" 
+                            class="w-full bg-cyber-dark/90 border border-slate-700/80 rounded-xl p-3 text-xs text-cyber-cyan font-mono focus:border-cyber-cyan focus:outline-none transition">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-mono text-slate-300 mb-1">Email Subject Line</label>
+                        <input type="text" id="emailSubjectInput" value="URGENT: Your account access will be suspended in 24 hours!" 
+                            class="w-full bg-cyber-dark/90 border border-slate-700/80 rounded-xl p-3 text-xs text-white focus:border-cyber-cyan focus:outline-none transition">
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-mono text-slate-300 mb-1">Email Content Body</label>
+                        <textarea id="emailBodyInput" rows="6" 
+                            class="w-full bg-cyber-dark/90 border border-slate-700/80 rounded-xl p-3 text-xs text-slate-200 focus:border-cyber-cyan focus:outline-none transition leading-relaxed font-sans">Dear User, We detected unauthorized login attempts on your account. To prevent immediate termination, click the secure link below to verify your password and update payment credentials immediately: http://login-micros0ft-portal-update.com/verify-now</textarea>
+                    </div>
+
+                    <button onclick="analyzeEmailWithAI()" id="analyzeBtn" class="w-full bg-gradient-to-r from-cyber-cyan via-blue-600 to-cyber-purple hover:opacity-90 text-cyber-dark font-black text-sm py-3 rounded-xl shadow-lg shadow-cyber-cyan/20 transition-all flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-microchip"></i>
+                        <span>Run Neural AI Phishing Deep Scan</span>
+                    </button>
+                </div>
+
+                <!-- AI Analysis Output Panel -->
+                <div class="glass-card p-5 rounded-2xl border border-slate-800 flex flex-col justify-between relative overflow-hidden" id="analysisResultCard">
+                    
+                    <!-- Scanning Progress Bar Overlay -->
+                    <div id="scanProgressBarContainer" class="hidden absolute inset-0 bg-cyber-dark/95 z-20 flex flex-col items-center justify-center p-6 space-y-4">
+                        <div class="w-16 h-16 rounded-full border-4 border-cyber-cyan/20 border-t-cyber-cyan animate-spin flex items-center justify-center">
+                            <i class="fa-solid fa-shield-halved text-cyber-cyan text-xl"></i>
+                        </div>
+                        <div class="text-center">
+                            <h4 class="text-white font-bold text-sm" id="scanStepText">Inspecting Domain & Typosquatting...</h4>
+                            <p class="text-xs text-slate-400 mt-1 font-mono">MZ Neural Engine evaluating 14 indicators</p>
+                        </div>
+                        <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden max-w-xs">
+                            <div id="scanProgressBar" class="bg-gradient-to-r from-cyber-cyan to-cyber-pink h-full w-0 transition-all duration-300"></div>
+                        </div>
+                    </div>
+
+                    <!-- Initial State / Scan Results Header -->
+                    <div>
+                        <div class="flex items-center justify-between border-b border-slate-800 pb-3 mb-4">
+                            <span class="text-xs font-mono text-slate-400">MZ AI Inspection Report</span>
+                            <span id="riskBadge" class="px-3 py-1 rounded-full text-xs font-mono font-bold bg-cyber-pink/20 text-cyber-pink border border-cyber-pink/40">
+                                HIGH RISK MALICIOUS
+                            </span>
+                        </div>
+
+                        <!-- Risk Meter Gauge -->
+                        <div class="space-y-2 mb-5">
+                            <div class="flex justify-between text-xs font-mono">
+                                <span class="text-slate-300">Phishing Risk Score:</span>
+                                <span class="text-cyber-pink font-bold" id="riskScoreVal">94 / 100</span>
+                            </div>
+                            <div class="w-full bg-slate-900 h-3 rounded-full overflow-hidden p-0.5 border border-slate-800">
+                                <div id="riskGaugeMeter" class="bg-gradient-to-r from-emerald-400 via-amber-400 to-cyber-pink h-full rounded-full transition-all duration-500" style="width: 94%;"></div>
+                            </div>
+                        </div>
+
+                        <!-- Detected Vector Highlights -->
+                        <div class="space-y-3" id="inspectionBreakdown">
+                            <h4 class="text-xs font-bold text-slate-300 font-mono uppercase tracking-wider">Detected Risk Factors:</h4>
+                            
+                            <div class="p-2.5 bg-cyber-pink/10 border border-cyber-pink/20 rounded-xl text-xs flex items-start gap-2.5">
+                                <i class="fa-solid fa-triangle-exclamation text-cyber-pink mt-0.5"></i>
+                                <div>
+                                    <span class="font-bold text-cyber-pink block">Typosquatting & Domain Spoofing</span>
+                                    <span class="text-slate-300 text-[11px]" id="factorDomain">Domain 'micros0ft-verify-acc.com' replaces 'o' with zero '0'.</span>
+                                </div>
+                            </div>
+
+                            <div class="p-2.5 bg-cyber-pink/10 border border-cyber-pink/20 rounded-xl text-xs flex items-start gap-2.5">
+                                <i class="fa-solid fa-clock-rotate-left text-cyber-pink mt-0.5"></i>
+                                <div>
+                                    <span class="font-bold text-cyber-pink block">Artificial Psychological Urgency</span>
+                                    <span class="text-slate-300 text-[11px]" id="factorUrgency">High pressure trigger language: "URGENT", "24 hours", "immediate termination".</span>
+                                </div>
+                            </div>
+
+                            <div class="p-2.5 bg-cyber-pink/10 border border-cyber-pink/20 rounded-xl text-xs flex items-start gap-2.5">
+                                <i class="fa-solid fa-link-slash text-cyber-pink mt-0.5"></i>
+                                <div>
+                                    <span class="font-bold text-cyber-pink block">Unverified Credential Harvesting URL</span>
+                                    <span class="text-slate-300 text-[11px]" id="factorLink">Link redirects to non-standard HTTP external login form.</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- AI Recommended Action -->
+                    <div class="mt-4 pt-3 border-t border-slate-800 flex items-center justify-between">
+                        <div class="text-xs">
+                            <span class="text-slate-400 block text-[10px]">AI Action Recommendation:</span>
+                            <span class="font-bold text-white font-mono" id="aiActionText">Quarantine Email & Block Sender IP</span>
+                        </div>
+                        <button onclick="simulateQuarantine()" class="bg-cyber-pink hover:bg-rose-600 text-white font-bold text-xs px-3.5 py-2 rounded-xl transition shadow-md shadow-cyber-pink/20">
+                            Apply Quarantine
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= SECTION 3: REAL-TIME THREAT LOGS & LIVE TELEMETRY ================= -->
+        <div class="glass-panel p-6 rounded-3xl border border-cyber-cyan/20 space-y-4">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div>
+                    <h3 class="font-bold text-white text-base flex items-center gap-2">
+                        <i class="fa-solid fa-list-check text-cyber-cyan"></i>
+                        Real-Time Intercepted Attack Roster
+                    </h3>
+                    <p class="text-xs text-slate-400">Live stream of phishing attempts deflected by MZ Shield across enterprise vectors</p>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <input type="text" id="tableSearchInput" onkeyup="filterAttackTable()" placeholder="Search domain, vector, location..." 
+                        class="bg-cyber-dark border border-slate-700/80 rounded-xl px-3 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-cyber-cyan">
+                </div>
+            </div>
+
+            <div class="overflow-x-auto rounded-2xl border border-slate-800">
+                <table class="w-full text-left text-xs text-slate-300">
+                    <thead class="bg-cyber-dark/90 font-mono text-[11px] text-cyber-cyan uppercase border-b border-slate-800">
+                        <tr>
+                            <th class="p-3.5">Threat ID</th>
+                            <th class="p-3.5">Timestamp</th>
+                            <th class="p-3.5">Attack Vector</th>
+                            <th class="p-3.5">Target Department</th>
+                            <th class="p-3.5">Origin Node</th>
+                            <th class="p-3.5">Severity</th>
+                            <th class="p-3.5 text-right">Shield Status</th>
+                        </tr>
+                    </thead>
+                    <tbody id="attackLogTableBody" class="divide-y divide-slate-800/80 font-mono">
+                        <!-- Dynamic Content Generated by JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="glass-panel border-t border-slate-800 py-4 px-6 text-center text-xs text-slate-500 mt-10">
+        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
+            <div class="flex items-center space-x-2">
+                <span class="font-black text-cyber-cyan">MZ SHIELD AI</span>
+                <span>— Enterprise Cybersecurity & Phishing Defense Platform</span>
+            </div>
+            <p>© 2026 MZ Security Systems. Autonomous Neural Defense Protocol.</p>
+        </div>
+    </footer>
+
+    <script>
+        /* ==========================================================================
+           AUDIO SYNTHESIZER ENGINE (Web Audio API)
+           Synthesizes cyber beeps, alerts, and neutralizer chimes dynamically
+           ========================================================================== */
+        let audioCtx = null;
+        let isAudioMuted = true;
+
+        function initAudio() {
+            if (!audioCtx) {
+                const AudioClass = window.AudioContext || window.webkitAudioContext;
+                if (AudioClass) {
+                    audioCtx = new AudioClass();
+                }
+            }
+            if (audioCtx && audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }
+
+        function toggleCyberAudio() {
+            initAudio();
+            isAudioMuted = !isAudioMuted;
+            
+            const btn = document.getElementById('audioToggleBtn');
+            const icon = document.getElementById('audioIcon');
+            const text = document.getElementById('audioStatusText');
+
+            if (!isAudioMuted) {
+                icon.className = "fa-solid fa-volume-high text-cyber-cyan";
+                text.innerText = "Audio: Live";
+                btn.classList.add("border-cyber-cyan/50", "bg-cyber-cyan/10");
+                playCyberSound('chime');
+            } else {
+                icon.className = "fa-solid fa-volume-xmark text-cyber-pink";
+                text.innerText = "Audio: Muted";
+                btn.classList.remove("border-cyber-cyan/50", "bg-cyber-cyan/10");
+            }
+        }
+
+        function playCyberSound(type) {
+            if (isAudioMuted || !audioCtx) return;
+
+            try {
+                const now = audioCtx.currentTime;
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+
+                if (type === 'scan') {
+                    // Futuristic high-tech scan sweep
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(1200, now);
+                    osc.frequency.exponentialRampToValueAtTime(300, now + 0.15);
+
+                    gain.gain.setValueAtTime(0.12, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
+
+                    osc.start(now);
+                    osc.stop(now + 0.15);
+
+                } else if (type === 'alert') {
+                    // Threat alert synthesizer
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(440, now);
+                    osc.frequency.setValueAtTime(880, now + 0.1);
+
+                    gain.gain.setValueAtTime(0.15, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
+
+                    osc.start(now);
+                    osc.stop(now + 0.25);
+
+                } else if (type === 'chime') {
+                    // Successful Defense Neutralization Chime
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(523.25, now); // C5
+                    osc.frequency.setValueAtTime(659.25, now + 0.08); // E5
+                    osc.frequency.setValueAtTime(783.99, now + 0.16); // G5
+
+                    gain.gain.setValueAtTime(0.15, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+
+                    osc.start(now);
+                    osc.stop(now + 0.35);
+                }
+            } catch (err) {
+                console.error("Web Audio API error:", err);
+            }
+        }
+
+
+        /* ==========================================================================
+           LIVE PARTICLE THREAT CANVAS VISUALIZER
+           Renders nodes, incoming attack vectors, and MZ defense shield interactions
+           ========================================================================== */
+        const canvas = document.getElementById('cyberCanvas');
+        const ctx = canvas.getContext('2d');
+
+        let nodes = [];
+        let threats = [];
+        let shields = [];
+        let totalInterceptions = 0;
+
+        function resizeCanvas() {
+            if (!canvas.parentElement) return;
+            canvas.width = canvas.parentElement.clientWidth;
+            canvas.height = canvas.parentElement.clientHeight;
+        }
+
+        class Node {
+            constructor(x, y) {
+                this.x = x || Math.random() * canvas.width;
+                this.y = y || Math.random() * canvas.height;
+                this.vx = (Math.random() - 0.5) * 0.8;
+                this.vy = (Math.random() - 0.5) * 0.8;
+                this.radius = 3;
+            }
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+                if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
+                if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
+            }
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.fillStyle = '#00F0FF';
+                ctx.shadowBlur = 8;
+                ctx.shadowColor = '#00F0FF';
+                ctx.fill();
+                ctx.shadowBlur = 0;
+            }
+        }
+
+        class ThreatVector {
+            constructor() {
+                this.x = Math.random() < 0.5 ? 0 : canvas.width;
+                this.y = Math.random() * canvas.height;
+                const targetX = canvas.width / 2;
+                const targetY = canvas.height / 2;
+                const angle = Math.atan2(targetY - this.y, targetX - this.x);
+                this.speed = 1.5 + Math.random() * 1.5;
+                this.vx = Math.cos(angle) * this.speed;
+                this.vy = Math.sin(angle) * this.speed;
+                this.radius = 4;
+            }
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+            }
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.fillStyle = '#FF007A';
+                ctx.shadowBlur = 10;
+                ctx.shadowColor = '#FF007A';
+                ctx.fill();
+                ctx.shadowBlur = 0;
+            }
+        }
+
+        class ShieldPulse {
+            constructor(x, y) {
+                this.x = x;
+                this.y = y;
+                this.radius = 5;
+                this.maxRadius = 60;
+                this.opacity = 1;
+            }
+            update() {
+                this.radius += 2.5;
+                this.opacity -= 0.03;
+            }
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.strokeStyle = `rgba(0, 255, 157, ${Math.max(0, this.opacity)})`;
+                ctx.lineWidth = 2;
+                ctx.stroke();
+            }
+        }
+
+        function initCanvasNodes() {
+            nodes = [];
+            for (let i = 0; i < 40; i++) {
+                nodes.push(new Node());
+            }
+            document.getElementById('nodeCount').innerText = nodes.length;
+        }
+
+        function animateCanvas() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Connect nearby safe nodes
+            for (let i = 0; i < nodes.length; i++) {
+                nodes[i].update();
+                nodes[i].draw();
+
+                for (let j = i + 1; j < nodes.length; j++) {
+                    const dx = nodes[i].x - nodes[j].x;
+                    const dy = nodes[i].y - nodes[j].y;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+
+                    if (dist < 100) {
+                        ctx.beginPath();
+                        ctx.moveTo(nodes[i].x, nodes[i].y);
+                        ctx.lineTo(nodes[j].x, nodes[j].y);
+                        ctx.strokeStyle = `rgba(0, 240, 255, ${1 - dist / 100})`;
+                        ctx.lineWidth = 0.6;
+                        ctx.stroke();
+                    }
+                }
+            }
+
+            // Spawn threats randomly
+            if (Math.random() < 0.04) {
+                threats.push(new ThreatVector());
+            }
+
+            // Process threats and shield collisions
+            for (let i = threats.length - 1; i >= 0; i--) {
+                const t = threats[i];
+                t.update();
+                t.draw();
+
+                // Interception logic by nearest node
+                nodes.forEach(n => {
+                    const dx = n.x - t.x;
+                    const dy = n.y - t.y;
+                    const dist = Math.sqrt(dx * dx + dy * dy);
+
+                    if (dist < 35) {
+                        // Threat intercepted by MZ Shield
+                        shields.push(new ShieldPulse(t.x, t.y));
+                        threats.splice(i, 1);
+                        totalInterceptions++;
+                        document.getElementById('interceptionCount').innerText = totalInterceptions;
+                        playCyberSound('scan');
+                    }
+                });
+            }
+
+            // Draw active shield pulses
+            for (let i = shields.length - 1; i >= 0; i--) {
+                shields[i].update();
+                shields[i].draw();
+                if (shields[i].opacity <= 0) {
+                    shields.splice(i, 1);
+                }
+            }
+
+            requestAnimationFrame(animateCanvas);
+        }
+
+        // Canvas Click Burst
+        canvas.addEventListener('click', (e) => {
+            const rect = canvas.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            shields.push(new ShieldPulse(x, y));
+            playCyberSound('chime');
+        });
+
+
+        /* ==========================================================================
+           PHISHING EMAIL ANALYZER ENGINE
+           ========================================================================== */
+        const sampleEmails = {
+            phish: {
+                sender: "support-security@micros0ft-verify-acc.com",
+                subject: "URGENT: Your account access will be suspended in 24 hours!",
+                body: "Dear User, We detected unauthorized login attempts on your account. To prevent immediate termination, click the secure link below to verify your password and update payment credentials immediately: http://login-micros0ft-portal-update.com/verify-now"
+            },
+            spear: {
+                sender: "executive-ceo-office@company-corp-desk.net",
+                subject: "CONFIDENTIAL: Wire Transfer Request for M&A Acquisition",
+                body: "Hi Finance Team, I am currently in a closed-door meeting and cannot take calls. Please execute an urgent wire transfer of $48,500 to the attached vendor account immediately for project clearance. Keep this strictly confidential."
+            },
+            legit: {
+                sender: "security-noreply@microsoft.com",
+                subject: "Security code for your Microsoft account",
+                body: "Your single-use security code is: 849201. If you did not request this code, you can safely ignore this email. Someone else might have typed your email address by mistake."
+            }
+        };
+
+        function loadSampleEmail(type) {
+            const data = sampleEmails[type];
+            if (!data) return;
+
+            document.getElementById('emailSenderInput').value = data.sender;
+            document.getElementById('emailSubjectInput').value = data.subject;
+            document.getElementById('emailBodyInput').value = data.body;
+
+            analyzeEmailWithAI();
+        }
+
+        function analyzeEmailWithAI() {
+            initAudio();
+            playCyberSound('scan');
+
+            const overlay = document.getElementById('scanProgressBarContainer');
+            const bar = document.getElementById('scanProgressBar');
+            const stepText = document.getElementById('scanStepText');
+
+            overlay.classList.remove('hidden');
+            bar.style.width = '0%';
+
+            const steps = [
+                { percent: '25%', text: 'Inspecting Sender Domain & Typosquatting...' },
+                { percent: '50%', text: 'Parsing Suspicious Links & Redirects...' },
+                { percent: '75%', text: 'Analyzing Psychological Urgency & NLP Sentiment...' },
+                { percent: '100%', text: 'Generating AI Mitigation Protocol...' }
+            ];
+
+            let stepIdx = 0;
+            const interval = setInterval(() => {
+                if (stepIdx < steps.length) {
+                    bar.style.width = steps[stepIdx].percent;
+                    stepText.innerText = steps[stepIdx].text;
+                    playCyberSound('scan');
+                    stepIdx++;
+                } else {
+                    clearInterval(interval);
+                    setTimeout(() => {
+                        overlay.classList.add('hidden');
+                        renderAnalysisResults();
+                    }, 300);
+                }
+            }, 250);
+        }
+
+        function renderAnalysisResults() {
+            const sender = document.getElementById('emailSenderInput').value.toLowerCase();
+            const subject = document.getElementById('emailSubjectInput').value.toLowerCase();
+            const body = document.getElementById('emailBodyInput').value.toLowerCase();
+
+            let score = 15; // default base safe
+            let riskLevel = "SAFE / CLEAN";
+            let riskClass = "bg-cyber-emerald/20 text-cyber-emerald border-cyber-emerald/40";
+            let barColor = "from-emerald-400 to-cyan-400";
+
+            let factorDomText = "Sender domain passes DKIM / SPF verification.";
+            let factorUrgText = "Normal language pattern; no artificial urgency detected.";
+            let factorLinkText = "No malicious external URL redirects found.";
+            let actionText = "Allow Email to Inbox";
+
+            // Threat checks
+            const hasSuspiciousDomain = sender.includes('0') || sender.includes('micros0ft') || sender.includes('.net') || sender.includes('-verify');
+            const hasUrgency = subject.includes('urgent') || subject.includes('suspended') || body.includes('confidential') || body.includes('wire transfer') || body.includes('immediately');
+            const hasBadLink = body.includes('http://') || body.includes('.com/verify') || body.includes('login-');
+
+            if (hasSuspiciousDomain) score += 35;
+            if (hasUrgency) score += 25;
+            if (hasBadLink) score += 25;
+
+            score = Math.min(score, 98);
+
+            if (score > 70) {
+                riskLevel = "HIGH RISK MALICIOUS";
+                riskClass = "bg-cyber-pink/20 text-cyber-pink border-cyber-pink/40";
+                barColor = "from-amber-400 to-cyber-pink";
+                actionText = "Quarantine Email & Block Sender IP";
+                playCyberSound('alert');
+            } else if (score > 40) {
+                riskLevel = "SUSPICIOUS / WARNING";
+                riskClass = "bg-amber-500/20 text-amber-400 border-amber-500/40";
+                barColor = "from-emerald-400 to-amber-400";
+                actionText = "Flag with Warning Banner";
+            } else {
+                playCyberSound('chime');
+            }
+
+            if (hasSuspiciousDomain) {
+                factorDomText = `Domain '${sender}' uses subversion techniques or typosquatting.`;
+            }
+            if (hasUrgency) {
+                factorUrgText = `Artificial panic language detected: High urgency keywords found.`;
+            }
+            if (hasBadLink) {
+                factorLinkText = `Unencrypted HTTP external authentication link detected in body.`;
+            }
+
+            // Update UI
+            document.getElementById('riskScoreVal').innerText = `${score} / 100`;
+            const riskBadge = document.getElementById('riskBadge');
+            riskBadge.innerText = riskLevel;
+            riskBadge.className = `px-3 py-1 rounded-full text-xs font-mono font-bold border ${riskClass}`;
+
+            const gauge = document.getElementById('riskGaugeMeter');
+            gauge.style.width = `${score}%`;
+            gauge.className = `bg-gradient-to-r ${barColor} h-full rounded-full transition-all duration-500`;
+
+            document.getElementById('factorDomain').innerText = factorDomText;
+            document.getElementById('factorUrgency').innerText = factorUrgText;
+            document.getElementById('factorLink').innerText = factorLinkText;
+            document.getElementById('aiActionText').innerText = actionText;
+        }
+
+        function simulateQuarantine() {
+            playCyberSound('chime');
+            const card = document.getElementById('analysisResultCard');
+            card.classList.add('cyber-flash');
+            setTimeout(() => card.classList.remove('cyber-flash'), 300);
+            
+            // Add to attack roster
+            addAttackToRoster("MZ-PHISH-" + Math.floor(1000 + Math.random() * 9000), "Credential Harvesting", "Finance & HR", document.getElementById('emailSenderInput').value, "CRITICAL");
+        }
+
+
+        /* ==========================================================================
+           REAL-TIME ATTACK LOG ROSTER & RADAR DATA
+           ========================================================================== */
+        let attackLogs = [
+            { id: 'MZ-9081', time: '10:44:02', vector: 'Spear Phishing Spoof', target: 'Executive / CEO Desk', origin: '185.220.101.45 (Russia)', severity: 'CRITICAL', status: 'QUARANTINED' },
+            { id: 'MZ-9080', time: '10:43:45', vector: 'Fake Office365 OAuth', target: 'IT Support', origin: '103.251.167.22 (Vietnam)', severity: 'HIGH', status: 'BLOCKED' },
+            { id: 'MZ-9079', time: '10:42:12', vector: 'Typosquat Domain URL', target: 'Accounting', origin: '45.154.255.88 (Netherlands)', severity: 'HIGH', status: 'BLOCKED' },
+            { id: 'MZ-9078', time: '10:40:08', vector: 'Malicious Invoice PDF', target: 'Procurement', origin: '194.26.29.112 (Bulgaria)', severity: 'MEDIUM', status: 'DEFLECTED' }
+        ];
+
+        function renderAttackTable() {
+            const body = document.getElementById('attackLogTableBody');
+            body.innerHTML = '';
+
+            attackLogs.forEach(log => {
+                let sevBadge = 'text-amber-400 bg-amber-500/10 border-amber-500/30';
+                if (log.severity === 'CRITICAL') sevBadge = 'text-cyber-pink bg-cyber-pink/10 border-cyber-pink/30';
+                if (log.severity === 'MEDIUM') sevBadge = 'text-cyber-cyan bg-cyber-cyan/10 border-cyber-cyan/30';
+
+                const row = `
+                    <tr class="hover:bg-cyber-card/60 transition">
+                        <td class="p-3.5 text-cyber-cyan font-bold">${log.id}</td>
+                        <td class="p-3.5 text-slate-400">${log.time}</td>
+                        <td class="p-3.5 text-white">${log.vector}</td>
+                        <td class="p-3.5 text-slate-300">${log.target}</td>
+                        <td class="p-3.5 text-slate-400">${log.origin}</td>
+                        <td class="p-3.5">
+                            <span class="px-2 py-0.5 rounded border text-[10px] font-bold ${sevBadge}">${log.severity}</span>
+                        </td>
+                        <td class="p-3.5 text-right">
+                            <span class="text-cyber-emerald font-bold flex items-center justify-end gap-1">
+                                <i class="fa-solid fa-shield-check text-xs"></i> ${log.status}
+                            </span>
+                        </td>
+                    </tr>
+                `;
+                body.innerHTML += row;
+            });
+        }
+
+        function addAttackToRoster(id, vector, target, origin, severity) {
+            const now = new Date().toTimeString().split(' ')[0];
+            attackLogs.unshift({
+                id: id,
+                time: now,
+                vector: vector,
+                target: target,
+                origin: origin,
+                severity: severity,
+                status: 'NEUTRALIZED'
+            });
+            if (attackLogs.length > 8) attackLogs.pop();
+            renderAttackTable();
+        }
+
+        function filterAttackTable() {
+            const query = document.getElementById('tableSearchInput').value.toLowerCase();
+            const rows = document.querySelectorAll('#attackLogTableBody tr');
+            
+            rows.forEach((row, idx) => {
+                const log = attackLogs[idx];
+                if (!log) return;
+                const match = log.vector.toLowerCase().includes(query) || 
+                              log.origin.toLowerCase().includes(query) || 
+                              log.target.toLowerCase().includes(query) ||
+                              log.id.toLowerCase().includes(query);
+                row.style.display = match ? '' : 'none';
+            });
+        }
+
+        function triggerQuickSecurityScan() {
+            initAudio();
+            playCyberSound('scan');
+            
+            // Increment intercepted counter visually
+            const stat = document.getElementById('statThreatsBlocked');
+            let current = parseInt(stat.innerText.replace(/,/g, ''));
+            stat.innerText = (current + 14).toLocaleString();
+
+            // Spawn visual shield wave on canvas
+            shields.push(new ShieldPulse(canvas.width / 2, canvas.height / 2));
+            playCyberSound('chime');
+        }
+
+        // Periodic background telemetry ticker
+        function startBackgroundTicker() {
+            setInterval(() => {
+                const stat = document.getElementById('statThreatsBlocked');
+                let current = parseInt(stat.innerText.replace(/,/g, ''));
+                stat.innerText = (current + Math.floor(1 + Math.random() * 3)).toLocaleString();
+            }, 1200);
+
+            // Random radar alerts
+            const fakeAttacks = [
+                "Spear Phishing: CEO Credentials Spoof",
+                "Fake DHL Delivery Attachment Malspam",
+                "Subdomain Hijack: auth-portal-login.com",
+                "Crypto Wallet Phishing Link"
+            ];
+            setInterval(() => {
+                const randAttack = fakeAttacks[Math.floor(Math.random() * fakeAttacks.length)];
+                document.getElementById('radarAlertDomain').innerText = `Origin IP: ${Math.floor(Math.random()*200)}.${Math.floor(Math.random()*250)}.42.1 (Neutralized)`;
+                document.getElementById('liveAttackTime').innerText = "Just now";
+            }, 6000);
+        }
+
+        // Window Initialization
+        window.onload = function() {
+            resizeCanvas();
+            initCanvasNodes();
+            animateCanvas();
+            renderAttackTable();
+            startBackgroundTicker();
+
+            window.addEventListener('resize', () => {
+                resizeCanvas();
+                initCanvasNodes();
+            });
+
+            // Unlock audio context on user tap
+            document.body.addEventListener('click', () => {
+                initAudio();
+            }, { once: true });
+        };
+    </script>
+</body>
+</html>
