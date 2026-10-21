@@ -711,14 +711,14 @@ function sendToWhatsApp(event) {
                 body: JSON.stringify({ message: text })
             });
 
-            const data = await response.json();
-            if (data.success) {
-                botMsg.innerText = data.reply;
-                // Yahan saaf awaz wala function call ho raha hai
-                speakResponse(data.reply);
-            } else {
-                botMsg.innerText = "Error: " + data.error;
-            }
+           if (data && data.reply) {
+    botMsg.innerText = data.reply;
+    speakResponse(data.reply);
+} else if (data && data.error) {
+    botMsg.innerText = "Error: " + data.error;
+} else {
+    botMsg.innerText = "Error: Invalid response format";
+}
         } catch (err) {
             botMsg.innerText = "Server connection error.";
         }
