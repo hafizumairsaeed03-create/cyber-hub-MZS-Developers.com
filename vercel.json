@@ -2,6 +2,7 @@
   "cleanUrls": true,
   "rewrites": [
     { "source": "/api/chat", "destination": "/api/chat.js" },
+    { "source": "/api/voice-assistant", "destination": "/api/chat.js" },
     { "source": "/", "destination": "/index.html" }
   ]
 }
