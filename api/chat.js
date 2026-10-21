@@ -1,4 +1,5 @@
 export default async function handler(req, res) {
+  // CORS Headers
   res.setHeader('Access-Control-Allow-Credentials', true);
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
@@ -17,7 +18,7 @@ export default async function handler(req, res) {
   if (!apiKey) {
     return res.status(200).json({ 
       success: false, 
-      error: 'Gemini API key missing on Vercel' 
+      error: 'Vercel par GEMINI_API_KEY mojood nahi hai.' 
     });
   }
 
@@ -45,16 +46,24 @@ Rules:
 
     const data = await response.json();
 
+    // اگر Gemini API کی طرف سے ایرر آئے
     if (data.error) {
       return res.status(200).json({
         success: false,
-        error: data.error.message || 'Gemini API Error'
+        error: data.error.message || JSON.stringify(data.error)
       });
     }
 
-    const replyText = data.candidates?.[0]?.content?.parts?.[0]?.text || "No response from Gemini.";
+    const replyText = data.candidates?.[0]?.content?.parts?.[0]?.text;
 
-    // آپ کے فرنٹ اینڈ کی ڈیمانڈ کے مطابق success: true اور reply بھیج رہے ہیں
+    if (!replyText) {
+      return res.status(200).json({
+        success: false,
+        error: 'AI ne koi jawab nahi diya. API key check karein.'
+      });
+    }
+
+    // کامیابی کی صورت میں
     return res.status(200).json({ 
       success: true, 
       reply: replyText 
@@ -63,7 +72,7 @@ Rules:
   } catch (err) {
     return res.status(200).json({ 
       success: false, 
-      error: 'Server internal error' 
+      error: err.message || 'Server connection issue' 
     });
   }
 }
