@@ -1,4 +1,6 @@
-export default async function handler(req, res) {
+const https = require('https');
+
+module.exports = async (req, res) => {
   res.setHeader('Access-Control-Allow-Credentials', true);
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
@@ -11,66 +13,80 @@ export default async function handler(req, res) {
     return res.status(200).end();
   }
 
-  const userQuery = req.body?.message || req.body?.query || req.body?.userQuery || "Hello";
+  let body = '';
+  if (req.body) {
+    body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
+  }
+
+  const userQuery = body.message || body.query || body.userQuery || "Hello";
   const apiKey = process.env.GEMINI_API_KEY;
 
   if (!apiKey) {
     return res.status(200).json({ 
       success: false, 
-      error: 'GEMINI_API_KEY is missing on server.' 
+      error: 'Vercel par GEMINI_API_KEY missing hai.' 
     });
   }
 
-  const systemPrompt = `Tum 'CyberHub' (Cyber Academy) website ke official AI Assistant ho. Tumhe is website ki har cheez aur folders ke baray mein mukammal malumat hai.
-Rules:
-1. Tumne kisi bhi user se website ka link ya naam nahi maangna.
-2. Tumne sirf Cyberhub aur iske pages/features ke baray mein jawab dena hai.
-3. Agar koi aam ya gair-mutalliqat sawal poochay, toh politely refusal mein jawab dena hai.`;
+  const systemPrompt = `Tum 'CyberHub' (Cyber Academy) website ke official AI Assistant ho. Tumhe is website ki har cheez ke baray mein mukammal malumat hai. Polite aur short jawab do.`;
 
-  try {
-    // Model name updated to gemini-2.0-flash
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        contents: [
-          {
-            role: "user",
-            parts: [{ text: `${systemPrompt}\n\nUser Question: ${userQuery}` }]
-          }
-        ]
-      })
-    });
+  const postData = JSON.stringify({
+    contents: [
+      {
+        role: "user",
+        parts: [{ text: `${systemPrompt}\n\nUser Question: ${userQuery}` }]
+      }
+    ]
+  });
 
-    const data = await response.json();
-
-    if (data.error) {
-      return res.status(200).json({
-        success: false,
-        error: data.error.message || 'Gemini API Error'
-      });
+  const options = {
+    hostname: 'generativelanguage.googleapis.com',
+    path: `/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Content-Length': Buffer.byteLength(postData)
     }
+  };
 
-    const replyText = data.candidates?.[0]?.content?.parts?.[0]?.text;
+  const apiReq = https.request(options, (apiRes) => {
+    let responseData = '';
 
-    if (!replyText) {
-      return res.status(200).json({
-        success: false,
-        error: 'AI ne koi jawab nahi diya.'
-      });
-    }
-
-    return res.status(200).json({ 
-      success: true, 
-      reply: replyText 
+    apiRes.on('data', (chunk) => {
+      responseData += chunk;
     });
 
-  } catch (err) {
-    return res.status(200).json({ 
-      success: false, 
-      error: err.message || 'Server connection issue' 
+    apiRes.on('end', () => {
+      try {
+        const parsedData = JSON.parse(responseData);
+        if (parsedData.error) {
+          return res.status(200).json({
+            success: false,
+            error: parsedData.error.message || 'Gemini API error'
+          });
+        }
+
+        const replyText = parsedData.candidates?.[0]?.content?.parts?.[0]?.text || "AI ne koi jawab nahi diya.";
+        return res.status(200).json({
+          success: true,
+          reply: replyText
+        });
+      } catch (e) {
+        return res.status(200).json({
+          success: false,
+          error: 'Response parsing error'
+        });
+      }
     });
-  }
-}
+  });
+
+  apiReq.on('error', (e) => {
+    return res.status(200).json({
+      success: false,
+      error: 'Server Connection Failed: ' + e.message
+    });
+  });
+
+  apiReq.write(postData);
+  apiReq.end();
+};
