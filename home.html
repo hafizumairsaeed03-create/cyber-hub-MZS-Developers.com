@@ -720,7 +720,7 @@ function sendToWhatsApp(event) {
     botMsg.innerText = "Error: Invalid response format";
 }
         } catch (err) {
-            botMsg.innerText = "Server connection error.";
+            botMsg.innerText = "Fetch Error: "+err.message;
         }
         list.scrollTop = list.scrollHeight;
     }
