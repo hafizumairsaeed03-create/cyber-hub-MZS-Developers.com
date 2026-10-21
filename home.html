@@ -704,25 +704,27 @@ function sendToWhatsApp(event) {
         list.appendChild(botMsg);
         list.scrollTop = list.scrollHeight;
 
-        try {
-            const response = await fetch('/api/chat', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ message: text })
-            });
+       try {
+        const response = await fetch('/api/chat', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ message: text })
+        });
 
-           if (data && data.reply) {
-    botMsg.innerText = data.reply;
-    speakResponse(data.reply);
-} else if (data && data.error) {
-    botMsg.innerText = "Error: " + data.error;
-} else {
-    botMsg.innerText = "Error: Invalid response format";
-}
-        } catch (err) {
-            botMsg.innerText = "Fetch Error: "+err.message;
+        const data = await response.json();
+
+        if (data && data.success && data.reply) {
+            botMsg.innerText = data.reply;
+            if (typeof speakResponse === 'function') {
+                speakResponse(data.reply);
+            }
+        } else if (data && data.error) {
+            botMsg.innerText = "Error: " + data.error;
+        } else {
+            botMsg.innerText = "Error: Invalid response from AI";
         }
-        list.scrollTop = list.scrollHeight;
+    } catch (err) {
+        botMsg.innerText = "Fetch Error: " + err.message;
     }
 
     // Clear aur behtareen voice ke liye updated function
