@@ -720,7 +720,7 @@ function sendToWhatsApp(event) {
         } else if (data && data.error) {
             botMsg.innerText = "Error: " + data.error;
         } else {
-            botMsg.innerText = "Error: Invalid response from AI";
+            botMsg.innerText = "Error: Response missing";
         }
     } catch (err) {
         botMsg.innerText = "Fetch Error: " + err.message;
