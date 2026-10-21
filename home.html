@@ -687,24 +687,23 @@ function sendToWhatsApp(event) {
     async function sendAIMessage() {
         const input = document.getElementById('ai-user-input');
         const list = document.getElementById('ai-messages');
-        const text = input.value.trim();
+      const text = input.value.trim();
+    if (!text) return;
 
-        if (!text) return;
+    const userMsg = document.createElement('p');
+    userMsg.className = 'ai-msg ai-msg-user';
+    userMsg.innerText = text;
+    list.appendChild(userMsg);
+    input.value = '';
+    list.scrollTop = list.scrollHeight;
 
-        const userMsg = document.createElement('p');
-        userMsg.className = 'ai-msg ai-msg-user';
-        userMsg.innerText = text;
-        list.appendChild(userMsg);
-        input.value = '';
-        list.scrollTop = list.scrollHeight;
+    const botMsg = document.createElement('p');
+    botMsg.className = 'ai-msg';
+    botMsg.innerText = 'Thinking...';
+    list.appendChild(botMsg);
+    list.scrollTop = list.scrollHeight;
 
-        const botMsg = document.createElement('p');
-        botMsg.className = 'ai-msg';
-        botMsg.innerText = 'Thinking...';
-        list.appendChild(botMsg);
-        list.scrollTop = list.scrollHeight;
-
-       try {
+    try {
         const response = await fetch('/api/chat', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -726,14 +725,7 @@ function sendToWhatsApp(event) {
     } catch (err) {
         botMsg.innerText = "Fetch Error: " + err.message;
     }
-
-    // Clear aur behtareen voice ke liye updated function
-    function speakResponse(text) {
-        if ('speechSynthesis' in window) {
-            window.speechSynthesis.cancel();
-            let utterance = new SpeechSynthesisUtterance(text);
-            utterance.rate = 1.0;
-            utterance.pitch = 1.0;
+    list.scrollTop = list.scrollHeight;
 
             let voices = window.speechSynthesis.getVoices();
             let bestVoice = voices.find(v => v.name.includes('Google') || v.name.includes('Natural') || v.lang.includes('en-US'));
