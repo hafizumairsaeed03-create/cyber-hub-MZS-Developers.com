@@ -617,8 +617,8 @@ function sendToWhatsApp(event) {
                 <p class="ai-msg">Hello! Main CyberHub AI Assistant hoon. Kya poochna chahte hain?</p>
             </div>
             <div class="ai-input-container">
-                <input type="text" id="ai-user-input" placeholder="Type query..." onkeypress="...">
-                <button onclick="sendAIMessage()">Send</button>
+                <input type="text" id="ai-user-input" placeholder="Type query..." onkeydown="if(event.key==='Enter'){sendAIMessage();}">
+                <button type="button" id="ai-send-btn" onclick="sendAIMessage()">Send</button>
             </div>
         </div>
     </div>
