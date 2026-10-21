@@ -1,5 +1,4 @@
 export default async function handler(req, res) {
-  // CORS Headers
   res.setHeader('Access-Control-Allow-Credentials', true);
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
@@ -18,7 +17,7 @@ export default async function handler(req, res) {
   if (!apiKey) {
     return res.status(200).json({ 
       success: false, 
-      error: 'Vercel par GEMINI_API_KEY mojood nahi hai.' 
+      error: 'GEMINI_API_KEY is missing on server.' 
     });
   }
 
@@ -29,7 +28,8 @@ Rules:
 3. Agar koi aam ya gair-mutalliqat sawal poochay, toh politely refusal mein jawab dena hai.`;
 
   try {
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
+    // Model name updated to gemini-2.0-flash
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -46,11 +46,10 @@ Rules:
 
     const data = await response.json();
 
-    // اگر Gemini API کی طرف سے ایرر آئے
     if (data.error) {
       return res.status(200).json({
         success: false,
-        error: data.error.message || JSON.stringify(data.error)
+        error: data.error.message || 'Gemini API Error'
       });
     }
 
@@ -59,11 +58,10 @@ Rules:
     if (!replyText) {
       return res.status(200).json({
         success: false,
-        error: 'AI ne koi jawab nahi diya. API key check karein.'
+        error: 'AI ne koi jawab nahi diya.'
       });
     }
 
-    // کامیابی کی صورت میں
     return res.status(200).json({ 
       success: true, 
       reply: replyText 
