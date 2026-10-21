@@ -13,9 +13,13 @@ module.exports = async (req, res) => {
     return res.status(200).end();
   }
 
-  let body = '';
-  if (req.body) {
-    body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
+  let body = {};
+  try {
+    if (req.body) {
+      body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
+    }
+  } catch (e) {
+    body = {};
   }
 
   const userQuery = body.message || body.query || body.userQuery || "Hello";
@@ -24,11 +28,11 @@ module.exports = async (req, res) => {
   if (!apiKey) {
     return res.status(200).json({ 
       success: false, 
-      error: 'Vercel par GEMINI_API_KEY missing hai.' 
+      error: 'Vercel Environment Variables mein GEMINI_API_KEY missing hai.' 
     });
   }
 
-  const systemPrompt = `Tum 'CyberHub' (Cyber Academy) website ke official AI Assistant ho. Tumhe is website ki har cheez ke baray mein mukammal malumat hai. Polite aur short jawab do.`;
+  const systemPrompt = "Tum 'CyberHub' (Cyber Academy) ke official AI Assistant ho. Short aur polite jawab do.";
 
   const postData = JSON.stringify({
     contents: [
@@ -62,7 +66,7 @@ module.exports = async (req, res) => {
         if (parsedData.error) {
           return res.status(200).json({
             success: false,
-            error: parsedData.error.message || 'Gemini API error'
+            error: parsedData.error.message || 'Gemini API Error'
           });
         }
 
@@ -74,7 +78,7 @@ module.exports = async (req, res) => {
       } catch (e) {
         return res.status(200).json({
           success: false,
-          error: 'Response parsing error'
+          error: 'Response JSON Parse Error'
         });
       }
     });
@@ -83,7 +87,7 @@ module.exports = async (req, res) => {
   apiReq.on('error', (e) => {
     return res.status(200).json({
       success: false,
-      error: 'Server Connection Failed: ' + e.message
+      error: 'Google Gemini Connection Failed: ' + e.message
     });
   });
 
