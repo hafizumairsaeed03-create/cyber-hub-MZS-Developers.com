@@ -1,5 +1,4 @@
 export default async function handler(req, res) {
-  // CORS Headers تاکہ براؤزر کی طرف سے کوئی بلاک نہ ہو
   res.setHeader('Access-Control-Allow-Credentials', true);
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
@@ -9,16 +8,17 @@ export default async function handler(req, res) {
   );
 
   if (req.method === 'OPTIONS') {
-    res.status(200).end();
-    return;
+    return res.status(200).end();
   }
 
-  // فرنٹ اینڈ کے بھیجے گئے کسی بھی فیلڈ نیم کو قبول کرے (message, query, ya userQuery)
   const userQuery = req.body?.message || req.body?.query || req.body?.userQuery || "Hello";
   const apiKey = process.env.GEMINI_API_KEY;
 
   if (!apiKey) {
-    return res.status(500).json({ error: 'Gemini API key is missing', reply: 'API Key missing on server.' });
+    return res.status(200).json({ 
+      success: false, 
+      error: 'Gemini API key missing on Vercel' 
+    });
   }
 
   const systemPrompt = `Tum 'CyberHub' (Cyber Academy) website ke official AI Assistant ho. Tumhe is website ki har cheez aur folders ke baray mein mukammal malumat hai.
@@ -44,16 +44,26 @@ Rules:
     });
 
     const data = await response.json();
-    const reply = data.candidates?.[0]?.content?.parts?.[0]?.text || "No response received from AI.";
-    
-    // تمام ممکنہ رسپانس فارمیٹس بھیجیں تاکہ فرنٹ اینڈ جو بھی مانگ رہا ہو، مل جائے
+
+    if (data.error) {
+      return res.status(200).json({
+        success: false,
+        error: data.error.message || 'Gemini API Error'
+      });
+    }
+
+    const replyText = data.candidates?.[0]?.content?.parts?.[0]?.text || "No response from Gemini.";
+
+    // آپ کے فرنٹ اینڈ کی ڈیمانڈ کے مطابق success: true اور reply بھیج رہے ہیں
     return res.status(200).json({ 
-      reply: reply,
-      response: reply,
-      message: reply,
-      text: reply
+      success: true, 
+      reply: replyText 
     });
-  } catch (error) {
-    return res.status(500).json({ error: 'Failed to connect with AI service', reply: 'Server connection error.' });
+
+  } catch (err) {
+    return res.status(200).json({ 
+      success: false, 
+      error: 'Server internal error' 
+    });
   }
 }
