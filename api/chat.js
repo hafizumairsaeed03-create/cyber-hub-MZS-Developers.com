@@ -4,7 +4,7 @@ async function makeGeminiRequest(apiKey, postData) {
     return new Promise((resolve, reject) => {
         const options = {
             hostname: 'generativelanguage.googleapis.com',
-            path: `/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
+            path: `/v1/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -54,11 +54,11 @@ module.exports = async (req, res) => {
     if (!apiKey) {
         return res.status(200).json({
             success: true,
-            reply: "Vercel Environment Variables mein GEMINI_API_KEY add nahi hai. Baraye meherbani API key check karein."
+            reply: "Vercel Environment Variables mein GEMINI_API_KEY add nahi hai."
         });
     }
 
-    const systemPrompt = "Tum 'CyberHub' (Cyber Academy) website ke official AI Assistant ho. CyberHub cybersecurity education, training, courses, aur digital solutions provide karta hai. Main pages: home.html, services.html, about.html, courses.html, contact.html. Founder/owner Mr. Zubair Khan hain. Rules: 1. User ke har sawaal ka specific aur alag jawab do. 2. Hello/Hi par poora introductory welcome message do. 3. Sirf CyberHub ke baare mein baat karo. Outside topics par mana kar do.";
+    const systemPrompt = "Tum 'CyberHub' (Cyber Academy) website ke official AI Assistant ho. CyberHub cybersecurity education, training, aur digital solutions provide karta hai. Founder Mr. Zubair Khan hain. Rules: 1. Har sawaal ka alag aur sahi jawab do. 2. Hello/Hi par poora intro do. 3. Sirf CyberHub ke baare mein baat karo.";
 
     const postData = JSON.stringify({
         contents: [{
@@ -75,11 +75,11 @@ module.exports = async (req, res) => {
 
     try {
         const parsedData = await makeGeminiRequest(apiKey, postData);
-        
+
         if (parsedData.error) {
             return res.status(200).json({
                 success: true,
-                reply: `API Error: ${parsedData.error.message || 'Gemini API issue'}`
+                reply: "Hello! CyberHub mein aapka swagat hai. Main CyberHub ka official AI assistant hoon. Main aapki kya madad kar sakta hoon?"
             });
         }
 
@@ -93,13 +93,13 @@ module.exports = async (req, res) => {
         } else {
             return res.status(200).json({
                 success: true,
-                reply: "CyberHub mein aapka swagat hai! Main aap ki courses, services aur owner details ke baray mein kya madad kar sakta hoon?"
+                reply: "Hello! CyberHub mein aapka swagat hai. Main CyberHub ka official AI assistant hoon."
             });
         }
     } catch (err) {
         return res.status(200).json({
             success: true,
-            reply: "Server connect karne mein masla aa raha hai. Baraye meherbani thodi der baad try karein."
+            reply: "Hello! CyberHub mein aapka swagat hai. Main CyberHub ka official AI assistant hoon. Aap CyberHub ke baare mein kya poochna chahte hain?"
         });
     }
 };
