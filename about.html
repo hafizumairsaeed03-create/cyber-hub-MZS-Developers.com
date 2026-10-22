@@ -3,749 +3,123 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cyber Academy - Master Cybersecurity</title>
-    <link rel="stylesheet" href="style.css">
-    <!-- FontAwesome CDN (Working Version) -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <title>About Us - Cyber Academy</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-deep: #070b14;
+            --panel-bg: #0c1322;
+            --border-color: #1a2744;
+            --neon-cyan: #00f2fe;
+            --neon-green: #10b981;
+            --neon-blue: #2563eb;
+            --text-main: #f8fafc;
+            --text-dim: #94a3b8;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: var(--bg-deep); color: var(--text-main); min-height: 100vh; padding-bottom: 50px; }
+        
+        /* Navbar */
+        nav { display: flex; justify-content: space-between; align-items: center; padding: 20px 60px; border-bottom: 1px solid var(--border-color); background: var(--panel-bg); }
+        .logo { font-size: 1.3rem; font-weight: bold; color: #fff; display: flex; align-items: center; gap: 10px; }
+        .logo span { color: var(--neon-cyan); }
+        .nav-menu { display: flex; list-style: none; gap: 30px; align-items: center; }
+        .nav-menu a { text-decoration: none; color: var(--text-dim); font-size: 0.9rem; transition: 0.3s; }
+        .nav-menu a:hover { color: var(--neon-cyan); }
+        .back-btn { background: transparent; border: 1px solid var(--neon-cyan); color: var(--neon-cyan); padding: 8px 18px; border-radius: 6px; text-decoration: none; font-size: 0.85rem; transition: 0.3s; }
+        .back-btn:hover { background: rgba(0,242,254,0.1); }
+
+        /* Container */
+        .container { max-width: 1100px; margin: 50px auto; padding: 0 20px; }
+        
+        /* About Hero Section */
+        .about-hero { background-color: var(--panel-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 45px; display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 40px; align-items: center; margin-bottom: 40px; }
+        .about-text h1 { font-size: 2.2rem; color: #fff; margin-bottom: 15px; }
+        .about-text h1 span { color: var(--neon-cyan); }
+        .about-text p { font-size: 0.95rem; color: var(--text-dim); line-height: 1.7; margin-bottom: 20px; }
+        
+        .feature-bullets { display: flex; flex-direction: column; gap: 10px; }
+        .feature-item { display: flex; align-items: center; gap: 10px; font-size: 0.9rem; color: var(--text-main); }
+        .feature-item i { color: var(--neon-green); }
+
+        /* Stats Grid */
+        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+        .stat-card { background-color: var(--panel-bg); border: 1px solid var(--border-color); border-radius: 10px; padding: 30px; text-align: center; }
+        .stat-card h3 { font-size: 2rem; color: var(--neon-cyan); margin-bottom: 8px; }
+        .stat-card p { font-size: 0.85rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; }
+    </style>
 </head>
+
 <body>
 
-    <!-- NAVBAR -->
-    <nav class="navbar">
-        <div class="logo"><i class="fa-solid fa-shield-halved"></i> Cyber Academy</div>
-        <ul class="nav-links">
-            <li><a href="#home">Home</a></li>
+    <!-- Navbar -->
+    <nav>
+        <div class="logo"><i class="fa-solid fa-shield-halved"></i> Cyber <span>Academy</span></div>
+        <ul class="nav-menu">
+            <li><a href="home.html">Home</a></li>
             <li><a href="services.html">Services</a></li>
-           <a href="about.html">About</a>
-            <li><a href="#contact">Contact</a></li>
-            <li><a href="owner profile.html">Owner profile</a></li>
+            <li><a href="about.html" style="color: var(--neon-cyan);">About</a></li>
         </ul>
-       <div class="nav-btns">
-    <a href="login.html" class="btn-secondary" style="text-decoration: none; display: inline-flex; align-items: center; justify-content: center;">Login</a>
-    <a href="register.html" class="btn-primary" style="text-decoration: none; display: inline-flex; align-items: center; justify-content: center;">Register</a>
-</div>
+        <a href="home.html" class="back-btn"><i class="fa-solid fa-arrow-left"></i> Back to Home</a>
     </nav>
 
-    <!-- HERO SECTION -->
-    <section id="home" class="hero-section">
-        <div class="hero-content">
-            <span class="badge">Cybersecurity Education & Solutions</span>
-            <h1>Master Cybersecurity.<br><span class="neon-text">Defend the Digital World.</span></h1>
-            <p>Learn. Build. Secure. Become a cybersecurity expert with hands-on labs and industry-focused courses.</p>
-            <div class="hero-btns">
-    <a href="courses.html" class="btn-primary">Explore Courses &rarr;</a>
-    <a href="about.html" class="btn-outline">Learn More</a>
-</div>
-            <div class="stats-grid">
-                <div><h3>10+</h3><p>Projects</p></div>
-                <div><h3>5+</h3><p>Technologies</p></div>
-                <div><h3>100%</h3><p>Responsive</p></div>
-                <div><h3>24/7</h3><p>Support</p></div>
-            </div>
-        </div>
+    <!-- Main Container -->
+    <div class="container">
         
-        <!-- HERO GRAPHIC / IMAGE -->
-    <!-- HERO GRAPHIC / IMAGE -->
-<div class="hero-graphic">
-    <div class="cyber-card">
-        <!-- Apni local logo.jpeg image -->
-        <img src="logo.jpeg" alt="Cyber Academy Logo" class="hero-img">
-    </div>
-</div>    
-    </section>
-
-    <!-- SERVICES SECTION -->
-    <!-- PROJECTS SECTION -->
-    
-<section id="projects" class="section-container">
-    <span class="badge">OUR PORTFOLIO</span>
-    <h2>Practical & Real-World Projects</h2>
-    <p class="section-desc">Explore our top 15 digital and security projects built with modern technologies.</p>
-
-   <a href="student-login.html" class="project-card-link">
-    <div class="project-card">
-        <div class="project-tag">Web App</div>
-        <h3>Student Login & Learning Portal</h3>
-        <p>Secure student authentication, course dashboard, and grade tracking system.</p>
-    </div>
-    
-</a>
-        <a href="ecommerce.html" class="project-card-link">
-        <div class="project-card">
-            <div class="project-tag">E-Commerce</div>
-            <h3>Digital Tech E-Commerce Store</h3>
-            <p>Full-stack online shop with shopping cart, Stripe payment gateway, and order management.</p>
+        <!-- Hero Section -->
+        <div class="about-hero">
+            <div class="about-text">
+                <h1>Your Journey to <span>Cybersecurity Starts Here</span></h1>
+                <p>Cyber Academy is a modern learning platform designed to help you build in-demand cybersecurity skills. Whether you are a beginner or a professional, we provide the resources, tools, and guidance you need to succeed.</p>
+                <div class="feature-bullets">
+                    <div class="feature-item"><i class="fa-solid fa-circle-check"></i> Practical Learning & Hands-on Labs</div>
+                    <div class="feature-item"><i class="fa-solid fa-circle-check"></i> Modern Security Techniques & Pentesting</div>
+                    <div class="feature-item"><i class="fa-solid fa-circle-check"></i> Industry-Focused Skills & Expert Mentorship</div>
+                </div>
+            </div>
+            <div class="about-visual" style="text-align: center; background: rgba(0,242,254,0.03); border: 1px dashed var(--border-color); padding: 40px; border-radius: 10px;">
+                <i class="fa-solid fa-user-secret" style="font-size: 5rem; color: var(--neon-cyan); margin-bottom: 15px;"></i>
+                <h3 style="color: #fff; font-size: 1.2rem;">Mr. Zubair Khan</h3>
+                <p style="color: var(--text-dim); font-size: 0.85rem; margin-top: 5px;">Lead Security Instructor & Founder</p>
+            </div>
         </div>
-       </a>
-    
-       <!-- 2. Cyber Security -->
-    <a href="scanner.html" class="project-card-link">
-        <div class="project-card">
-            <div class="project-tag">Cyber Security</div>
-            <h3>Automated Web Vulnerability Scanner</h3>
-            <p>Python tool to scan web applications</p>
-        </div>
+
+        <!-- Stats Section -->
+       <!-- Clickable Stats Grid -->
+<div class="stats-grid">
+    <a href="modules.html" class="stat-card" style="text-decoration: none; color: inherit; display: block; transition: 0.3s;">
+        <h3>100+</h3>
+        <p>Security Modules</p>
     </a>
-
-    <!-- 4. Keylogger & Monitor -->
-    <a href="keylogger.html" class="project-card-link">
-        <div class="project-card">
-            <div class="project-tag">Python & Security</div>
-            <h3>Ethical Keylogger & Activity Monitor</h3>
-            <p>System monitoring tool built for fore</p>
-        </div>
+    <a href="students.html" class="stat-card" style="text-decoration: none; color: inherit; display: block; transition: 0.3s;">
+        <h3>5,000+</h3>
+        <p>Active Students</p>
     </a>
-
-    <!-- 5. Digital Banking System -->
-    <a href="banking.html" class="project-card-link">
-        <div class="project-card">
-            <div class="project-tag">FinTech</div>
-            <h3>Digital Banking & Wallet System</h3>
-            <p>Encrypted money transfer portal with mu</p>
-        </div>
+    <a href="labs.html" class="stat-card" style="text-decoration: none; color: inherit; display: block; transition: 0.3s;">
+        <h3>24/7</h3>
+        <p>Lab Access</p>
     </a>
-
-       <!-- 6. Network Sniffer -->
-    <a href="sniffer.html" class="project-card-link">
-        <div class="project-card">
-            <div class="project-tag">Networking</div>
-            <h3>Packet Sniffer & Traffic Analyzer</h3>
-            <p>Wireshark-like tool for capturing network packets and</p>
-        </div>
-    </a>
-
-    <!-- 7. Ransomware Simulator -->
-    <a href="ransomware.html" class="project-card-link">
-        <div class="project-card">
-            <div class="project-tag">Cyber Defense</div>
-            <h3>AES-256 File Encrypter & Decrypter</h3>
-            <p>Ransomware defense testing project for data encryption</p>
-        </div>
-    </a>
-
-    <!-- 8. Password Manager -->
-    <a href="password-manager.html" class="project-card-link">
-        <div class="project-card">
-            <div class="project-tag">Security Tool</div>
-            <h3>Secure Vault Password Manager</h3>
-            <p>Zero-knowledge encrypted password vault using Master Pa</p>
-        </div>
-    </a>
-
-    <!-- 9. Hospital Management -->
-    <a href="hospital.html" class="project-card-link">
-        <div class="project-card">
-            <div class="project-tag">Management System</div>
-            <h3>Hospital & Patient Record System</h3>
-            <p>HIPAA-compliant healthcare management portal for doctors</p>
-        </div>
-    </a>
-
-    <!-- 10. Cyber Threat Dashboard -->
-    <a href="threat-dashboard.html" class="project-card-link">
-        <div class="project-card">
-            <div class="project-tag">Analytics</div>
-            <h3>Real-Time Cyber Threat Dashboard</h3>
-            <p>Live map visualizing global cyber attacks, IP blacklis</p>
-        </div>
-    </a>
-
-    <!-- 11. Port Scanner -->
-    <a href="port-scanner.html" class="project-card-link">
-        <div class="project-card">
-            <div class="project-tag">DevOps / Security</div>
-            <h3>Multi-Threaded Port Scanner</h3>
-            <p>High-speed network auditing software built using C++ and S</p>
-        </div>
-    </a>
-
-       <!-- 12. Phishing Protection Tool -->
-    <a href="phishing-detector.html" class="project-card-link">
-        <div class="project-card">
-            <div class="project-tag">AI / Security</div>
-            <h3>AI Phishing URL Detector</h3>
-            <p>Machine learning model to detect fake phishing links</p>
-        </div>
-    </a>
-
-    <!-- 13. LMS Portal -->
-    <a href="lms-portal.html" class="project-card-link">
-        <div class="project-card">
-            <div class="project-tag">Education</div>
-            <h3>Learning Management System (LMS)</h3>
-            <p>Online course platform with live video streaming and</p>
-        </div>
-    </a>
-
-    <!-- 14. Attendance System -->
-    <a href="attendance-system.html" class="project-card-link">
-        <div class="project-card">
-            <div class="project-tag">Biometric / AI</div>
-            <h3>Face Recognition Attendance System</h3>
-            <p>Smart attendance marker for schools using OpenCV and Py</p>
-        </div>
-    </a>
-
-    <!-- 15. SOC Log Analyzer -->
-    <a href="log-analyzer.html" class="project-card-link">
-        <div class="project-card">
-            <div class="project-tag">SOC / Forensics</div>
-            <h3>SIEM Security Log Analyzer</h3>
-            <p>Log parser that flags suspicious brute-force login at</p>
-        </div>
-    </a>
-    <!-- ABOUT US SECTION -->
-    <section id="about" class="section-container about-section">
-        <div class="about-content">
-            <span class="badge">About Us</span>
-            <h2>Your Journey to<br><span class="neon-text">Cybersecurity Starts Here</span></h2>
-            <p>Cyber Academy is a modern learning platform designed to help you build in-demand cybersecurity skills. Whether you're a beginner or a professional, we provide the resources, tools and guidance you need to succeed.</p>
-            
-            <ul class="feature-list">
-                <li><i class="fa-solid fa-circle-check"></i> Practical Learning</li>
-                <li><i class="fa-solid fa-circle-check"></i> Modern Security Techniques</li>
-                <li><i class="fa-solid fa-circle-check"></i> Hands-on Labs</li>
-                <li><i class="fa-solid fa-circle-check"></i> Beginner Friendly</li>
-                <li><i class="fa-solid fa-circle-check"></i> Industry-focused Skills</li>
-            </ul>
-
-           <a href="courses.html" class="learn-more-btn" style="display: inline-block; background: #0066ff; color: #fff; padding: 12px 25px; border-radius: 6px; text-decoration: none; font-weight: 600; transition: 0.3s;">
-    Learn More &rarr;
-</a>
-        </div>
-
-        <!-- ABOUT US GRAPHIC -->
-<div class="hacker-graphic-container">
-    <img src="hacker.jpeg" alt="Cyber Security Expert Mr. Zubair Khan" class="hacker-bg-img">
 </div>
-    </section>
-
-<!-- FEATURED COURSES SECTION -->
-    <section id="courses" class="section-container">
-        <div class="section-header">
-            <div>
-                <span class="badge">Popular Courses</span>
-                <h2>Featured Courses</h2>
-                <p class="text-muted">Choose from a variety of courses designed to take you from beginner to expert in cybersecurity.</p>
-            </div>
-            <button class="btn-outline">View All Courses →</button>
         </div>
 
-        <div class="grid-cards">
-            <!-- Course Card 1 -->
-            <div class="course-card">
-                <div class="course-badge">Beginner • 4 Weeks</div>
-                <h3>Introduction to Cybersecurity</h3>
-                <div class="progress-box">
-                    <div class="progress-bar" style="width: 75%;"></div>
-                </div>
-                <span class="progress-text">75% Enrolled</span>
-               <a href="intro-cybersecurity.html" class="btn-primary course-btn" style="text-decoration: none; text-align: center; display: block;">Enroll Now &rarr;</a>
-            </div>
-
-            <!-- Course Card 2 -->
-            <div class="course-card">
-                <div class="course-badge">Intermediate • 6 Weeks</div>
-                <h3>Ethical Hacking & Penetration Testing</h3>
-                <div class="progress-box">
-                    <div class="progress-bar" style="width: 45%;"></div>
-                </div>
-                <span class="progress-text">45% Enrolled</span>
-                <a href="ethical-hacking.html" class="btn-primary course-btn" style="text-decoration: none; text-align: center; display: block;">Enroll Now &rarr;</a>
-            </div>
-
-            <!-- Course Card 3 -->
-            <div class="course-card">
-                <div class="course-badge">Advanced • 8 Weeks</div>
-                <h3>Network Security Defense</h3>
-                <div class="progress-box">
-                    <div class="progress-bar" style="width: 20%;"></div>
-                </div>
-                <span class="progress-text">20% Enrolled</span>
-                <a href="network-security.html" class="btn-primary course-btn" style="text-decoration: none; text-align: center; display: block;">Enroll Now &rarr;</a>
-
-            <!-- Course Card 4 -->
-            <div class="course-card">
-                <div class="course-badge">Intermediate • 5 Weeks</div>
-                <h3>Python for Security Automation</h3>
-                <div class="progress-box">
-                    <div class="progress-bar" style="width: 70%;"></div>
-                </div>
-                <span class="progress-text">70% Enrolled</span>
-                <a href="python-security.html" class="btn-primary course-btn" style="text-decoration: none; text-align: center; display: block;">Enroll Now &rarr;</a>
-            </div>
-        </div>
-    </section>
-    <!-- CONTACT SECTION -->
-    <section id="contact" class="section-container">
-        <div class="contact-wrapper">
-            <!-- Left Info Column -->
-            <div class="contact-info">
-                <span class="badge">Get In Touch</span>
-                <h2>Contact Section</h2>
-                <p class="text-muted">Have a question or want to work together? Feel free to reach out!</p>
-
-                <div class="info-list">
-                    <div class="info-item">
-                        <i class="fa-solid fa-envelope"></i>
-                        <div>
-                            <h4>Email</h4>
-                            <p>info@cyberacademy.com</p>
-                        </div>
-                    </div>
-                    <div class="info-item">
-                        <i class="fa-solid fa-phone"></i>
-                        <div>
-                            <h4>Phone</h4>
-                            <p>+92 300 1234567</p>
-                        </div>
-                    </div>
-                    <div class="info-item">
-                        <i class="fa-solid fa-location-dot"></i>
-                        <div>
-                            <h4>Location</h4>
-                            <p>Pakistan</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="social-links">
-                    <h4>Follow Us</h4>
-                     <div style="display: flex; gap: 10px;">
-    <!-- GitHub Link -->
-    <a href="https://github.com/aapka-username" target="_blank" style="background: #0c1322; border: 1px solid #1a2744; color: #00f2fe; width: 38px; height: 38px; display: flex; align-items: center; justify-content: center; border-radius: 6px; text-decoration: none;"><i class="fa-brands fa-github"></i></a>
-    
-    <!-- LinkedIn Link -->
-    <a href="https://linkedin.com/in/aapka-username" target="_blank" style="background: #0c1322; border: 1px solid #1a2744; color: #00f2fe; width: 38px; height: 38px; display: flex; align-items: center; justify-content: center; border-radius: 6px; text-decoration: none;"><i class="fa-brands fa-linkedin-in"></i></a>
-    
-    <!-- Twitter / X Link -->
-    <a href="https://twitter.com/aapka-username" target="_blank" style="background: #0c1322; border: 1px solid #1a2744; color: #00f2fe; width: 38px; height: 38px; display: flex; align-items: center; justify-content: center; border-radius: 6px; text-decoration: none;"><i class="fa-brands fa-twitter"></i></a>
-    
-    <!-- Discord Link -->
-    <a href="https://discord.com/invite/aapka-invite" target="_blank" style="background: #0c1322; border: 1px solid #1a2744; color: #00f2fe; width: 38px; height: 38px; display: flex; align-items: center; justify-content: center; border-radius: 6px; text-decoration: none;"><i class="fa-brands fa-discord"></i></a>
-</div>
-                </div>
-            </div>
-
-            <!-- Right Form Column -->
-           <form id="contactForm" onsubmit="sendToWhatsApp(event)">
-    <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px;">
-        <div class="input-group">
-            <label style="color: #94a3b8; font-size: 0.8rem; display: block; margin-bottom: 5px;">Full Name</label>
-            <input type="text" id="clientName" placeholder="Your name" required style="width: 100%; padding: 10px; background: #070b14; border: 1px solid #1a2744; color: #fff; border-radius: 6px;">
-        </div>
-        <div class="input-group">
-            <label style="color: #94a3b8; font-size: 0.8rem; display: block; margin-bottom: 5px;">Mobile Number</label>
-            <input type="tel" id="clientPhone" placeholder="03xx xxxxxxx" required style="width: 100%; padding: 10px; background: #070b14; border: 1px solid #1a2744; color: #fff; border-radius: 6px;">
-        </div>
     </div>
-
-    <div class="input-group" style="margin-bottom: 15px;">
-        <label style="color: #94a3b8; font-size: 0.8rem; display: block; margin-bottom: 5px;">Email Address</label>
-        <input type="email" id="clientEmail" placeholder="your@email.com" required style="width: 100%; padding: 10px; background: #070b14; border: 1px solid #1a2744; color: #fff; border-radius: 6px;">
-    </div>
-
-    <div class="input-group" style="margin-bottom: 20px;">
-        <label style="color: #94a3b8; font-size: 0.8rem; display: block; margin-bottom: 5px;">Kis tarah ki website chahiye? (Requirements)</label>
-        <textarea id="clientMessage" rows="4" placeholder="Mujhe is tarah ki website banwani hai..." required style="width: 100%; padding: 10px; background: #070b14; border: 1px solid #1a2744; color: #fff; border-radius: 6px; resize: vertical;"></textarea>
-    </div>
-
-    <button type="submit" class="btn-primary" style="width: 100%; background: #0066ff; color: #fff; border: none; padding: 12px; border-radius: 6px; font-weight: bold; cursor: pointer;">
-        Send Message <i class="fa-solid fa-paper-plane"></i>
-    </button>
-</form>
-
-<script>
-function sendToWhatsApp(event) {
-    event.preventDefault();
+    <script>
+    // Stats counter animation or interactive click effect
+    const statCards = document.querySelectorAll('.stat-card');
     
-    let name = document.getElementById('clientName').value;
-    let phone = document.getElementById('clientPhone').value;
-    let email = document.getElementById('clientEmail').value;
-    let message = document.getElementById('clientMessage').value;
-
-    // Yahan apna WhatsApp number likhein (Country code ke sath, jaise 92 se start ho)
-    let myPhoneNumber = "923147357078"; 
-
-    let whatsappURL = `https://wa.me/${myPhoneNumber}?text=` + 
-        `*New Website Order / Inquiry*%0A%0A` +
-        `*Name:* ${name}%0A` +
-        `*Mobile No:* ${phone}%0A` +
-        `*Email:* ${email}%0A` +
-        `*Requirement:* ${message}`;
-
-    window.open(whatsappURL, '_blank');
-}
+    statCards.forEach(card => {
+        card.addEventListener('mouseenter', () => {
+            card.style.borderColor = 'var(--neon-cyan)';
+            card.style.transform = 'translateY(-5px)';
+            card.style.transition = '0.3s ease';
+        });
+        
+        card.addEventListener('mouseleave', () => {
+            card.style.borderColor = 'var(--border-color)';
+            card.style.transform = 'translateY(0)';
+        });
+    });
 </script>
-    </section>
-
-    <!-- FOOTER -->
-    <footer class="cyber-footer">
-        <div class="footer-container">
-            <div class="footer-col">
-                <div class="logo"><i class="fa-solid fa-shield-halved"></i> Cyber Academy</div>
-                
-                
-    <!-- MZS Developers - Perfectly Centered & Aligned Section -->
-<div style="background-color: #050b18; width: 100%; padding: 50px 20px; box-sizing: border-box; display: flex; justify-content: center; align-items: center;">
-  <style>
-    .mzs-footer-card {
-      background: #091326 !important;
-      border: 10px solid #1e3a8a !important;
-      border-radius: 90px !important;
-      width: 100% !important;
-      max-width: 100% !important;
-      margin:  auto !important;
-      padding: 45px !important;
-      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.7), 0 0 25px rgba(59, 130, 246, 0.25) !important;
-      box-sizing: border-box !important;
-      font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif !important;
-    }
-
-    /* Animated Lighting Title Effect */
-    .mzs-footer-title {
-      font-size: 3rem !important;
-      font-weight: 800 !important;
-      text-align: center !important;
-      margin-bottom: 12px !important;
-      text-transform: uppercase !important;
-      letter-spacing: 1.5px !important;
-      background: linear-gradient(90deg, #38bdf8, #ec4899, #34d399, #f59e0b, #38bdf8) !important;
-      background-size: 300% auto !important;
-      -webkit-background-clip: text !important;
-      -webkit-text-fill-color: transparent !important;
-      animation: titleLighting 6s linear infinite !important;
-    }
-
-    @keyframes titleLighting {
-      0% { background-position: 0% center; }
-      50% { background-position: 100% center; }
-      100% { background-position: 0% center; }
-    }
-
-    .mzs-footer-subtitle {
-      text-align: center !important;
-      font-size: 1.2rem !important;
-      color: #f43f5e !important;
-      font-weight: 700 !important;
-      margin-bottom: 25px !important;
-      letter-spacing: 0.5px !important;
-    }
-
-    .mzs-badge-row {
-      display: flex !important;
-      justify-content: center !important;
-      margin-bottom: 25px !important;
-    }
-
-    .mzs-live-badge {
-      display: inline-flex !important;
-      align-items: center !important;
-      gap: 10px !important;
-      background: rgba(168, 85, 247, 0.15) !important;
-      color: #c084fc !important;
-      border: 1px solid rgba(192, 132, 252, 0.3) !important;
-      padding: 8px 22px !important;
-      border-radius: 30px !important;
-      font-size: 1rem !important;
-      font-weight: 700 !important;
-    }
-
-    .mzs-live-dot {
-      width: 10px !important;
-      height: 10px !important;
-      background-color: #c084fc !important;
-      border-radius: 50% !important;
-      box-shadow: 0 0 12px #c084fc !important;
-      animation: pulseDot 1.5s infinite !important;
-    }
-
-    @keyframes pulseDot {
-      0% { transform: scale(0.95); opacity: 0.8; }
-      50% { transform: scale(1.3); opacity: 1; box-shadow: 0 0 18px #c084fc; }
-      100% { transform: scale(0.95); opacity: 0.8; }
-    }
-
-    .mzs-footer-desc {
-      font-size: 1.15rem !important;
-      color: #38bdf8 !important;
-      line-height: 1.8 !important;
-      text-align: center !important;
-      max-width: 1100px !important;
-      margin: 0 auto 35px auto !important;
-      font-weight: 500 !important;
-    }
-
-    .mzs-grid-services {
-      display: grid !important;
-      grid-template-columns: repeat(2, 1fr) !important;
-      gap: 25px !important;
-      margin-bottom: 30px !important;
-    }
-
-    @media (max-width: 768px) {
-      .mzs-grid-services { grid-template-columns: 1fr !important; }
-      .mzs-footer-title { font-size: 2.1rem !important; }
-    }
-
-    .mzs-service-item {
-      background: rgba(255, 255, 255, 0.02) !important;
-      border: 1px solid rgba(245, 158, 11, 0.3) !important;
-      padding: 25px !important;
-      border-radius: 14px !important;
-      transition: 0.3s !important;
-    }
-
-    .mzs-service-item:hover {
-      border-color: #f59e0b !important;
-      box-shadow: 0 8px 25px rgba(245, 158, 11, 0.2) !important;
-      transform: translateY(-3px) !important;
-    }
-
-    .mzs-service-item h4 {
-      color: #f59e0b !important;
-      font-size: 1.3rem !important;
-      margin-bottom: 10px !important;
-      display: flex !important;
-      align-items: center !important;
-      gap: 12px !important;
-    }
-
-    .mzs-service-item p {
-      color: #cbd5e1 !important;
-      font-size: 1rem !important;
-      line-height: 1.6 !important;
-    }
-
-    .mzs-features-bar {
-      display: flex !important;
-      justify-content: space-around !important;
-      background: rgba(16, 185, 129, 0.05) !important;
-      border: 1px dashed rgba(16, 185, 129, 0.4) !important;
-      padding: 18px !important;
-      border-radius: 14px !important;
-      margin-bottom: 35px !important;
-      flex-wrap: wrap !important;
-      gap: 20px !important;
-    }
-
-    .mzs-feature-tag-1 { color: #34d399 !important; font-weight: 700 !important; font-size: 1.05rem !important; display: flex !important; align-items: center !important; gap: 8px !important; }
-    .mzs-feature-tag-2 { color: #f43f5e !important; font-weight: 700 !important; font-size: 1.05rem !important; display: flex !important; align-items: center !important; gap: 8px !important; }
-    .mzs-feature-tag-3 { color: #38bdf8 !important; font-weight: 700 !important; font-size: 1.05rem !important; display: flex !important; align-items: center !important; gap: 8px !important; }
-
-    .mzs-footer-action {
-      text-align: center !important;
-      border-top: 1px solid rgba(255, 255, 255, 0.08) !important;
-      padding-top: 30px !important;
-    }
-
-    .mzs-visit-btn {
-      display: inline-flex !important;
-      align-items: center !important;
-      gap: 12px !important;
-      background: linear-gradient(135deg, #f59e0b, #d97706) !important;
-      color: #000 !important;
-      text-decoration: none !important;
-      padding: 15px 35px !important;
-      border-radius: 12px !important;
-      font-weight: 800 !important;
-      font-size: 1.15rem !important;
-      transition: 0.3s !important;
-      box-shadow: 0 6px 20px rgba(245, 158, 11, 0.4) !important;
-    }
-
-    .mzs-visit-btn:hover {
-      transform: translateY(-3px) !important;
-      box-shadow: 0 8px 25px rgba(245, 158, 11, 0.6) !important;
-      color: #000 !important;
-    }
-  </style>
-
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
- <main class="w-full min-h-screen flex flex-col justify-start py-8 px-4 lg:px-8">
-    <div class="w-full max-w-[1450px] mx-auto cyber-glass-glow rounded-2xl p-5 md:p-8 relative overflow-hidden">
-        
-        <!-- Top Decorative Ambient Glows -->
-        <div class="absolute -top-20 -right-20 w-44 h-44 bg-cyan-500/20 rounded-full blur-3xl pointer-events-none"></div>
-        <div class="absolute -bottom-20 -left-20 w-44 h-44 bg-blue-600/20 rounded-full blur-3xl pointer-events-none"></div>
-
-        <!-- Ab yeh card seedha main wide container ke andar hai, yeh 100% width le lega -->
-       <div class="mzs-main-container">
-  <div class="mzs-cyber-card">
-    
-    <div class="mzs-header-box">
-      <h2>MZS DEVELOPERS</h2>
-    </div>
-    
-    <p class="mzs-info"><strong>Manager:</strong> Mr. Zubair Saeed</p>
-    <p class="mzs-info">24/7 Dedicated Network</p>
-    <p class="mzs-desc">MZS Developers operates through a robust and professional digital infrastructure.</p>
-    
-<div class="service-item web-neon">
-    <div class="bulb-line-top">
-        <span class="bulb"></span><span class="bulb"></span><span class="bulb"></span><span class="bulb"></span><span class="bulb"></span><span class="bulb"></span><span class="bulb"></span><span class="bulb"></span><span class="bulb"></span>
-    </div>
-    <div class="bulb-line-bottom">
-        <span class="bulb"></span><span class="bulb"></span><span class="bulb"></span><span class="bulb"></span><span class="bulb"></span><span class="bulb"></span><span class="bulb"></span><span class="bulb"></span><span class="bulb"></span>
-    </div>
-    <span>🌐 Website Development</span>
-    <p>Building high-performance, responsive business websites.</p>
-</div>
-
-<div class="service-item soft-neon">
-    <div class="bulb-line-top">
-        <span class="bulb"></span><span class="bulb"></span><span class="bulb"></span><span class="bulb"></span><span class="bulb"></span><span class="bulb"></span><span class="bulb"></span><span class="bulb"></span><span class="bulb"></span>
-    </div>
-    <div class="bulb-line-bottom">
-        <span class="bulb"></span><span class="bulb"></span><span class="bulb"></span><span class="bulb"></span><span class="bulb"></span><span class="bulb"></span><span class="bulb"></span><span class="bulb"></span><span class="bulb"></span>
-    </div>
-    <span>&lt;/&gt; Software Solutions</span>
-    <p>Developing robust, custom software applications engineered for scale.</p>
-</div>
-
- 
-<!-- CyberHub Floating AI Widget (Default Open) -->
-    <div id="ai-floating-widget">
-        <button id="ai-toggle-btn" onclick="toggleAIChat()">💬 AI</button>
-        <div id="ai-chat-box">
-            <div class="ai-box-header">
-                <span>CyberHub AI Assistant</span>
-                <button onclick="toggleAIChat()" class="ai-close-btn">✖</button>
-            </div>
-            <div id="ai-messages" class="ai-messages-list">
-                <p class="ai-msg">Hello! Main CyberHub AI Assistant hoon. Kya poochna chahte hain?</p>
-            </div>
-            <div class="ai-input-container">
-                <input type="text" id="ai-user-input" placeholder="Type query..." onkeypress="if(event.key==='Enter') sendAIMessage()">
-                <button onclick="sendAIMessage()">Send</button>
-            </div>
-        </div>
-    </div>
 
 </body>
 </html>
-
-<style>
-   #ai-floating-widget {
-    position: fixed;
-    top: 80px;         /* Isse widget screen ke upar shift ho jayega */
-    right: 30px;       /* Upar right-side par set ho jayega */
-    z-index: 99999;
-    font-family: Arial, sans-serif;
-}
-    #ai-toggle-btn {
-        width: 60px;
-        height: 60px;
-        border-radius: 50%;
-        background: #2563eb;
-        color: #ffffff;
-        border: none;
-        font-size: 18px;
-        font-weight: bold;
-        cursor: pointer;
-        box-shadow: 0 4px 15px rgba(37, 99, 235, 0.4);
-    }
-    #ai-chat-box {
-        position: absolute;
-        bottom: 75px;
-        right: 0;
-        width: 320px;
-        background: #1e293b;
-        border: 1px solid #334155;
-        border-radius: 12px;
-        box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-        display: flex;
-        flex-direction: column;
-        overflow: hidden;
-    }
-    .ai-box-hidden { display: none !important; }
-    .ai-box-header {
-        background: #0f172a;
-        color: #38bdf8;
-        padding: 12px 15px;
-        font-weight: bold;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        border-bottom: 1px solid #334155;
-    }
-    .ai-close-btn { background: transparent; border: none; color: #94a3b8; cursor: pointer; }
-    .ai-messages-list { padding: 12px; max-height: 200px; overflow-y: auto; font-size: 13px; color: #e2e8f0; }
-    .ai-msg { margin: 5px 0; background: #334155; padding: 8px 12px; border-radius: 8px; }
-    .ai-msg-user { background: #2563eb; text-align: right; }
-    .ai-input-container { display: flex; padding: 10px; background: #0f172a; gap: 5px; }
-    .ai-input-container input { flex: 1; padding: 8px; background: #1e293b; border: 1px solid #475569; color: #ffffff; border-radius: 6px; outline: none; }
-    .ai-input-container button { background: #2563eb; color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; }
-</style>
-
-<script>
-    function toggleAIChat() {
-        document.getElementById('ai-chat-box').classList.toggle('ai-box-hidden');
-    }
-
-    async function sendAIMessage() {
-        const input = document.getElementById('ai-user-input');
-        const list = document.getElementById('ai-messages');
-        const text = input.value.trim();
-
-        if (!text) return;
-
-        const userMsg = document.createElement('p');
-        userMsg.className = 'ai-msg ai-msg-user';
-        userMsg.innerText = text;
-        list.appendChild(userMsg);
-        input.value = '';
-        list.scrollTop = list.scrollHeight;
-
-        const botMsg = document.createElement('p');
-        botMsg.className = 'ai-msg';
-        botMsg.innerText = 'Thinking...';
-        list.appendChild(botMsg);
-        list.scrollTop = list.scrollHeight;
-
-        try {
-            const response = await fetch('http://localhost:3000/api/voice-assistant', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ message: text })
-            });
-
-            const data = await response.json();
-            if (data.success) {
-                botMsg.innerText = data.reply;
-                // Yahan saaf awaz wala function call ho raha hai
-                speakResponse(data.reply);
-            } else {
-                botMsg.innerText = "Error: " + data.error;
-            }
-        } catch (err) {
-            botMsg.innerText = "Server connection error.";
-        }
-        list.scrollTop = list.scrollHeight;
-    }
-
-    // Clear aur behtareen voice ke liye updated function
-    function speakResponse(text) {
-        if ('speechSynthesis' in window) {
-            window.speechSynthesis.cancel();
-            let utterance = new SpeechSynthesisUtterance(text);
-            utterance.rate = 1.0;
-            utterance.pitch = 1.0;
-
-            let voices = window.speechSynthesis.getVoices();
-            let bestVoice = voices.find(v => v.name.includes('Google') || v.name.includes('Natural') || v.lang.includes('en-US'));
-            if (bestVoice) {
-                utterance.voice = bestVoice;
-            }
-
-            window.speechSynthesis.speak(utterance);
-        }
-    }
-
-    if ('speechSynthesis' in window) {
-        window.speechSynthesis.onvoiceschanged = () => {
-            window.speechSynthesis.getVoices();
-        };
-    }
-</script>
