@@ -51,3 +51,4 @@ app.post('/api/voice-assistant', async (req, res) => {
 app.listen(3000, () => {
     console.log('Gemini AI Server running on http://localhost:3000');
 });
+module.exports = app;
