@@ -726,26 +726,37 @@ function sendToWhatsApp(event) {
     }
 
     // Clear aur behtareen voice ke liye updated function
-    function speakResponse(text) {
-        if ('speechSynthesis' in window) {
-            window.speechSynthesis.cancel();
-            let utterance = new SpeechSynthesisUtterance(text);
-            utterance.rate = 1.0;
-            utterance.pitch = 1.0;
-
-            let voices = window.speechSynthesis.getVoices();
-            let bestVoice = voices.find(v => v.name.includes('Google') || v.name.includes('Natural') || v.lang.includes('en-US'));
-            if (bestVoice) {
-                utterance.voice = bestVoice;
-            }
-
-            window.speechSynthesis.speak(utterance);
-        }
-    }
-
+   function speakResponse(text) {
     if ('speechSynthesis' in window) {
-        window.speechSynthesis.onvoiceschanged = () => {
-            window.speechSynthesis.getVoices();
-        };
+        window.speechSynthesis.cancel(); // Purani awaaz ko stop karne ke liye
+
+        let utterance = new SpeechSynthesisUtterance(text);
+        utterance.rate = 0.9;  // Thodi slow aur clear speech
+        utterance.pitch = 1.0; // Normal natural pitch
+
+        let voices = window.speechSynthesis.getVoices();
+
+        // High Quality / Natural voices filter karna
+        let bestVoice = voices.find(v => 
+            v.name.includes('Google US English') || 
+            v.name.includes('Microsoft Zira') || 
+            v.name.includes('Natural') || 
+            (v.lang === 'en-US' && v.name.includes('Google'))
+        );
+
+        // Agar specific clear voice mil jaye toh apply karein
+        if (bestVoice) {
+            utterance.voice = bestVoice;
+        }
+
+        window.speechSynthesis.speak(utterance);
     }
+}
+
+// Voices ko ready rakhne ke liye listener
+if ('speechSynthesis' in window) {
+    window.speechSynthesis.onvoiceschanged = () => {
+        window.speechSynthesis.getVoices();
+    };
+}
 </script>
