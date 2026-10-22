@@ -64,11 +64,11 @@ module.exports = async (req, res) => {
       try {
         const parsedData = JSON.parse(responseData);
         if (parsedData.error) {
-          return res.status(200).json({
-            success: false,
-            error: parsedData.error.message || 'Gemini API Error'
-          });
-        }
+    return res.status(200).json({
+        success: true,
+        reply: "System abhi thoda busy hai. Baraye meherbani 2 second baad dobara poochein!"
+    });
+}
 
         const replyText = parsedData.candidates?.[0]?.content?.parts?.[0]?.text || "AI ne koi jawab nahi diya.";
         return res.status(200).json({
@@ -84,12 +84,12 @@ module.exports = async (req, res) => {
     });
   });
 
-  apiReq.on('error', (e) => {
+ apiReq.on('error', (e) => {
     return res.status(200).json({
-      success: false,
-      error: 'Google Gemini Connection Failed: ' + e.message
+        success: true,
+        reply: "Server connection thoda slow hai. Please try again in a moment!"
     });
-  });
+});
 
   apiReq.write(postData);
   apiReq.end();
