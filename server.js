@@ -1,7 +1,6 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
-const { GoogleGenAI } = require('@google/genai');
 
 const app = express();
 
@@ -9,58 +8,50 @@ app.use(cors());
 app.use(express.static(__dirname));
 app.use(express.json());
 
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
-
 app.post('/api/voice-assistant', async (req, res) => {
     try {
         const userQuery = req.body.message || req.body.query || "Hello";
+        const apiKey = process.env.GEMINI_API_KEY;
 
-        const systemPrompt = `
-        Tum 'CyberHub' (Cyber Academy) website ke official AI Assistant ho. 
-        Tumhe is website ki har cheez aur folders ke baray mein mukammal malumat hai:
-        - Yeh website cybersecurity education, training, aur digital solutions provide karti hai.
-        - Isme main files aur pages hain: home.html (main dashboard & hero section), services.html, about.html, courses.html, contact.html, aur enjoyment.html.
-        - Iska design modern dark tactical command center aur sci-fi style par mabni hai.
-        - Founder/owner Mr. Zubair Khan hain.
-        
-        Rules:
-        1. Tumne kisi bhi user se website ka link ya naam nahi maangna, kyunki yeh tum khud ho aur sab jaante ho.
-        2. Tumne sirf CyberHub aur iske pages/features ke baray mein jawab dena hai.
-        3. Agar koi aam ya gair-mutalliq sawal pooche, toh polite tareeqay se mana kar dena.
-        `;
+        if (!apiKey) {
+            return res.json({ success: true, reply: "Error: GEMINI_API_KEY missing in .env" });
+        }
 
-        const response = await ai.models.generateContent({
-            model: 'gemini-1.5-flash',
-            contents: [
-                { role: 'user', parts: [{ text: userQuery }] }
-            ],
-            config: {
-                systemInstruction: systemPrompt,
-                temperature: 0.7,
-                maxOutputTokens: 250
-            }
+        const systemPrompt = `Tum 'CyberHub' website ke official AI assistant ho. CyberHub cybersecurity education aur digital solutions provide karta hai. Owner Mr. Zubair Khan hain. User ke har alag sawaal ka mukammal, naya aur accurate jawab do.`;
+
+        // Direct fetch request to Gemini API (No SDK version mismatch issues)
+        const apiResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                contents: [{ parts: [{ text: userQuery }] }],
+                system_instruction: { parts: [{ text: systemPrompt }] }
+            })
         });
 
-        // SDK ke mutabiq text extract karne ka sahi tareeqa
-        const replyText = response.text || "Hello! CyberHub mein aapka swagat hai. Main aapki kya madad kar sakta hoon?";
+        const data = await apiResponse.json();
 
-        res.json({ 
-            success: true, 
-            reply: replyText 
-        });
+        if (data.error) {
+            return res.json({ success: true, reply: "Gemini Error: " + data.error.message });
+        }
+
+        const replyText = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+
+        if (replyText) {
+            return res.json({ success: true, reply: replyText });
+        } else {
+            return res.json({ success: true, reply: "Main CyberHub AI hoon, farmayein kya madad karoon?" });
+        }
 
     } catch (error) {
-        console.error('Server Error Detail:', error);
-        res.status(200).json({ 
-            success: true, 
-            reply: "Server Error: " + (error.message || 'AI processing failed') 
-        });
+        console.error('Server Error:', error);
+        res.json({ success: true, reply: "Server Error: " + error.message });
     }
 });
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-    console.log(`Gemini AI Server running on port ${PORT}`);
+    console.log(`Server running on http://localhost:${PORT}`);
 });
 
 module.exports = app;
