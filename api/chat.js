@@ -1,10 +1,10 @@
 const https = require('https');
 
-async function makeGeminiRequest(apiKey, postData, retries = 2) {
+async function makeGeminiRequest(apiKey, postData) {
     return new Promise((resolve, reject) => {
         const options = {
             hostname: 'generativelanguage.googleapis.com',
-            path: `/v1beta/models/gemini-3.8-flash:generateContent?key=${apiKey}`,
+            path: `/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -15,13 +15,9 @@ async function makeGeminiRequest(apiKey, postData, retries = 2) {
         const req = https.request(options, (res) => {
             let responseData = '';
             res.on('data', (chunk) => { responseData += chunk; });
-            res.on('end', async () => {
+            res.on('end', () => {
                 try {
                     const parsed = JSON.parse(responseData);
-                    if (parsed.error && retries > 0) {
-                        await new Promise(r => setTimeout(r, 1500));
-                        return resolve(await makeGeminiRequest(apiKey, postData, retries - 1));
-                    }
                     resolve(parsed);
                 } catch (e) {
                     reject(e);
@@ -58,11 +54,11 @@ module.exports = async (req, res) => {
     if (!apiKey) {
         return res.status(200).json({
             success: true,
-            reply: "Vercel Environment Variables mein GEMINI_API_KEY missing hai."
+            reply: "Vercel Environment Variables mein GEMINI_API_KEY add nahi hai. Baraye meherbani API key check karein."
         });
     }
 
-    const systemPrompt = "Tum 'CyberHub' (Cyber Academy) website ke official AI Assistant ho. Tumhe is website ki har cheez aur folders ke baray mein mukammal malumat hai: Yeh website cybersecurity education, training, aur digital solutions provide karti hai. Isme main files hain: home.html, services.html, about.html, courses.html, contact.html. Founder/owner Mr. Zubair Khan hain. Rules: 1. Greeting Rule: Jab bhi user 'Hello', 'Hi', ya 'Hey' bheje, tumne full introduction dena hai: 'Hello! CyberHub mein aapka swagat hai. Main CyberHub ka official AI assistant hoon. CyberHub cybersecurity education, training, aur digital solutions provide karta hai. Main aapki CyberHub ke courses, services, ya owner profile (Mr. Zubair Khan) ke baare mein kya madad kar sakta hoon?' 2. Scope Rule: Tumne SIRF aur SIRF CyberHub website aur iske owner (Mr. Zubair Khan) ke baare mein jawab dena hai. 3. Out of Topic Rule: Agar user CyberHub ke ilawa koi bhi aam sawaal pooche, toh seedha yeh jawab do: 'Main CyberHub ka official AI assistant hoon. Main sirf CyberHub aur iske services/courses ke baare mein malumat de sakta hoon.' 4. Friendly aur Roman Urdu mein fast jawab do.";
+    const systemPrompt = "Tum 'CyberHub' (Cyber Academy) website ke official AI Assistant ho. CyberHub cybersecurity education, training, courses, aur digital solutions provide karta hai. Main pages: home.html, services.html, about.html, courses.html, contact.html. Founder/owner Mr. Zubair Khan hain. Rules: 1. User ke har sawaal ka specific aur alag jawab do. 2. Hello/Hi par poora introductory welcome message do. 3. Sirf CyberHub ke baare mein baat karo. Outside topics par mana kar do.";
 
     const postData = JSON.stringify({
         contents: [{
@@ -72,13 +68,21 @@ module.exports = async (req, res) => {
             parts: [{ text: systemPrompt }]
         },
         generationConfig: {
-            maxOutputTokens: 150,
+            maxOutputTokens: 250,
             temperature: 0.7
         }
     });
 
     try {
         const parsedData = await makeGeminiRequest(apiKey, postData);
+        
+        if (parsedData.error) {
+            return res.status(200).json({
+                success: true,
+                reply: `API Error: ${parsedData.error.message || 'Gemini API issue'}`
+            });
+        }
+
         const replyText = parsedData?.candidates?.[0]?.content?.parts?.[0]?.text;
 
         if (replyText) {
@@ -89,13 +93,13 @@ module.exports = async (req, res) => {
         } else {
             return res.status(200).json({
                 success: true,
-                reply: "Hello! CyberHub mein aapka swagat hai. Main CyberHub ka official AI assistant hoon. Main aapki CyberHub ke courses, services, ya owner profile ke baare mein kya madad kar sakta hoon?"
+                reply: "CyberHub mein aapka swagat hai! Main aap ki courses, services aur owner details ke baray mein kya madad kar sakta hoon?"
             });
         }
     } catch (err) {
         return res.status(200).json({
             success: true,
-            reply: "Hello! CyberHub mein aapka swagat hai. Main CyberHub ka official AI assistant hoon. Aap CyberHub ke baare mein kya poochna chahte hain?"
+            reply: "Server connect karne mein masla aa raha hai. Baraye meherbani thodi der baad try karein."
         });
     }
 };
