@@ -4,14 +4,13 @@ async function makeGeminiRequest(apiKey, postData) {
     return new Promise((resolve, reject) => {
         const options = {
             hostname: 'generativelanguage.googleapis.com',
-            path: `/v1/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
+            path: `/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'Content-Length': Buffer.byteLength(postData)
             }
         };
-
         const req = https.request(options, (res) => {
             let responseData = '';
             res.on('data', (chunk) => { responseData += chunk; });
@@ -30,7 +29,6 @@ async function makeGeminiRequest(apiKey, postData) {
         req.end();
     });
 }
-
 module.exports = async (req, res) => {
     res.setHeader('Access-Control-Allow-Credentials', true);
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -47,24 +45,23 @@ module.exports = async (req, res) => {
     } catch (e) {
         body = {};
     }
-
     const userQuery = body.message || body.query || body.userQuery || "Hello";
     const apiKey = process.env.GEMINI_API_KEY;
 
     if (!apiKey) {
         return res.status(200).json({
             success: true,
-            reply: "Vercel Environment Variables mein GEMINI_API_KEY add nahi hai."
+            reply: "Vercel Environment Variables mein GEMINI_API_KEY missing hai."
         });
     }
 
-    const systemPrompt = "Tum 'CyberHub' (Cyber Academy) website ke official AI Assistant ho. CyberHub cybersecurity education, training, aur digital solutions provide karta hai. Founder Mr. Zubair Khan hain. Rules: 1. Har sawaal ka alag aur sahi jawab do. 2. Hello/Hi par poora intro do. 3. Sirf CyberHub ke baare mein baat karo.";
+    const systemPrompt = "Tum 'CyberHub' (Cyber Academy) website ke official AI Assistant ho. CyberHub cybersecurity education, training, aur digital solutions provide karta hai. Isme main pages hain: home.html, services.html, about.html, courses.html, contact.html. Founder/owner Mr. Zubair Khan hain. Rules: 1. User ke har alag sawaal ka mukammal aur accurate jawab do. 2. Hello/Hi par welcome intro do. 3. Sirf CyberHub ke baare mein baat karo.";
 
     const postData = JSON.stringify({
         contents: [{
             parts: [{ text: userQuery }]
         }],
-        systemInstruction: {
+        system_instruction: {
             parts: [{ text: systemPrompt }]
         },
         generationConfig: {
@@ -79,10 +76,9 @@ module.exports = async (req, res) => {
         if (parsedData.error) {
             return res.status(200).json({
                 success: true,
-                reply: "Hello! CyberHub mein aapka swagat hai. Main CyberHub ka official AI assistant hoon. Main aapki kya madad kar sakta hoon?"
+                reply: "Gemini API Error: " + parsedData.error.message
             });
         }
-
         const replyText = parsedData?.candidates?.[0]?.content?.parts?.[0]?.text;
 
         if (replyText) {
@@ -93,13 +89,13 @@ module.exports = async (req, res) => {
         } else {
             return res.status(200).json({
                 success: true,
-                reply: "Hello! CyberHub mein aapka swagat hai. Main CyberHub ka official AI assistant hoon."
+                reply: "CyberHub assistant active hai. Aap apna sawaal pooch sakte hain!"
             });
         }
     } catch (err) {
         return res.status(200).json({
             success: true,
-            reply: "Hello! CyberHub mein aapka swagat hai. Main CyberHub ka official AI assistant hoon. Aap CyberHub ke baare mein kya poochna chahte hain?"
+            reply: "Connection error: " + err.message
         });
     }
 };
