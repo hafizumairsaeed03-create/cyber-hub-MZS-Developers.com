@@ -704,13 +704,12 @@ function sendToWhatsApp(event) {
         list.appendChild(botMsg);
         list.scrollTop = list.scrollHeight;
 
-        try {
-            // Localhost ki jagah apna live backend URL dein
-const response = await fetch('https://YOUR-LIVE-BACKEND-URL.vercel.app/api/voice-assistant', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ message: text })
-});
+try {
+    const response = await fetch('/api/voice-assistant', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: text })
+    });
 
             const data = await response.json();
             if (data.success) {
