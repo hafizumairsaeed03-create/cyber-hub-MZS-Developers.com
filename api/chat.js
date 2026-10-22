@@ -74,14 +74,18 @@ module.exports = async (req, res) => {
     2. Tumne sirf CyberHub aur iske pages/features ke baray mein jawab dena hai.
     3. User ke har sawaal ka friendly aur accurate jawab do.
     `;
-  const postData = JSON.stringify({
-        contents: [{
-            parts: [{ text: userQuery }]
-        }],
-        systemInstruction: {
-            parts: [{ text: systemPrompt }]
-        }
-    });
+ const postData = JSON.stringify({
+    contents: [{
+        parts: [{ text: userQuery }]
+    }],
+    systemInstruction: {
+        parts: [{ text: systemPrompt }]
+    },
+    generationConfig: {
+        maxOutputTokens: 150,
+        temperature: 0.7
+    }
+});
 
     try {
         const parsedData = await makeGeminiRequest(apiKey, postData);
