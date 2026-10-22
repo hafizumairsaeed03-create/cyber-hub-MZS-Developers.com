@@ -18,35 +18,23 @@ module.exports = async (req, res) => {
         const apiKey = process.env.GEMINI_API_KEY;
 
         if (!apiKey) {
-            return res.json({ success: true, reply: "Error: Vercel environment variables mein GEMINI_API_KEY missing hai!" });
+            return res.json({ success: true, reply: "CRITICAL ERROR: Vercel environment variables mein GEMINI_API_KEY set nahi hai!" });
         }
-
-        const systemPrompt = `
-        Tum 'CyberHub' (Cyber Academy) website ke official AI Assistant ho. 
-        Tumhe is website ki har cheez aur folders ke baray mein mukammal malumat hai:
-        - Yeh website cybersecurity education, training, aur digital solutions provide karti hai.
-        - Isme main files aur pages hain: home.html (main dashboard & hero section), services.html, about.html, courses.html, contact.html, aur enjoyment.html.
-        - Iska design modern dark tactical command center aur sci-fi style par mabni hai.
-        - Founder/owner Mr. Zubair Khan hain.
-        
-        Rules:
-        1. Jab bhi koi Hello, Hi ya website ka intro pooche, toh CyberHub ka mukammal, shandar aur professional introduction do (mentioning cybersecurity training, digital solutions, founder Mr. Zubair Khan, aur main pages).
-        2. User ke har sawaal ka mukammal, naya aur accurate jawab do. Sirf CyberHub ke baray mein baat karo.
-        `;
 
         const apiResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 contents: [{ parts: [{ text: userQuery }] }],
-                system_instruction: { parts: [{ text: systemPrompt }] }
+                system_instruction: { parts: [{ text: "Tum CyberHub ke official AI assistant ho. Har sawaal ka naya jawab do." }] }
             })
         });
 
         const data = await apiResponse.json();
 
+        // Agar Google API ki taraf se koi error aaya ho
         if (data.error) {
-            return res.json({ success: true, reply: "Gemini Error: " + data.error.message });
+            return res.json({ success: true, reply: "Google API Error: " + data.error.message });
         }
 
         const replyText = data?.candidates?.[0]?.content?.parts?.[0]?.text;
@@ -54,13 +42,11 @@ module.exports = async (req, res) => {
         if (replyText) {
             return res.json({ success: true, reply: replyText });
         } else {
-            return res.json({ 
-                success: true, 
-                reply: "Hello! Main CyberHub ka official AI assistant hoon. Mr. Zubair Khan ki banai gayi is platform par aapko cybersecurity education aur digital solutions milte hain. Main aapki kya madad kar sakta hoon?" 
-            });
+            // Agar text na mile toh poora raw JSON print karwa do taake asal waja pata chale
+            return res.json({ success: true, reply: "RAW DEBUG DATA: " + JSON.stringify(data) });
         }
 
     } catch (error) {
-        return res.json({ success: true, reply: "Server Error: " + error.message });
+        return res.json({ success: true, reply: "Server Catch Error: " + error.message });
     }
 };
