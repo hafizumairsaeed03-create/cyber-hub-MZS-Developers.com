@@ -627,60 +627,7 @@ function sendToWhatsApp(event) {
 </html>
 
 <style>
-   #ai-floating-widget {
-    position: fixed;
-    top: 80px;         /* Isse widget screen ke upar shift ho jayega */
-    right: 30px;       /* Upar right-side par set ho jayega */
-    z-index: 99999;
-    font-family: Arial, sans-serif;
-}
-    #ai-toggle-btn {
-        width: 60px;
-        height: 60px;
-        border-radius: 50%;
-        background: #2563eb;
-        color: #ffffff;
-        border: none;
-        font-size: 18px;
-        font-weight: bold;
-        cursor: pointer;
-        box-shadow: 0 4px 15px rgba(37, 99, 235, 0.4);
-    }
-    #ai-chat-box {
-        position: absolute;
-        bottom: 75px;
-        right: 0;
-        width: 320px;
-        background: #1e293b;
-        border: 1px solid #334155;
-        border-radius: 12px;
-        box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-        display: flex;
-        flex-direction: column;
-        overflow: hidden;
-    }
-    .ai-box-hidden { display: none !important; }
-    .ai-box-header {
-        background: #0f172a;
-        color: #38bdf8;
-        padding: 12px 15px;
-        font-weight: bold;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        border-bottom: 1px solid #334155;
-    }
-    .ai-close-btn { background: transparent; border: none; color: #94a3b8; cursor: pointer; }
-    .ai-messages-list { padding: 12px; max-height: 200px; overflow-y: auto; font-size: 13px; color: #e2e8f0; }
-    .ai-msg { margin: 5px 0; background: #334155; padding: 8px 12px; border-radius: 8px; }
-    .ai-msg-user { background: #2563eb; text-align: right; }
-    .ai-input-container { display: flex; padding: 10px; background: #0f172a; gap: 5px; }
-    .ai-input-container input { flex: 1; padding: 8px; background: #1e293b; border: 1px solid #475569; color: #ffffff; border-radius: 6px; outline: none; }
-    .ai-input-container button { background: #2563eb; color: white; border: none; padding: 8px 12px; border-radius: 6px; cursor: pointer; }
-</style>
-
-<script>
-    function toggleAIChat() {
+ function toggleAIChat() {
         document.getElementById('ai-chat-box').classList.toggle('ai-box-hidden');
     }
 
@@ -704,12 +651,12 @@ function sendToWhatsApp(event) {
         list.appendChild(botMsg);
         list.scrollTop = list.scrollHeight;
 
-try {
-  const response = await fetch('/api/chat', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ message: text })
-});
+        try {
+            const response = await fetch('http://localhost:3000/api/voice-assistant', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message: text })
+            });
 
             const data = await response.json();
             if (data.success) {
@@ -726,37 +673,26 @@ try {
     }
 
     // Clear aur behtareen voice ke liye updated function
-function speakResponse(text) {
-    if ('speechSynthesis' in window) {
-        window.speechSynthesis.cancel(); // Purani awaaz ko stop karne ke liye
+    function speakResponse(text) {
+        if ('speechSynthesis' in window) {
+            window.speechSynthesis.cancel();
+            let utterance = new SpeechSynthesisUtterance(text);
+            utterance.rate = 1.0;
+            utterance.pitch = 1.0;
 
-        let utterance = new SpeechSynthesisUtterance(text);
-        utterance.rate = 0.9;  // Thodi slow aur clear speech
-        utterance.pitch = 1.0; // Normal natural pitch
+            let voices = window.speechSynthesis.getVoices();
+            let bestVoice = voices.find(v => v.name.includes('Google') || v.name.includes('Natural') || v.lang.includes('en-US'));
+            if (bestVoice) {
+                utterance.voice = bestVoice;
+            }
 
-        let voices = window.speechSynthesis.getVoices();
-
-        // High Quality / Natural voices filter karna
-        let bestVoice = voices.find(v => 
-            v.name.includes('Google US English') || 
-            v.name.includes('Microsoft Zira') || 
-            v.name.includes('Natural') || 
-            (v.lang === 'en-US' && v.name.includes('Google'))
-        );
-
-        // Agar specific clear voice mil jaye toh apply karein
-        if (bestVoice) {
-            utterance.voice = bestVoice;
+            window.speechSynthesis.speak(utterance);
         }
-
-        window.speechSynthesis.speak(utterance);
     }
-}
 
-// Voices ko ready rakhne ke liye listener
-if ('speechSynthesis' in window) {
-    window.speechSynthesis.onvoiceschanged = () => {
-        window.speechSynthesis.getVoices();
-    };
-}
+    if ('speechSynthesis' in window) {
+        window.speechSynthesis.onvoiceschanged = () => {
+            window.speechSynthesis.getVoices();
+        };
+    }
 </script>
