@@ -1,34 +1,3 @@
-const https = require('https');
-
-async function makeGeminiRequest(apiKey, postData) {
-    return new Promise((resolve, reject) => {
-        const options = {
-            hostname: 'generativelanguage.googleapis.com',
-            path: `/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Content-Length': Buffer.byteLength(postData)
-            }
-        };
-        const req = https.request(options, (res) => {
-            let responseData = '';
-            res.on('data', (chunk) => { responseData += chunk; });
-            res.on('end', () => {
-                try {
-                    const parsed = JSON.parse(responseData);
-                    resolve(parsed);
-                } catch (e) {
-                    reject(e);
-                }
-            });
-        });
-
-        req.on('error', (e) => reject(e));
-        req.write(postData);
-        req.end();
-    });
-}
 module.exports = async (req, res) => {
     res.setHeader('Access-Control-Allow-Credentials', true);
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -45,41 +14,49 @@ module.exports = async (req, res) => {
     } catch (e) {
         body = {};
     }
+
     const userQuery = body.message || body.query || body.userQuery || "Hello";
     const apiKey = process.env.GEMINI_API_KEY;
 
     if (!apiKey) {
         return res.status(200).json({
             success: true,
-            reply: "Vercel Environment Variables mein GEMINI_API_KEY missing hai."
+            reply: "GEMINI_API_KEY environment variable missing hai."
         });
     }
 
-    const systemPrompt = "Tum 'CyberHub' (Cyber Academy) website ke official AI Assistant ho. CyberHub cybersecurity education, training, aur digital solutions provide karta hai. Isme main pages hain: home.html, services.html, about.html, courses.html, contact.html. Founder/owner Mr. Zubair Khan hain. Rules: 1. User ke har alag sawaal ka mukammal aur accurate jawab do. 2. Hello/Hi par welcome intro do. 3. Sirf CyberHub ke baare mein baat karo.";
-
-    const postData = JSON.stringify({
-        contents: [{
-            parts: [{ text: userQuery }]
-        }],
-        system_instruction: {
-            parts: [{ text: systemPrompt }]
-        },
-        generationConfig: {
-            maxOutputTokens: 250,
-            temperature: 0.7
-        }
-    });
+    const systemPrompt = "Tum 'CyberHub' (Cyber Academy) website ke official AI Assistant ho. CyberHub cybersecurity education, training, aur digital solutions provide karta hai. Founder Mr. Zubair Khan hain. Rules: 1. User ke har alag sawaal ka mukammal, naya aur accurate jawab do. 2. Hello/Hi par introduction do. 3. Sirf CyberHub ke baare mein baat karo.";
 
     try {
-        const parsedData = await makeGeminiRequest(apiKey, postData);
+        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                contents: [{
+                    parts: [{ text: userQuery }]
+                }],
+                system_instruction: {
+                    parts: [{ text: systemPrompt }]
+                },
+                generationConfig: {
+                    maxOutputTokens: 250,
+                    temperature: 0.7
+                }
+            })
+        });
 
-        if (parsedData.error) {
+        const data = await response.json();
+
+        if (data.error) {
             return res.status(200).json({
                 success: true,
-                reply: "Gemini API Error: " + parsedData.error.message
+                reply: "API Error: " + data.error.message
             });
         }
-        const replyText = parsedData?.candidates?.[0]?.content?.parts?.[0]?.text;
+
+        const replyText = data?.candidates?.[0]?.content?.parts?.[0]?.text;
 
         if (replyText) {
             return res.status(200).json({
@@ -95,7 +72,7 @@ module.exports = async (req, res) => {
     } catch (err) {
         return res.status(200).json({
             success: true,
-            reply: "Connection error: " + err.message
+            reply: "Server error: " + err.message
         });
     }
 };
