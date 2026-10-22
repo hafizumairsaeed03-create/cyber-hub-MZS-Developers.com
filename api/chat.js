@@ -1,78 +1,96 @@
+const https = require('https');
+
 module.exports = async (req, res) => {
-    res.setHeader('Access-Control-Allow-Credentials', true);
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
-    res.setHeader('Access-Control-Allow-Headers', 'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version');
+  res.setHeader('Access-Control-Allow-Credentials', true);
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET,OPTIONS,PATCH,DELETE,POST,PUT');
+  res.setHeader(
+    'Access-Control-Allow-Headers',
+    'X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version'
+  );
 
-    if (req.method === 'OPTIONS') {
-        return res.status(200).end();
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
+
+  let body = {};
+  try {
+    if (req.body) {
+      body = typeof req.body === 'string' ? JSON.parse(req.body) : req.body;
     }
+  } catch (e) {
+    body = {};
+  }
 
-    let body = {};
-    try {
-        body = typeof req.body === 'string' ? JSON.parse(req.body) : (req.body || {});
-    } catch (e) {
-        body = {};
+  const userQuery = body.message || body.query || body.userQuery || "Hello";
+  const apiKey = process.env.GEMINI_API_KEY;
+
+  if (!apiKey) {
+    return res.status(200).json({ 
+      success: false, 
+      error: 'Vercel Environment Variables mein GEMINI_API_KEY missing hai.' 
+    });
+  }
+
+  const systemPrompt = "Tum 'CyberHub' (Cyber Academy) ke official AI Assistant ho. Short aur polite jawab do.";
+
+  const postData = JSON.stringify({
+    contents: [
+      {
+        role: "user",
+        parts: [{ text: `${systemPrompt}\n\nUser Question: ${userQuery}` }]
+      }
+    ]
+  });
+
+  const options = {
+    hostname: 'generativelanguage.googleapis.com',
+    path: `/v1beta/models/gemini-3.8-flash:generateContent?key=${apiKey}`,
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Content-Length': Buffer.byteLength(postData)
     }
+  };
 
-    const userQuery = body.message || body.query || body.userQuery || "Hello";
-    const apiKey = process.env.GEMINI_API_KEY;
+  const apiReq = https.request(options, (apiRes) => {
+    let responseData = '';
 
-    if (!apiKey) {
+    apiRes.on('data', (chunk) => {
+      responseData += chunk;
+    });
+
+    apiRes.on('end', () => {
+      try {
+        const parsedData = JSON.parse(responseData);
+        if (parsedData.error) {
+    return res.status(200).json({
+        success: true,
+        reply: "System abhi thoda busy hai. Baraye meherbani 2 second baad dobara poochein!"
+    });
+}
+
+        const replyText = parsedData.candidates?.[0]?.content?.parts?.[0]?.text || "AI ne koi jawab nahi diya.";
         return res.status(200).json({
-            success: true,
-            reply: "GEMINI_API_KEY environment variable missing hai."
+          success: true,
+          reply: replyText
         });
-    }
-
-    const systemPrompt = "Tum 'CyberHub' (Cyber Academy) website ke official AI Assistant ho. CyberHub cybersecurity education, training, aur digital solutions provide karta hai. Founder Mr. Zubair Khan hain. Rules: 1. User ke har alag sawaal ka mukammal, naya aur accurate jawab do. 2. Hello/Hi par introduction do. 3. Sirf CyberHub ke baare mein baat karo.";
-
-    try {
-        const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({
-                contents: [{
-                    parts: [{ text: userQuery }]
-                }],
-                system_instruction: {
-                    parts: [{ text: systemPrompt }]
-                },
-                generationConfig: {
-                    maxOutputTokens: 250,
-                    temperature: 0.7
-                }
-            })
-        });
-
-        const data = await response.json();
-
-        if (data.error) {
-            return res.status(200).json({
-                success: true,
-                reply: "API Error: " + data.error.message
-            });
-        }
-
-        const replyText = data?.candidates?.[0]?.content?.parts?.[0]?.text;
-
-        if (replyText) {
-            return res.status(200).json({
-                success: true,
-                reply: replyText
-            });
-        } else {
-            return res.status(200).json({
-                success: true,
-                reply: "CyberHub assistant active hai. Aap apna sawaal pooch sakte hain!"
-            });
-        }
-    } catch (err) {
+      } catch (e) {
         return res.status(200).json({
-            success: true,
-            reply: "Server error: " + err.message
+          success: false,
+          error: 'Response JSON Parse Error'
         });
-    }
+      }
+    });
+  });
+
+ apiReq.on('error', (e) => {
+    return res.status(200).json({
+        success: true,
+        reply: "Server connection thoda slow hai. Please try again in a moment!"
+    });
+});
+
+  apiReq.write(postData);
+  apiReq.end();
 };
