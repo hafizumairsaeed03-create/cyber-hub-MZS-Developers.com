@@ -34,16 +34,19 @@ module.exports = async (req, res) => {
         3. Do not ask for website link/name because you are embedded directly inside CyberHub.
         `;
 
-        // FIXED MODEL NAME TO gemini-3.8-flash:
-        const apiResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${apiKey}`, {
+      const apiResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${apiKey}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 contents: [{ parts: [{ text: userQuery }] }],
-                system_instruction: { parts: [{ text: systemPrompt }] }
+                system_instruction: { parts: [{ text: systemPrompt }] },
+                // Response speed ko fast karne ke liye generationConfig add karein:
+                generationConfig: {
+                    maxOutputTokens: 150, // Chota answer fast generate hoga
+                    temperature: 0.7
+                }
             })
         });
-
         const data = await apiResponse.json();
 
         if (data.error) {
