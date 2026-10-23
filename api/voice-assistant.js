@@ -29,12 +29,13 @@ module.exports = async (req, res) => {
         - Main pages: home.html, services.html, about.html, courses.html, contact.html, enjoyment.html.
         
         Rules:
-        1. Always speak politely, professionally, and keep answers concise and crisp so Web Speech API can speak it smoothly.
+        1. Always speak politely, professionally, and keep answers concise so Web Speech API can speak it smoothly.
         2. Give full details about CyberHub, its training programs, and founder Mr. Zubair Khan when greeted or asked.
         3. Do not ask for website link/name because you are embedded directly inside CyberHub.
         `;
 
-        const apiResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
+        // FIXED API ENDPOINT MODEL NAME HERE:
+        const apiResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
