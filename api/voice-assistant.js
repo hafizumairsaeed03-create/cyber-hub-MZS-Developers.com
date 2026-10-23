@@ -18,29 +18,25 @@ module.exports = async (req, res) => {
         const apiKey = process.env.GEMINI_API_KEY;
 
         if (!apiKey) {
-            return res.json({ success: true, reply: "Error: Vercel Environment Variables mein GEMINI_API_KEY Missing hai!" });
+            return res.json({ success: true, reply: "Error: GEMINI_API_KEY missing!" });
         }
 
         const systemPrompt = `
-        Tum 'CyberHub' (Cyber Academy) website ke official AI Assistant ho. 
-        Tumhe is website ki har cheez aur pages ke baray mein mukammal malumat hai:
-        - Yeh website cybersecurity education, training, aur digital solutions provide karti hai.
-        - Founder aur Owner Mr. Zubair Khan hain.
-        - Main pages: home.html, services.html, about.html, courses.html, contact.html, enjoyment.html.
-        
-        Rules:
-        1. Always speak politely, professionally, and keep answers concise so Web Speech API can speak it smoothly.
-        2. Give full details about CyberHub, its training programs, and founder Mr. Zubair Khan when greeted or asked.
-        3. Do not ask for website link/name because you are embedded directly inside CyberHub.
+        Tum 'CyberHub' (Cyber Academy) ke official AI Assistant ho.
+        Founder: Mr. Zubair Khan.
+        STRICT RULE: Sirf 1 chota aur short sentence mein jawab do. Fast speed boht zaroori hai.
         `;
 
-     // FIXED MODEL NAME TO gemini-3.8-flash:
-        const apiResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${apiKey}`, {
+        const apiResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 contents: [{ parts: [{ text: userQuery }] }],
-                system_instruction: { parts: [{ text: systemPrompt }] }
+                system_instruction: { parts: [{ text: systemPrompt }] },
+                generationConfig: {
+                    maxOutputTokens: 60, // Boht chota response = Super Fast Processing
+                    temperature: 0.5
+                }
             })
         });
 
@@ -57,7 +53,7 @@ module.exports = async (req, res) => {
         } else {
             return res.json({ 
                 success: true, 
-                reply: "Hello! Main CyberHub ka official AI assistant hoon. Mr. Zubair Khan ki banai gayi is platform par aapka swagat hai. Main aapki kya madad kar sakta hoon?" 
+                reply: "CyberHub mein aapka swagat hai!" 
             });
         }
 
