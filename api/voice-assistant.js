@@ -62,3 +62,11 @@ module.exports = async (req, res) => {
         return res.json({ success: true, reply: "Server Error: " + error.message });
     }
 };
+{
+  "functions": {
+    "api/*.js": {
+      "memory": 1024,
+      "maxDuration": 10
+    }
+  }
+}
