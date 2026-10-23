@@ -18,23 +18,35 @@ module.exports = async (req, res) => {
         const apiKey = process.env.GEMINI_API_KEY;
 
         if (!apiKey) {
-            return res.json({ success: true, reply: "CRITICAL ERROR: Vercel environment variables mein GEMINI_API_KEY set nahi hai!" });
+            return res.json({ success: true, reply: "Error: GEMINI_API_KEY missing in Environment Variables!" });
         }
+
+        const systemPrompt = `
+        Tum 'CyberHub' (Cyber Academy) website ke official AI Assistant ho. 
+        Tumhe is website ki har cheez aur pages ke baray mein mukammal malumat hai:
+        - Yeh website cybersecurity education, training, aur digital solutions provide karti hai.
+        - Founder aur Owner Mr. Zubair Khan hain.
+        - Main pages: home.html, services.html, about.html, courses.html, contact.html, enjoyment.html.
+        
+        Rules:
+        1. Always speak politely, professionally, and keep answers concise and crisp so Web Speech API can speak it smoothly.
+        2. Give full details about CyberHub, its training programs, and founder Mr. Zubair Khan when greeted or asked.
+        3. Do not ask for website link/name because you are embedded directly inside CyberHub.
+        `;
 
         const apiResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 contents: [{ parts: [{ text: userQuery }] }],
-                system_instruction: { parts: [{ text: "Tum CyberHub ke official AI assistant ho. Har sawaal ka naya jawab do." }] }
+                system_instruction: { parts: [{ text: systemPrompt }] }
             })
         });
 
         const data = await apiResponse.json();
 
-        // Agar Google API ki taraf se koi error aaya ho
         if (data.error) {
-            return res.json({ success: true, reply: "Google API Error: " + data.error.message });
+            return res.json({ success: true, reply: "Gemini Error: " + data.error.message });
         }
 
         const replyText = data?.candidates?.[0]?.content?.parts?.[0]?.text;
@@ -42,11 +54,13 @@ module.exports = async (req, res) => {
         if (replyText) {
             return res.json({ success: true, reply: replyText });
         } else {
-            // Agar text na mile toh poora raw JSON print karwa do taake asal waja pata chale
-            return res.json({ success: true, reply: "RAW DEBUG DATA: " + JSON.stringify(data) });
+            return res.json({ 
+                success: true, 
+                reply: "Hello! Main CyberHub ka official AI assistant hoon. Mr. Zubair Khan ki banai gayi is platform par aapka swagat hai. Main aapki kya madad kar sakta hoon?" 
+            });
         }
 
     } catch (error) {
-        return res.json({ success: true, reply: "Server Catch Error: " + error.message });
+        return res.json({ success: true, reply: "Server Error: " + error.message });
     }
 };
