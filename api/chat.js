@@ -18,7 +18,7 @@ module.exports = async (req, res) => {
         const apiKey = process.env.GEMINI_API_KEY;
 
         if (!apiKey) {
-            return res.json({ success: true, reply: "Error: Vercel environment variables mein GEMINI_API_KEY Missing hai!" });
+            return res.json({ success: true, reply: "Error: Vercel Environment Variables mein GEMINI_API_KEY Missing hai!" });
         }
 
         const systemPrompt = `
@@ -34,8 +34,8 @@ module.exports = async (req, res) => {
         3. Do not ask for website link/name because you are embedded directly inside CyberHub.
         `;
 
-        // Updated working model endpoint
-        const apiResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
+        // FIXED MODEL NAME TO gemini-3.8-flash:
+        const apiResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${apiKey}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
