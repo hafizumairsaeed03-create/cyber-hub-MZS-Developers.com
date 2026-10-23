@@ -14,20 +14,24 @@ module.exports = async (req, res) => {
             body = JSON.parse(body);
         }
         
-        const userQuery = body?.message || body?.query || "Hello";
+        // Dynamic query check (message ya query dono accept karega)
+        const userQuery = body?.message || body?.query || req.query?.message || "Hello";
         const apiKey = process.env.GEMINI_API_KEY;
 
         if (!apiKey) {
-            return res.json({ success: true, reply: "Error: GEMINI_API_KEY missing!" });
+            return res.json({ success: true, reply: "GEMINI_API_KEY Missing in Vercel!" });
         }
 
         const systemPrompt = `
         Tum 'CyberHub' (Cyber Academy) ke official AI Assistant ho.
-        Founder: Mr. Zubair Khan.
-        STRICT RULE: Sirf 1 short sentence mein jawab do. Fast speed boht zaroori hai.
+        Founder aur Owner: Mr. Zubair Khan.
+        
+        Rules:
+        1. User ke poocha gaya sawal ka direct aur accurate jawab do.
+        2. Sirf tab hi "CyberHub mein aapka swagat hai" kaho jab user "Hello" ya greeting kare. Baaki sawalon par unka specific jawab do.
+        3. Jawab concise aur short rakho (1-2 sentences) taake fast response aaye.
         `;
 
-        // FIXED: Endpoint name restored to gemini-3.8-flash
         const apiResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${apiKey}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -35,38 +39,28 @@ module.exports = async (req, res) => {
                 contents: [{ parts: [{ text: userQuery }] }],
                 system_instruction: { parts: [{ text: systemPrompt }] },
                 generationConfig: {
-                    maxOutputTokens: 60, // Short response = Instant Fast Speed
-                    temperature: 0.5
+                    maxOutputTokens: 100,
+                    temperature: 0.7
                 }
             })
         });
 
         const data = await apiResponse.json();
 
+        // Agar Google API se koi error aaye to real error show ho
         if (data.error) {
-            return res.json({ success: true, reply: "Gemini Error: " + data.error.message });
+            return res.json({ success: true, reply: "API Error: " + data.error.message });
         }
 
         const replyText = data?.candidates?.[0]?.content?.parts?.[0]?.text;
 
         if (replyText) {
-            return res.json({ success: true, reply: replyText });
+            return res.json({ success: true, reply: replyText.trim() });
         } else {
-            return res.json({ 
-                success: true, 
-                reply: "CyberHub mein aapka swagat hai!" 
-            });
+            return res.json({ success: true, reply: "Main aapki CyberHub ke hawale se kya madad kar sakta hoon?" });
         }
 
     } catch (error) {
         return res.json({ success: true, reply: "Server Error: " + error.message });
     }
 };
-{
-  "functions": {
-    "api/*.js": {
-      "memory": 1024,
-      "maxDuration": 10
-    }
-  }
-}
