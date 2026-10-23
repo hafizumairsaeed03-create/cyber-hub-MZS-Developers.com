@@ -749,38 +749,66 @@ function sendToWhatsApp(event) {
     list.scrollTop = list.scrollHeight;
 }
 
-    // Clear aur behtareen voice ke liye updated function
-   function speakResponse(text) {
+  // Web Speech API Voice Synthesis Function
+function speakResponse(text) {
     if ('speechSynthesis' in window) {
-        window.speechSynthesis.cancel(); // Purani awaaz ko stop karne ke liye
-
-        let utterance = new SpeechSynthesisUtterance(text);
-        utterance.rate = 0.9;  // Thodi slow aur clear speech
-        utterance.pitch = 1.0; // Normal natural pitch
-
-        let voices = window.speechSynthesis.getVoices();
-
-        // High Quality / Natural voices filter karna
-        let bestVoice = voices.find(v => 
-            v.name.includes('Google US English') || 
-            v.name.includes('Microsoft Zira') || 
-            v.name.includes('Natural') || 
-            (v.lang === 'en-US' && v.name.includes('Google'))
-        );
-
-        // Agar specific clear voice mil jaye toh apply karein
-        if (bestVoice) {
-            utterance.voice = bestVoice;
+        window.speechSynthesis.cancel(); // Stop any ongoing speech
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.rate = 1.0;
+        utterance.pitch = 1.0;
+        
+        // Voice selection (Preferred English or Accent)
+        const voices = window.speechSynthesis.getVoices();
+        if (voices.length > 0) {
+            utterance.voice = voices.find(v => v.lang.includes('en')) || voices[0];
         }
-
+        
         window.speechSynthesis.speak(utterance);
     }
 }
 
-// Voices ko ready rakhne ke liye listener
-if ('speechSynthesis' in window) {
-    window.speechSynthesis.onvoiceschanged = () => {
-        window.speechSynthesis.getVoices();
-    };
+async function sendAIMessage() {
+    const input = document.getElementById('ai-user-input');
+    const list = document.getElementById('ai-messages');
+    if (!input || !list) return;
+    
+    const text = input.value.trim();
+    if (!text) return;
+
+    // Display User Message
+    const userMsg = document.createElement('p');
+    userMsg.className = 'ai-msg ai-msg-user';
+    userMsg.innerText = text;
+    list.appendChild(userMsg);
+    input.value = '';
+    list.scrollTop = list.scrollHeight;
+
+    // Display Thinking Status
+    const botMsg = document.createElement('p');
+    botMsg.className = 'ai-msg';
+    botMsg.innerText = 'Thinking...';
+    list.appendChild(botMsg);
+    list.scrollTop = list.scrollHeight;
+
+    try {
+        const response = await fetch('/api/voice-assistant', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ message: text })
+        });
+
+        const data = await response.json();
+
+        if (data && data.reply) {
+            botMsg.innerText = data.reply;
+            speakResponse(data.reply); // Auto Generate & Speak Voice
+        } else {
+            botMsg.innerText = "Response parse error.";
+        }
+    } catch (err) {
+        botMsg.innerText = "Connection error.";
+    }
+
+    list.scrollTop = list.scrollHeight;
 }
 </script>
