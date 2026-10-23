@@ -12,19 +12,23 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
 
-    body {
+   body {
     min-height: 100vh;
     width: 100vw;
     overflow: hidden;
     background-color: #000;
     background-image: url('logo.jpg');
-    background-size: cover;
-    background-position: center;
+    
+    /* Cover ki jagah 'contain' use karein taake poori image screen par fit aaye aur cut na ho */
+    background-size: contain; 
+    
+    /* Image ko screen ke bilkul center mein aligned rakhne ke liye */
+    background-position: center; 
+    
     background-repeat: no-repeat;
     color: #ffffff;
     position: relative;
 }
-
         .bottom-content {
             position: absolute;
             bottom: 30px;
