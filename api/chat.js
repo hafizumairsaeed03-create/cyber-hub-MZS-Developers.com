@@ -14,7 +14,6 @@ module.exports = async (req, res) => {
             body = JSON.parse(body);
         }
         
-        // Dynamic query check (message ya query dono accept karega)
         const userQuery = body?.message || body?.query || req.query?.message || "Hello";
         const apiKey = process.env.GEMINI_API_KEY;
 
@@ -47,7 +46,6 @@ module.exports = async (req, res) => {
 
         const data = await apiResponse.json();
 
-        // Agar Google API se koi error aaye to real error show ho
         if (data.error) {
             return res.json({ success: true, reply: "API Error: " + data.error.message });
         }
