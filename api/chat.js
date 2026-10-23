@@ -14,11 +14,11 @@ module.exports = async (req, res) => {
             body = JSON.parse(body);
         }
         
-        const userQuery = body?.message || body?.query || req.query?.message || "Hello";
+        const userQuery = body?.message || body?.query || "Hello";
         const apiKey = process.env.GEMINI_API_KEY;
 
         if (!apiKey) {
-            return res.json({ success: true, reply: "GEMINI_API_KEY Missing in Vercel!" });
+            return res.json({ success: true, reply: "Error: GEMINI_API_KEY Vercel environment variables mein missing hai!" });
         }
 
         const systemPrompt = `
@@ -26,9 +26,9 @@ module.exports = async (req, res) => {
         Founder aur Owner: Mr. Zubair Khan.
         
         Rules:
-        1. User ke poocha gaya sawal ka direct aur accurate jawab do.
-        2. Sirf tab hi "CyberHub mein aapka swagat hai" kaho jab user "Hello" ya greeting kare. Baaki sawalon par unka specific jawab do.
-        3. Jawab concise aur short rakho (1-2 sentences) taake fast response aaye.
+        1. User ke sawaal ka direct, dynamic, aur accurate jawab do.
+        2. CyberHub, courses, services aur Mr. Zubair Khan ke baare mein sahi information do.
+        3. Response 1-2 sentences mein short aur fast rakho.
         `;
 
         const apiResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${apiKey}`, {
