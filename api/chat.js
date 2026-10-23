@@ -24,17 +24,18 @@ module.exports = async (req, res) => {
         const systemPrompt = `
         Tum 'CyberHub' (Cyber Academy) ke official AI Assistant ho.
         Founder: Mr. Zubair Khan.
-        STRICT RULE: Sirf 1 chota aur short sentence mein jawab do. Fast speed boht zaroori hai.
+        STRICT RULE: Sirf 1 short sentence mein jawab do. Fast speed boht zaroori hai.
         `;
 
-        const apiResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
+        // FIXED: Endpoint name restored to gemini-3.8-flash
+        const apiResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${apiKey}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 contents: [{ parts: [{ text: userQuery }] }],
                 system_instruction: { parts: [{ text: systemPrompt }] },
                 generationConfig: {
-                    maxOutputTokens: 60, // Boht chota response = Super Fast Processing
+                    maxOutputTokens: 60, // Short response = Instant Fast Speed
                     temperature: 0.5
                 }
             })
