@@ -31,19 +31,18 @@ module.exports = async (req, res) => {
         3. Response direct, clear, aur helpful rakho.
         `;
 
-        const apiResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${apiKey}`, {
+       const apiResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 contents: [{ parts: [{ text: userQuery }] }],
                 system_instruction: { parts: [{ text: systemPrompt }] },
                 generationConfig: {
-                    maxOutputTokens: 200, // Fixed: Sentence ab bich mein nahi katega
+                    maxOutputTokens: 200,
                     temperature: 0.7
                 }
             })
         });
-
         const data = await apiResponse.json();
 
         if (data.error) {
