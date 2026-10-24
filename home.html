@@ -683,10 +683,10 @@ function sendToWhatsApp(event) {
     function toggleAIChat() {
         document.getElementById('ai-chat-box').classList.toggle('ai-box-hidden');
     }
-
+JavaScript
 async function sendAIMessage() {
-    const input = document.getElementById('ai-user-input'); // Aapke input box ki ID
-    const list = document.getElementById('ai-messages');    // Aapke message list ki ID
+    const input = document.getElementById('ai-user-input');
+    const list = document.getElementById('ai-messages');
     if (!input || !list) return;
     
     const text = input.value.trim();
@@ -700,7 +700,21 @@ async function sendAIMessage() {
     input.value = '';
     list.scrollTop = list.scrollHeight;
 
-    // 2. Thinking message
+    const lowerText = text.toLowerCase();
+
+    // 2. Instant Greetings (0 Second Delay)
+    if (['hello', 'hi', 'hey', 'aoa', 'assalam o alaikum', 'hy'].includes(lowerText)) {
+        const botMsg = document.createElement('div');
+        botMsg.className = 'ai-msg';
+        const fullIntro = "Hello! Main CyberHub ka official AI Assistant hoon. Mr. Zubair Khan ki is platform par aapka swagat hai. Main aapki kya madad kar sakta hoon?";
+        botMsg.innerText = fullIntro;
+        list.appendChild(botMsg);
+        list.scrollTop = list.scrollHeight;
+        if (typeof speakResponse === 'function') speakResponse(fullIntro);
+        return;
+    }
+
+    // 3. Loading Indicator
     const botMsg = document.createElement('div');
     botMsg.className = 'ai-msg';
     botMsg.innerText = 'Thinking...';
@@ -708,7 +722,6 @@ async function sendAIMessage() {
     list.scrollTop = list.scrollHeight;
 
     try {
-        // Backend Vercel API call (No API key in frontend!)
         const response = await fetch('/api/chat', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -719,14 +732,12 @@ async function sendAIMessage() {
 
         if (data.reply) {
             botMsg.innerText = data.reply;
-            if (typeof speakResponse === 'function') {
-                speakResponse(data.reply);
-            }
+            if (typeof speakResponse === 'function') speakResponse(data.reply);
         } else {
-            botMsg.innerText = "Error: Answer nahi mil saka.";
+            botMsg.innerText = "CyberHub ke hawale se aap kya poochna chahte hain?";
         }
     } catch (err) {
-        botMsg.innerText = "Server response error. Please try again.";
+        botMsg.innerText = "Server connection issue. Please try again.";
     }
 
     list.scrollTop = list.scrollHeight;
