@@ -720,16 +720,9 @@ async function sendAIMessage() {
     botMsg.innerText = 'Thinking...';
     list.appendChild(botMsg);
     list.scrollTop = list.scrollHeight;
-
-   // Jab user message send kare
 async function handleUserMessage(text) {
     if (!text.trim()) return;
-  try {
-            const response = await fetch('http://localhost:3000/api/voice-assistant', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ message: text })
-            });
+
     // 1. User message ko chat mein append karein
     appendUserMessage(text);
     inputField.value = "";
@@ -741,7 +734,7 @@ async function handleUserMessage(text) {
     list.appendChild(botMsg);
     list.scrollTop = list.scrollHeight;
 
-    // 3. SMART LOCAL ANSWERS (Zero Delay & Zero Server Error)
+    // 3. SMART LOCAL ANSWERS (Zero Delay)
     const queryLower = text.toLowerCase().trim();
     let instantReply = "";
 
@@ -755,15 +748,15 @@ async function handleUserMessage(text) {
         instantReply = "Hello! Main CyberHub ka official AI Assistant hoon. Mr. Zubair Khan ki is platform par aapka swagat hai. Main aapki kya madad kar sakta hoon?";
     }
 
-    // Agar instant local jawab mil jaye, toh foran dikha do (No Server Call Needed!)
+    // Agar local answer mil gaya, toh foran dikha kar function yahin khatam kar do (Buttons block nahi honge!)
     if (instantReply) {
         botMsg.innerText = instantReply;
         if (typeof speakResponse === 'function') speakResponse(instantReply);
         list.scrollTop = list.scrollHeight;
-        return;
+        return; 
     }
 
-    // 4. Agar koi aur sawal ho toh API call karein (Fallback)
+    // 4. Agar local answer na ho, tab API call karein
     try {
         const response = await fetch('/api/chat', {
             method: 'POST',
@@ -780,7 +773,6 @@ async function handleUserMessage(text) {
             botMsg.innerText = "Main CyberHub ke hawale se aapki kya madad kar sakta hoon?";
         }
     } catch (err) {
-        // Agar server error bhi aaye toh friendly response de do, error show mat karo
         botMsg.innerText = "Main CyberHub ka assistant hoon, aap mujhse website ya courses ke baray mein pooch sakte hain!";
     }
 
