@@ -18,7 +18,7 @@ module.exports = async (req, res) => {
         const apiKey = process.env.GEMINI_API_KEY;
 
         if (!apiKey) {
-            return res.json({ success: true, reply: "GEMINI_API_KEY Missing!" });
+            return res.json({ success: true, reply: "GEMINI_API_KEY Missing in Vercel!" });
         }
 
         const systemPrompt = `
@@ -26,12 +26,13 @@ module.exports = async (req, res) => {
         Founder aur Owner: Mr. Zubair Khan.
         
         Rules:
-        1. Agar user "hello" ya greeting kare, toh complete intro do: "Hello! Main CyberHub ka official AI Assistant hoon. Mr. Zubair Khan ki is platform par aapka swagat hai. Main aapki kya madad kar sakta hoon?"
-        2. Baki sawaalon par CyberHub, courses, aur services ka accurate aur fast jawab do.
-        3. Response direct, clear, aur helpful rakho.
+        1. User ke sawaal ka direct, dynamic, aur accurate jawab do.
+        2. CyberHub, courses, aur services ke baare mein sahi information do.
+        3. Response 1-2 sentences mein short aur fast rakho.
         `;
-        
-const apiResponse = await fetch(`https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
+
+        // v1beta endpoint with gemini-1.5-flash
+        const apiResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
@@ -43,6 +44,7 @@ const apiResponse = await fetch(`https://generativelanguage.googleapis.com/v1/mo
                 }
             })
         });
+
         const data = await apiResponse.json();
 
         if (data.error) {
@@ -54,7 +56,7 @@ const apiResponse = await fetch(`https://generativelanguage.googleapis.com/v1/mo
         if (replyText) {
             return res.json({ success: true, reply: replyText.trim() });
         } else {
-            return res.json({ success: true, reply: "Hello! Main CyberHub ka official AI Assistant hoon. Mr. Zubair Khan ki is platform par aapka swagat hai. Main aapki kya madad kar sakta hoon?" });
+            return res.json({ success: true, reply: "Main aapki CyberHub ke hawale se kya madad kar sakta hoon?" });
         }
 
     } catch (error) {
