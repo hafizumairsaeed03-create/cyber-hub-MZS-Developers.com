@@ -2,12 +2,11 @@
 <html>
 <head>
     <title>Initialization</title>
-    <!-- CSS Files Link -->
     <link rel="stylesheet" type="text/css" href="initialization.css">
 </head>
 <body>
 
-    <!-- Background Video (playsinline & preload added for instant mobile video stream) -->
+    <!-- Background Video -->
     <video id="bg-video" autoplay muted loop playsinline preload="auto" class="bg-video">
         <source src="wr.mp4" type="video/mp4">
     </video>
@@ -17,30 +16,31 @@
         <source src="welcome.mp3" type="audio/mpeg">
     </audio>
 
-    <!-- Synchronized Script -->
     <script>
         const video = document.getElementById('bg-video');
         const audio = document.getElementById('welcome-audio');
 
-        function playAudioAndVideo() {
-            // Video play karein
-            video.play().catch(e => console.log("Video autoplay blocked:", e));
-            
-            // Audio tab hi chalayein jab video ready ho jaye
-            audio.play().catch(error => {
-                console.log("Autoplay block hua, user interaction chahiye:", error);
-            });
+        let isPlayed = false;
+
+        function startMedia() {
+            if (isPlayed) return;
+            isPlayed = true;
+
+            // Video & Audio Play
+            video.play().catch(e => console.log("Video error:", e));
+            audio.play().catch(e => console.log("Audio error:", e));
         }
 
-        // Check jab video load ho kar display hone ke liye ready ho
-        if (video.readyState >= 3) {
-            playAudioAndVideo();
-        } else {
-            // Video buffer hone ke baad dono exact same millisecond par chalenge
-            video.addEventListener('canplaythrough', playAudioAndVideo, { once: true });
-        }
+        // 1. Agar video fast load ho jaye to foran chala do
+        video.addEventListener('loadeddata', startMedia);
 
-        // 25 seconds baad home page par redirect
+        // 2. FALLBACK: Agar slow net ki waja se video 1.5 second mein load na ho, tab bhi zabardasti start kar do
+        setTimeout(startMedia, 1500);
+
+        // User click fallback (Agar browser autoplay block kar de)
+        document.addEventListener('click', startMedia, { once: true });
+
+        // 25 Seconds Redirection
         setTimeout(function() {
             window.location.href = "home.html";
         }, 25000);
