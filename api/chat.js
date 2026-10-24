@@ -1,3 +1,4 @@
+JavaScript
 module.exports = async (req, res) => {
     res.setHeader('Access-Control-Allow-Credentials', true);
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -15,51 +16,48 @@ module.exports = async (req, res) => {
         }
         
         const userQuery = body?.message || body?.query || "Hello";
-        const apiKey = process.env.GEMINI_API_KEY;
+        const queryLower = userQuery.toLowerCase().trim();
 
-        if (!apiKey) {
-            return res.json({ success: true, reply: "GEMINI_API_KEY Missing in Vercel!" });
+        // 1. CUSTOM ANSWERS (Aap yahan apni marzi ke jitne marzi sawal aur jawab add kar sakte hain!)
+        if (queryLower.includes('website kis baray') || queryLower.includes('cyberhub') || queryLower.includes('about')) {
+            return res.json({ success: true, reply: "Yeh CyberHub ek advanced digital solutions aur cyber academy platform hai, jahan modern tech aur security services provide ki jati hain!" });
+        } 
+        if (queryLower.includes('founder') || queryLower.includes('owner') || queryLower.includes('zubair')) {
+            return res.json({ success: true, reply: "Is amazing platform ke founder aur owner Mr. Zubair Khan hain." });
+        } 
+        if (queryLower.includes('hello') || queryLower.includes('salam') || queryLower.includes('hi')) {
+            return res.json({ success: true, reply: "Hello! Main CyberHub ka AI Assistant hoon, bataiye main aapki kya madad kar sakta hoon?" });
         }
 
-        const systemPrompt = `
-        Tum 'CyberHub' (Cyber Academy) ke official AI Assistant ho.
-        Founder aur Owner: Mr. Zubair Khan.
-        
-        Rules:
-        1. User ke sawaal ka direct, dynamic, aur accurate jawab do.
-        2. CyberHub, courses, aur services ke baare mein sahi information do.
-        3. Response 1-2 sentences mein short aur fast rakho.
-        `;
+        // 2. GEMINI API CALL (Agar custom match na ho toh AI API call karega)
+        const apiKey = process.env.GEMINI_API_KEY;
+        if (!apiKey) {
+            return res.json({ success: true, reply: "CyberHub Assistant active hai! (API Key missing hai)" });
+        }
 
-        // v1beta endpoint with gemini-1.5-flash
+        const systemPrompt = `Tum 'CyberHub' (Cyber Academy) ke official AI Assistant ho. Founder: Mr. Zubair Khan. Sawal ka short aur accurate jawab do.`;
+
         const apiResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 contents: [{ parts: [{ text: userQuery }] }],
                 system_instruction: { parts: [{ text: systemPrompt }] },
-                generationConfig: {
-                    maxOutputTokens: 200,
-                    temperature: 0.7
-                }
+                generationConfig: { maxOutputTokens: 200, temperature: 0.7 }
             })
         });
 
         const data = await apiResponse.json();
-
-        if (data.error) {
-            return res.json({ success: true, reply: "API Error: " + data.error.message });
-        }
-
         const replyText = data?.candidates?.[0]?.content?.parts?.[0]?.text;
 
         if (replyText) {
             return res.json({ success: true, reply: replyText.trim() });
         } else {
-            return res.json({ success: true, reply: "Main aapki CyberHub ke hawale se kya madad kar sakta hoon?" });
+            return res.json({ success: true, reply: "Main CyberHub ke hawale se aapki kya madad kar sakta hoon?" });
         }
 
     } catch (error) {
-        return res.json({ success: true, reply: "Server Error: " + error.message });
+        // Agar API error de toh apna custom friendly message bhej do taake user ko error show na ho
+        return res.json({ success: true, reply: "Main CyberHub ka assistant hoon, aap mujhse website ya courses ke baray mein pooch sakte hain!" });
     }
 };
