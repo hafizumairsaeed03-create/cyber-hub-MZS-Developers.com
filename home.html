@@ -724,7 +724,12 @@ async function sendAIMessage() {
    // Jab user message send kare
 async function handleUserMessage(text) {
     if (!text.trim()) return;
-
+  try {
+            const response = await fetch('http://localhost:3000/api/voice-assistant', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message: text })
+            });
     // 1. User message ko chat mein append karein
     appendUserMessage(text);
     inputField.value = "";
