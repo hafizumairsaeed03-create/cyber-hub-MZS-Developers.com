@@ -18,7 +18,7 @@ module.exports = async (req, res) => {
         const apiKey = process.env.GEMINI_API_KEY;
 
         if (!apiKey) {
-            return res.json({ success: true, reply: "Error: GEMINI_API_KEY Vercel environment variables mein missing hai!" });
+            return res.json({ success: true, reply: "GEMINI_API_KEY Missing!" });
         }
 
         const systemPrompt = `
@@ -26,9 +26,9 @@ module.exports = async (req, res) => {
         Founder aur Owner: Mr. Zubair Khan.
         
         Rules:
-        1. User ke sawaal ka direct, dynamic, aur accurate jawab do.
-        2. CyberHub, courses, services aur Mr. Zubair Khan ke baare mein sahi information do.
-        3. Response 1-2 sentences mein short aur fast rakho.
+        1. Agar user "hello" ya greeting kare, toh complete intro do: "Hello! Main CyberHub ka official AI Assistant hoon. Mr. Zubair Khan ki is platform par aapka swagat hai. Main aapki kya madad kar sakta hoon?"
+        2. Baki sawaalon par CyberHub, courses, aur services ka accurate aur fast jawab do.
+        3. Response direct, clear, aur helpful rakho.
         `;
 
         const apiResponse = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-3.8-flash:generateContent?key=${apiKey}`, {
@@ -38,7 +38,7 @@ module.exports = async (req, res) => {
                 contents: [{ parts: [{ text: userQuery }] }],
                 system_instruction: { parts: [{ text: systemPrompt }] },
                 generationConfig: {
-                    maxOutputTokens: 100,
+                    maxOutputTokens: 200, // Fixed: Sentence ab bich mein nahi katega
                     temperature: 0.7
                 }
             })
@@ -55,7 +55,7 @@ module.exports = async (req, res) => {
         if (replyText) {
             return res.json({ success: true, reply: replyText.trim() });
         } else {
-            return res.json({ success: true, reply: "Main aapki CyberHub ke hawale se kya madad kar sakta hoon?" });
+            return res.json({ success: true, reply: "Hello! Main CyberHub ka official AI Assistant hoon. Mr. Zubair Khan ki is platform par aapka swagat hai. Main aapki kya madad kar sakta hoon?" });
         }
 
     } catch (error) {
