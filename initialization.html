@@ -1,37 +1,48 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Initialization
-    </title>
+    <title>Initialization</title>
     <!-- CSS Files Link -->
     <link rel="stylesheet" type="text/css" href="initialization.css">
-    
 </head>
 <body>
 
-    <!-- Background Video -->
-    <video autoplay muted loop class="bg-video">
+    <!-- Background Video (playsinline & preload added for instant mobile video stream) -->
+    <video id="bg-video" autoplay muted loop playsinline preload="auto" class="bg-video">
         <source src="wr.mp4" type="video/mp4">
     </video>
 
     <!-- Welcome Voice Audio -->
-    <audio id="welcome-audio" autoplay>
+    <audio id="welcome-audio" preload="auto">
         <source src="welcome.mp3" type="audio/mpeg">
     </audio>
 
-    <!-- 25 Seconds Redirection Script -->
+    <!-- Synchronized Script -->
     <script>
-        // Page load hote hi voice play karne ke liye
-        window.addEventListener('DOMContentLoaded', () => {
-            const audio = document.getElementById('welcome-audio');
+        const video = document.getElementById('bg-video');
+        const audio = document.getElementById('welcome-audio');
+
+        function playAudioAndVideo() {
+            // Video play karein
+            video.play().catch(e => console.log("Video autoplay blocked:", e));
+            
+            // Audio tab hi chalayein jab video ready ho jaye
             audio.play().catch(error => {
                 console.log("Autoplay block hua, user interaction chahiye:", error);
             });
-        });
+        }
 
-        // 25 seconds (25000ms) baad next page par jane ke liye
+        // Check jab video load ho kar display hone ke liye ready ho
+        if (video.readyState >= 3) {
+            playAudioAndVideo();
+        } else {
+            // Video buffer hone ke baad dono exact same millisecond par chalenge
+            video.addEventListener('canplaythrough', playAudioAndVideo, { once: true });
+        }
+
+        // 25 seconds baad home page par redirect
         setTimeout(function() {
-            window.location.href = "home.html"; // Apne next page ka naam likhein
+            window.location.href = "home.html";
         }, 25000);
     </script>
 
