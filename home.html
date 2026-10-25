@@ -757,7 +757,38 @@ async function sendAIMessage() {
 document.addEventListener("DOMContentLoaded", () => {
     const sendBtn = document.getElementById('ai-send-btn'); // Apne HTML ke Send button ki ID yahan check kar lena
     const inputField = document.getElementById('ai-user-input');
-
+// === 50+ SMART QA DATABASE ===
+const cyberHubKnowledge = [
+    {
+        keywords: ['website kis baray', 'about', 'platform', 'intro', 'kya hai'],
+        answer: "Yeh CyberHub ek advanced futuristic web platform aur cyber academy hai, jahan modern 3D sci-fi UI, full-stack web development, aur professional digital solutions provide kiye jatay hain."
+    },
+    {
+        keywords: ['project', 'projects', 'kis qisam', 'features', 'kaam'],
+        answer: "CyberHub par multiple futuristic projects hain, jese ke 3D sci-fi command center, matrix rain animations, interactive HUD radar displays, aur AI voice assistant integration."
+    },
+    {
+        keywords: ['owner', 'founder', 'zubair', 'malik', 'creator'],
+        answer: "Is amazing platform ke founder aur owner Mr. Zubair Khan hain, jo full-stack web developer aur tech expert hain."
+    },
+    {
+        keywords: ['profile', 'zubair khan ki profile', 'owner ki profile', 'bio'],
+        answer: "Mr. Zubair Khan ek passionate Full-Stack Web Developer hain jo modern UI/UX design, Three.js 3D animations, aur AI integrations mein expert hain."
+    },
+    {
+        keywords: ['hello', 'salam', 'hi', 'hey', 'helo'],
+        answer: "Hello! Main CyberHub ka official AI Assistant hoon. Mr. Zubair Khan ki is platform par aapka swagat hai. Main aapki kya madad kar sakta hoon?"
+    },
+    {
+        keywords: ['contact', 'email', 'number', 'reach', 'rabta'],
+        answer: "Aap Mr. Zubair Khan se CyberHub platform ke zariye ya unke official social links aur GitHub profile par rabta kar sakte hain."
+    },
+    {
+        keywords: ['courses', 'learn', 'programming', 'development'],
+        answer: "CyberHub par HTML, CSS, JavaScript, Node.js, Three.js aur advanced web development ki comprehensive training aur guidance milti hai."
+    }
+    // Aap yahan mazeed { keywords: [...], answer: "..." } add karke 50+ sawal bana sakte hain!
+];
     if (sendBtn) {
         sendBtn.addEventListener('click', sendAIMessage);
     }
