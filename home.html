@@ -692,7 +692,7 @@ async function sendAIMessage() {
     if (!input || !input.value.trim()) return;
 
     const text = input.value.trim();
-    input.value = ""; // Input box clear kar dein
+    input.value = ""; 
 
     // 1. User message chat mein add karein
     const userMsg = document.createElement('div');
@@ -700,24 +700,24 @@ async function sendAIMessage() {
     userMsg.innerText = text;
     list.appendChild(userMsg);
 
-    // 2. Loading indicator ("Thinking...") show karein
+    // 2. Loading indicator ("Thinking...")
     const botMsg = document.createElement('div');
     botMsg.className = 'ai-msg';
     botMsg.innerText = 'Thinking...';
     list.appendChild(botMsg);
     list.scrollTop = list.scrollHeight;
 
-   // 3. Smart Local Database Check (0 Delay)
+    // === YAHAN PAR LAGANA HAI APNA LOCAL CHECK ===
     let instantReply = findLocalAnswer(text);
 
     if (instantReply) {
         botMsg.innerText = instantReply;
         if (typeof speakResponse === 'function') speakResponse(instantReply);
         list.scrollTop = list.scrollHeight;
-        return; // Yahin rok do, API par jane ki zaroorat nahi!
+        return; // Agar local jawab mil gaya toh yahin rok do!
     }
 
-    // 4. Agar local answer na ho, tab API call karein
+    // 3. Agar local match na ho, tab API call karein (Fallback)
     try {
         const response = await fetch('/api/chat', {
             method: 'POST',
