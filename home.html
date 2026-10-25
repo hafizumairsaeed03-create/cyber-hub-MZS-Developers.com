@@ -692,7 +692,7 @@ async function sendAIMessage() {
     if (!input || !input.value.trim()) return;
 
     const text = input.value.trim();
-    input.value = ""; 
+    input.value = ""; // Input box clear kar dein
 
     // 1. User message chat mein add karein
     const userMsg = document.createElement('div');
@@ -700,31 +700,42 @@ async function sendAIMessage() {
     userMsg.innerText = text;
     list.appendChild(userMsg);
 
-    // 2. Loading indicator ("Thinking...")
+    // 2. Loading indicator ("Thinking...") show karein
     const botMsg = document.createElement('div');
     botMsg.className = 'ai-msg';
     botMsg.innerText = 'Thinking...';
     list.appendChild(botMsg);
     list.scrollTop = list.scrollHeight;
 
-    // === YAHAN PAR LAGANA HAI APNA LOCAL CHECK ===
-    let instantReply = findLocalAnswer(text);
+    // 3. Smart Local Answers (Zero Delay & Zero Error)
+    const queryLower = text.toLowerCase().trim();
+    let instantReply = "";
 
+    if (queryLower.includes('website') || queryLower.includes('cyberhub') || queryLower.includes('baray') || queryLower.includes('about')) {
+        instantReply = "Yeh CyberHub ek advanced digital solutions aur cyber academy platform hai, jahan modern tech aur security services provide ki jati hain!";
+    } 
+    else if (queryLower.includes('founder') || queryLower.includes('owner') || queryLower.includes('zubair') || queryLower.includes('malik')) {
+        instantReply = "Is amazing platform ke founder aur owner Mr. Zubair Khan hain.";
+    } 
+    else if (queryLower.includes('hello') || queryLower.includes('salam') || queryLower.includes('hi') || queryLower.includes('hey') || queryLower.includes('helo')) {
+        instantReply = "Hello! Main CyberHub ka official AI Assistant hoon. Mr. Zubair Khan ki is platform par aapka swagat hai. Main aapki kya madad kar sakta hoon?";
+    }
+
+    // Agar local jawab mil jaye toh yahin rokh do aur foran dikha do
     if (instantReply) {
         botMsg.innerText = instantReply;
         if (typeof speakResponse === 'function') speakResponse(instantReply);
         list.scrollTop = list.scrollHeight;
-        return; // Agar local jawab mil gaya toh yahin rok do!
+        return;
     }
 
-    // 3. Agar local match na ho, tab API call karein (Fallback)
+    // 4. Agar local answer na ho, tab API call karein
     try {
         const response = await fetch('/api/chat', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ message: text })
         });
-        
 
         const data = await response.json();
 
@@ -746,51 +757,7 @@ async function sendAIMessage() {
 document.addEventListener("DOMContentLoaded", () => {
     const sendBtn = document.getElementById('ai-send-btn'); // Apne HTML ke Send button ki ID yahan check kar lena
     const inputField = document.getElementById('ai-user-input');
-// === 50+ SMART QA DATABASE ===
-const cyberHubKnowledge = [
-    {
-        keywords: ['website kis baray', 'about', 'platform', 'intro', 'kya hai'],
-        answer: "Yeh CyberHub ek advanced futuristic web platform aur cyber academy hai, jahan modern 3D sci-fi UI, full-stack web development, aur professional digital solutions provide kiye jatay hain."
-    },
-    {
-        keywords: ['project', 'projects', 'kis qisam', 'features', 'kaam'],
-        answer: "CyberHub par multiple futuristic projects hain, jese ke 3D sci-fi command center, matrix rain animations, interactive HUD radar displays, aur AI voice assistant integration."
-    },
-    {
-        keywords: ['owner', 'founder', 'zubair', 'malik', 'creator'],
-        answer: "Is amazing platform ke founder aur owner Mr. Zubair Khan hain, jo full-stack web developer aur tech expert hain."
-    },
-    {
-        keywords: ['profile', 'zubair khan ki profile', 'owner ki profile', 'bio'],
-        answer: "Mr. Zubair Khan ek passionate Full-Stack Web Developer hain jo modern UI/UX design, Three.js 3D animations, aur AI integrations mein expert hain."
-    },
-    {
-        keywords: ['hello', 'salam', 'hi', 'hey', 'helo'],
-        answer: "Hello! Main CyberHub ka official AI Assistant hoon. Mr. Zubair Khan ki is platform par aapka swagat hai. Main aapki kya madad kar sakta hoon?"
-    },
-    {
-        keywords: ['contact', 'email', 'number', 'reach', 'rabta'],
-        answer: "Aap Mr. Zubair Khan se CyberHub platform ke zariye ya unke official social links aur GitHub profile par rabta kar sakte hain."
-    },
-    {
-        keywords: ['courses', 'learn', 'programming', 'development'],
-        answer: "CyberHub par HTML, CSS, JavaScript, Node.js, Three.js aur advanced web development ki comprehensive training aur guidance milti hai."
-    }
-    // Aap yahan mazeed { keywords: [...], answer: "..." } add karke 50+ sawal bana sakte hain!
-];
 
-// Local Search Function
-function findLocalAnswer(userText) {
-    const query = userText.toLowerCase().trim();
-    for (let item of cyberHubKnowledge) {
-        for (let kw of item.keywords) {
-            if (query.includes(kw)) {
-                return item.answer;
-            }
-        }
-    }
-    return null;
-}
     if (sendBtn) {
         sendBtn.addEventListener('click', sendAIMessage);
     }
@@ -803,5 +770,4 @@ function findLocalAnswer(userText) {
         });
     }
 });
-   
 </script>
