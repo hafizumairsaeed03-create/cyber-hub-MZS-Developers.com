@@ -684,48 +684,21 @@ function sendToWhatsApp(event) {
         document.getElementById('ai-chat-box').classList.toggle('ai-box-hidden');
     }
 JavaScript
+// === AI CHAT SEND FUNCTION WITH SMART LOCAL ANSWERS ===
 async function sendAIMessage() {
     const input = document.getElementById('ai-user-input');
     const list = document.getElementById('ai-messages');
-    if (!input || !list) return;
     
-    const text = input.value.trim();
-    if (!text) return;
+    if (!input || !input.value.trim()) return;
 
-    // 1. User message show karein
+    const text = input.value.trim();
+    input.value = ""; // Input box clear kar dein
+
+    // 1. User message chat mein add karein
     const userMsg = document.createElement('div');
-    userMsg.className = 'ai-msg ai-msg-user';
+    userMsg.className = 'user-msg';
     userMsg.innerText = text;
     list.appendChild(userMsg);
-    input.value = '';
-    list.scrollTop = list.scrollHeight;
-
-    const lowerText = text.toLowerCase();
-
-    // 2. Instant Greetings (0 Second Delay)
-    if (['hello', 'hi', 'hey', 'aoa', 'assalam o alaikum', 'hy'].includes(lowerText)) {
-        const botMsg = document.createElement('div');
-        botMsg.className = 'ai-msg';
-        const fullIntro = "Hello! Main CyberHub ka official AI Assistant hoon. Mr. Zubair Khan ki is platform par aapka swagat hai. Main aapki kya madad kar sakta hoon?";
-        botMsg.innerText = fullIntro;
-        list.appendChild(botMsg);
-        list.scrollTop = list.scrollHeight;
-        if (typeof speakResponse === 'function') speakResponse(fullIntro);
-        return;
-    }
-
-    // 3. Loading Indicator
-    const botMsg = document.createElement('div');
-    botMsg.className = 'ai-msg';
-    botMsg.innerText = 'Thinking...';
-    list.appendChild(botMsg);
-    list.scrollTop = list.scrollHeight;
-async function handleUserMessage(text) {
-    if (!text.trim()) return;
-
-    // 1. User message ko chat mein append karein
-    appendUserMessage(text);
-    inputField.value = "";
 
     // 2. Loading indicator ("Thinking...") show karein
     const botMsg = document.createElement('div');
@@ -734,7 +707,7 @@ async function handleUserMessage(text) {
     list.appendChild(botMsg);
     list.scrollTop = list.scrollHeight;
 
-    // 3. SMART LOCAL ANSWERS (Zero Delay)
+    // 3. Smart Local Answers (Zero Delay & Zero Error)
     const queryLower = text.toLowerCase().trim();
     let instantReply = "";
 
@@ -744,16 +717,16 @@ async function handleUserMessage(text) {
     else if (queryLower.includes('founder') || queryLower.includes('owner') || queryLower.includes('zubair') || queryLower.includes('malik')) {
         instantReply = "Is amazing platform ke founder aur owner Mr. Zubair Khan hain.";
     } 
-    else if (queryLower.includes('hello') || queryLower.includes('salam') || queryLower.includes('hi') || queryLower.includes('hey')) {
+    else if (queryLower.includes('hello') || queryLower.includes('salam') || queryLower.includes('hi') || queryLower.includes('hey') || queryLower.includes('helo')) {
         instantReply = "Hello! Main CyberHub ka official AI Assistant hoon. Mr. Zubair Khan ki is platform par aapka swagat hai. Main aapki kya madad kar sakta hoon?";
     }
 
-    // Agar local answer mil gaya, toh foran dikha kar function yahin khatam kar do (Buttons block nahi honge!)
+    // Agar local jawab mil jaye toh yahin rokh do aur foran dikha do
     if (instantReply) {
         botMsg.innerText = instantReply;
         if (typeof speakResponse === 'function') speakResponse(instantReply);
         list.scrollTop = list.scrollHeight;
-        return; 
+        return;
     }
 
     // 4. Agar local answer na ho, tab API call karein
@@ -778,4 +751,23 @@ async function handleUserMessage(text) {
 
     list.scrollTop = list.scrollHeight;
 }
+
+// === BUTTON CLICK & ENTER KEY EVENT LISTENER ===
+// Isko is function ke bilkul neechay rakh dein:
+document.addEventListener("DOMContentLoaded", () => {
+    const sendBtn = document.getElementById('ai-send-btn'); // Apne HTML ke Send button ki ID yahan check kar lena
+    const inputField = document.getElementById('ai-user-input');
+
+    if (sendBtn) {
+        sendBtn.addEventListener('click', sendAIMessage);
+    }
+
+    if (inputField) {
+        inputField.addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                sendAIMessage();
+            }
+        });
+    }
+});
 </script>
