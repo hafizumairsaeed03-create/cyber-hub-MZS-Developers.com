@@ -770,4 +770,123 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 });
+    // === 50+ SMART QA DATABASE ===
+    const cyberHubKnowledge = [
+        {
+            keywords: ['website kis baray', 'about', 'platform', 'intro', 'kya hai'],
+            answer: "Yeh CyberHub ek advanced futuristic web platform aur cyber academy hai, jahan modern 3D sci-fi UI, full-stack web development, aur professional digital solutions provide kiye jatay hain."
+        },
+        {
+            keywords: ['project', 'projects', 'kis qisam', 'features', 'kaam'],
+            answer: "CyberHub par multiple futuristic projects hain, jese ke 3D sci-fi command center, matrix rain animations, interactive HUD radar displays, aur AI voice assistant integration."
+        },
+        {
+            keywords: ['owner', 'founder', 'zubair', 'malik', 'creator'],
+            answer: "Is amazing platform ke founder aur owner Mr. Zubair Khan hain, jo full-stack web developer aur tech expert hain."
+        },
+        {
+            keywords: ['profile', 'zubair khan ki profile', 'owner ki profile', 'bio'],
+            answer: "Mr. Zubair Khan ek passionate Full-Stack Web Developer hain jo modern UI/UX design, Three.js 3D animations, aur AI integrations mein expert hain."
+        },
+        {
+            keywords: ['hello', 'salam', 'hi', 'hey', 'helo'],
+            answer: "Hello! Main CyberHub ka official AI Assistant hoon. Mr. Zubair Khan ki is platform par aapka swagat hai. Main aapki kya madad kar sakta hoon?"
+        },
+        {
+            keywords: ['contact', 'email', 'number', 'reach', 'rabta'],
+            answer: "Aap Mr. Zubair Khan se CyberHub platform ke zariye ya unke official social links aur GitHub profile par rabta kar sakte hain."
+        },
+        {
+            keywords: ['courses', 'learn', 'programming', 'development'],
+            answer: "CyberHub par HTML, CSS, JavaScript, Node.js, Three.js aur advanced web development ki comprehensive training aur guidance milti hai."
+        }
+        // Yahan aap mazeed is tarah { keywords: [...], answer: "..." } add karke 50+ sawal bana sakte hain!
+    ];
+
+    // Local Search Function
+    function findLocalAnswer(userText) {
+        const query = userText.toLowerCase().trim();
+        for (let item of cyberHubKnowledge) {
+            for (let kw of item.keywords) {
+                if (query.includes(kw)) {
+                    return item.answer;
+                }
+            }
+        }
+        return null;
+    }
+
+    // === AI CHAT SEND FUNCTION ===
+    async function sendAIMessage() {
+        const input = document.getElementById('ai-user-input');
+        const list = document.getElementById('ai-messages');
+        
+        if (!input || !input.value.trim()) return;
+
+        const text = input.value.trim();
+        input.value = ""; 
+
+        // 1. User message chat mein add karein
+        const userMsg = document.createElement('div');
+        userMsg.className = 'user-msg';
+        userMsg.innerText = text;
+        list.appendChild(userMsg);
+
+        // 2. Loading indicator ("Thinking...")
+        const botMsg = document.createElement('div');
+        botMsg.className = 'ai-msg';
+        botMsg.innerText = 'Thinking...';
+        list.appendChild(botMsg);
+        list.scrollTop = list.scrollHeight;
+
+        // 3. Smart Local Database Check (0 Delay)
+        let instantReply = findLocalAnswer(text);
+
+        if (instantReply) {
+            botMsg.innerText = instantReply;
+            if (typeof speakResponse === 'function') speakResponse(instantReply);
+            list.scrollTop = list.scrollHeight;
+            return; // Yahin rok do, API par jane ki zaroorat hi nahi!
+        }
+
+        // 4. API Fallback (Agar local match na ho)
+        try {
+            const response = await fetch('/api/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message: text })
+            });
+
+            const data = await response.json();
+
+            if (data.reply) {
+                botMsg.innerText = data.reply;
+                if (typeof speakResponse === 'function') speakResponse(data.reply);
+            } else {
+                botMsg.innerText = "Main CyberHub ke hawale se aapki kya madad kar sakta hoon?";
+            }
+        } catch (err) {
+            botMsg.innerText = "Main CyberHub ka assistant hoon, aap mujhse website ya courses ke baray mein pooch sakte hain!";
+        }
+
+        list.scrollTop = list.scrollHeight;
+    }
+
+    // === BUTTON & ENTER KEY LISTENERS ===
+    document.addEventListener("DOMContentLoaded", () => {
+        const sendBtn = document.getElementById('ai-send-btn');
+        const inputField = document.getElementById('ai-user-input');
+
+        if (sendBtn) {
+            sendBtn.addEventListener('click', sendAIMessage);
+        }
+
+        if (inputField) {
+            inputField.addEventListener('keypress', function (e) {
+                if (e.key === 'Enter') {
+                    sendAIMessage();
+                }
+            });
+        }
+    });
 </script>
